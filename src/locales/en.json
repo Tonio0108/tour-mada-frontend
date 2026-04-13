@@ -1,0 +1,506 @@
+{
+  "navbar": {
+    "brand": "Tour Mada Discovery",
+    "home": "Home",
+    "about": "About",
+    "tours": "Tours",
+    "contact": "Contact",
+    "login": "Login",
+    "logout": "Logout",
+    "admin_panel": "Admin Panel",
+    "reservations": "My bookings",
+    "payments": "My payments",
+    "profile": "My profile",
+    "user": "User",
+    "language": "Language",
+    "account": "Account",
+    "connected_as": "Logged in as",
+    "select_language" : "Choose a language"
+  },
+  "hero": {
+    "title": "Leader in Authentic Tourism in Madagascar",
+    "subtitle": "The art of traveling, exploring a new culture, experiencing authentic Malagasy life",
+    "price_per_person": "Price per person",
+    "all_prices": "All budgets",
+    "price_0_50k": "Less than 50,000 Ar",
+    "price_50_100k": "50,000 - 100,000 Ar",
+    "price_100_200k": "100,000 - 200,000 Ar",
+    "price_200_500k": "200,000 - 500,000 Ar",
+    "price_500k_plus": "More than 500,000 Ar",
+    "duration": "Duration",
+    "all_durations": "All durations",
+    "duration_1_3": "1-3 days",
+    "duration_4_7": "4-7 days",
+    "duration_8_14": "8-14 days",
+    "duration_14_plus": "More than 14 days",
+    "tour_name": "Tour name",
+    "tour_placeholder": "Ex: Isalo Park, Tsingy, Baobabs...",
+    "search": "Search"
+  },
+  "about": {
+    "title": "Who <0>are we</0>?",
+    "description": "We are a passionate local team, specialized in receptive tourism in Madagascar. Our mission is to create authentic and responsible stays, tailored to your desires.",
+    "we_offer": "We offer:",
+    "nature_tours": {
+      "title": "Nature and discovery tours",
+      "description": "Exploration of Madagascar's national parks and nature reserves"
+    },
+    "beach_stays": {
+      "title": "Beach stays and relaxation",
+      "description": "Paradise destinations: Nosy Be, Sainte-Marie, Tulear and many more"
+    },
+    "adventures": {
+      "title": "Adventures",
+      "description": "Trekking, river descents, photo safaris for thrill-seekers"
+    },
+    "cultural_travels": {
+      "title": "Cultural travels",
+      "description": "Authentic encounters with local communities and discovery of traditions"
+    },
+    "conclusion": "With <0>TOUR MADA DECOUVERTE</0> every journey is personalized and supervised by experienced guides."
+  },
+  "tour": {
+    "title": "Discover our <0>tours</0>",
+    "description": "We offer tours across various locations in Madagascar, click learn more to see information about each tour.",
+    "location": "Madagascar",
+    "days": "day",
+    "days_plural": "days",
+    "not_specified": "Not specified",
+    "default_description": "Discover the wonders of Madagascar with this exceptional tour.",
+    "video_available": "Video available",
+    "videos_count": "video",
+    "videos_count_plural": "videos",
+    "learn_more": "Learn more",
+    "view_all_tours": "View all our tours",
+    "loading": "Loading tours..."
+  },
+
+  "cta": {
+    "custom_badge": "Custom",
+    "title": "Can't find <0>the perfect tour</0>?",
+    "description": "Let's create together the adventure that perfectly matches your desires. Our team designs custom experiences to offer you a unique and memorable journey in Madagascar.",
+    "features": {
+      "itinerary": {
+        "title": "Personalized itinerary",
+        "description": "according to your preferences"
+      },
+      "budget": {
+        "title": "Adapted budget",
+        "description": "to your possibilities"
+      },
+      "guide": {
+        "title": "Private guide",
+        "description": "dedicated to your experience"
+      }
+    },
+    "card": {
+      "title": "Custom Tour",
+      "subtitle": "Design your custom adventure",
+      "button": "Create my custom tour",
+      "response_time": "Response within 24h - Free quote"
+    }
+  },
+
+  "contact": {
+    "title": "Contact us",
+    "our_info": "Our information",
+    "our_location": "Our location",
+    "address": {
+      "title": "Address",
+      "value": "Lot 25 A IV / 36 09 ATANIFOTSY IV FIANARANTSOA 301"
+    },
+    "phone": {
+      "title": "Phone / WhatsApp",
+      "value": "034 53 161 61"
+    },
+    "email": {
+      "title": "Email",
+      "value": "tourmadadecouverte@gmail.com"
+    },
+    "social": {
+      "title": "Social media",
+      "facebook": "Rado Tour Guida (Facebook)"
+    },
+    "location_description": "We are located in Fianarantsoa, a strategic city to explore the wonders of Madagascar",
+    "call_to_action": "Don't hesitate to contact us for any information request or booking",
+    "buttons": {
+      "call": "Call us",
+      "email": "Send email"
+    }
+  },
+
+  "tour_details": {
+    "loading": "Loading tour...",
+    "media": {
+      "photos": "Photos",
+      "videos": "Videos",
+      "no_media": "No media available",
+      "video_not_supported": "Your browser does not support video playback."
+    },
+    "tabs": {
+      "itinerary": "Itinerary",
+      "tips": "Tips",
+      "description": "Description"
+    },
+    "description": {
+      "title": "Detailed description"
+    },
+    "itinerary": {
+      "title": "Detailed itinerary"
+    },
+    "tips": {
+      "title": "Things to bring",
+      "no_items": "No necessary items specified.",
+      "mandatory": "Mandatory"
+    },
+    "pricing": "From {{price}} Ar/person",
+    "days": "days",
+    "book_tour": "Book this tour",
+    "admin": {
+      "options": "Options",
+      "edit": "Edit",
+      "delete": "Delete",
+      "delete_confirm": {
+        "title": "Confirm deletion",
+        "message": "Are you sure you want to delete this tour? This action is irreversible.",
+        "cancel": "Cancel",
+        "confirm": "Delete"
+      },
+      "delete_success": {
+        "title": "Tour deletion",
+        "message": "The tour has been successfully deleted."
+      }
+    }
+  },
+
+  "reservation": {
+    "title": "Reservation Form",
+    "subtitle_standard": "Tour: {{tourName}}",
+    "subtitle_custom": "Custom reservation",
+    "interest_section": "Interests",
+    "interest_label": "Tour name or interest *",
+    "interest_placeholder": "Ex: Ranomafana",
+    "personal_info": {
+      "title": "Personal information",
+      "full_name": "Full name *",
+      "email": "Email *",
+      "phone": "Phone *",
+      "address": "Address *"
+    },
+    "reservation_details": {
+      "title": "Reservation details",
+      "planned_date": "Planned date *",
+      "days_count": "Number of days *",
+      "total_people": "Total number of people *",
+      "price_per_person": "Price per person"
+    },
+    "people_distribution": {
+      "title": "People distribution",
+      "adults": "Adults (18+ years)",
+      "youth": "Youth (12-17 years)",
+      "children": "Children (-12 years)",
+      "men": "Number of men",
+      "women": "Number of women",
+      "oldest_age": "Oldest age",
+      "youngest_age": "Youngest age",
+      "sum_error": "The sum of categories ({{total}}) must equal the total number of people ({{totalPeople}})"
+    },
+    "budget": {
+      "title": "Budget",
+      "total_amount": "Total amount *",
+      "estimated_budget": "Estimated budget *",
+      "currency": "Ariary"
+    },
+    "submit_button": {
+      "confirm": "Confirm reservation",
+      "loading": "Reservation in progress...",
+      "success_standard": "Reservation successfully recorded, pending confirmation",
+      "success_custom": "Proposal and reservation successfully recorded, pending confirmation",
+      "error": "An error occurred during the reservation."
+    },
+    "placeholders": {
+      "full_name": "Your full name",
+      "email": "your@email.com",
+      "phone": "Your phone number",
+      "address": "Your complete address",
+      "days": "Duration in days",
+      "total_people": "Total number",
+      "amount": "Total amount in Ariary",
+      "budget": "Estimated budget in Ariary"
+    }
+  },
+
+  "login": {
+    "title": "Login to your account",
+    "create_account": "create a new account",
+    "email_label": "Email address *",
+    "email_placeholder": "your@email.com",
+    "password_label": "Password *",
+    "password_placeholder": "Your password",
+    "remember_me": "Remember me",
+    "forgot_password": "Forgot password?",
+    "submit_button": "Sign in",
+    "loading": "Signing in...",
+    "first_visit": "First visit?",
+    "create_account_button": "Create account",
+    "errors": {
+      "invalid_credentials": "Email or password incorrect",
+      "generic": "An error occurred during login"
+    },
+    "success_message": "Welcome back!",
+    "create_account_prompt": "Or <0>create a new account</0>"
+  },
+
+  "register": {
+    "title": "Create a new account",
+    "subtitle": "Join our community of passionate travelers",
+    "login_prompt": "Or <0>sign in to your existing account</0>",
+    "sections": {
+      "personal": "Personal Information",
+      "address": "Address",
+      "security": "Security"
+    },
+    "personal_info": {
+      "first_name": "First name *",
+      "last_name": "Last name *",
+      "email": "Email address *",
+      "phone": "Phone number",
+      "address": "Address",
+      "city": "City",
+      "postal_code": "Postal code",
+      "country": "Country"
+    },
+    "password": {
+      "password": "Password *",
+      "confirm_password": "Confirm password *",
+      "password_placeholder": "Create a password (min. 8 characters)",
+      "confirm_placeholder": "Confirm your password"
+    },
+    "terms": {
+      "label": "I accept the <0>terms of use</0> and the <1>privacy policy</1>"
+    },
+    "submit_button": {
+      "create_account": "Create account",
+      "loading": "Creating account..."
+    },
+    "already_have_account": "Already have an account?",
+    "login_link": "Sign in",
+    "placeholders": {
+      "first_name": "Your first name",
+      "last_name": "Your last name",
+      "email": "your@email.com",
+      "phone": "Your phone number",
+      "address": "Your address",
+      "city": "Your city",
+      "postal_code": "Your postal code"
+    },
+    "errors": {
+      "generic": "An error occurred during registration"
+    },
+    "success_message": "Account created successfully!"
+  },
+
+  "reservations": {
+    "title": "My Reservations",
+    "loading": "Loading reservations...",
+    "error": "Error",
+    "no_reservations": "You don't have any reservations at the moment.",
+    "reservations_count": "You have {{count}} reservation(s)",
+    "status": {
+      "confirmed": "Confirmed",
+      "pending": "Pending",
+      "cancelled": "Cancelled"
+    },
+    "reservation_card": {
+      "custom_reservation": "Custom reservation",
+      "persons": "pers.",
+      "days": "days",
+      "expand_details": "Details",
+      "collapse_details": "Collapse"
+    },
+    "details": {
+      "contact": "Contact",
+      "details": "Details",
+      "adults": "Adults",
+      "youth": "Youth",
+      "children": "Children",
+      "budget": "Budget",
+      "men": "Men",
+      "women": "Women",
+      "oldest_age": "Oldest age",
+      "youngest_age": "Youngest age",
+      "tour": "Tour",
+      "custom": "Custom",
+      "reserved_on": "Reserved on"
+    },
+    "actions": {
+      "cancel": "Cancel",
+      "contact": "Contact"
+    },
+    "empty_state": {
+      "title": "No reservations",
+      "description": "You haven't made any reservations yet.",
+      "discover_tours": "Discover our tours"
+    }
+  },
+
+  "payments": {
+    "title": "My Payments",
+    "subtitle": "View the history of all your payments",
+    "loading": "Loading payments...",
+    "error": "Error",
+    "retry": "Retry",
+    "add_payment": "New payment",
+    "cancel_payment": "Cancel payment",
+    "form": {
+      "title": "Add a new payment",
+      "reservation": "Reservation",
+      "reservation_placeholder": "Select a reservation",
+      "reference": "Payment reference",
+      "reference_placeholder": "Ex: PAY-2024-001",
+      "amount": "Amount (Ar)",
+      "amount_placeholder": "Ex: 50000",
+      "payment_method": "Payment method",
+      "method_placeholder": "Select a payment method",
+      "proof": "Proof (optional)",
+      "upload_text": "Upload a file",
+      "drag_drop": "or drag and drop",
+      "file_types": "PNG, JPG, PDF up to 10MB",
+      "file_selected": "File selected:",
+      "cancel": "Cancel",
+      "submit": "Add payment",
+      "uploading": "Uploading...",
+      "loading_reservations": "Loading...",
+      "success": "Payment added successfully!",
+      "error": "An error occurred while adding the payment"
+    },
+    "methods": {
+      "credit_card": "Credit Card",
+      "transfer": "Transfer",
+      "mobile_money": "Mobile Money",
+      "cash": "Cash"
+    },
+    "table": {
+      "reference": "Reference",
+      "reservation": "Reservation",
+      "amount": "Amount",
+      "method": "Method",
+      "tour_not_specified": "Tour not specified"
+    },
+    "search": {
+      "placeholder": "Search by reference, name or tour..."
+    },
+    "empty_state": {
+      "title": "No payments found",
+      "description": "No payments match your search criteria.",
+      "no_payments": "You haven't made any payments yet.",
+      "first_payment": "Create your first payment"
+    }
+  },
+
+  "tours_page": {
+    "title": "All our <0>tours</0> in Madagascar",
+    "loading": "Loading tours...",
+    "available_tours": "{{count}} tour available",
+    "available_tours_plural": "{{count}} tours available",
+    "filters": {
+      "price_per_person": "Price per person",
+      "duration": "Duration",
+      "tour_name": "Tour name",
+      "all_budgets": "All budgets",
+      "all_durations": "All durations",
+      "price_ranges": {
+        "0-50000": "Less than 50,000 Ar",
+        "50000-100000": "50,000 - 100,000 Ar",
+        "100000-200000": "100,000 - 200,000 Ar",
+        "200000-500000": "200,000 - 500,000 Ar",
+        "500000": "More than 500,000 Ar"
+      },
+      "duration_ranges": {
+        "1-3": "1-3 days",
+        "4-7": "4-7 days",
+        "8-14": "8-14 days",
+        "14": "More than 14 days"
+      },
+      "tour_name_placeholder": "Ex: Isalo Park, Tsingy, Baobabs...",
+      "reset": "Reset",
+      "filter": "Filter"
+    },
+    "tour_card": {
+      "location": "Madagascar",
+      "default_description": "Discover the wonders of Madagascar with this exceptional tour.",
+      "days": "day",
+      "days_plural": "days",
+      "not_specified": "Not specified",
+      "learn_more": "Learn more",
+      "video_available": "Video available",
+      "videos_count": "video",
+      "videos_count_plural": "videos"
+    },
+    "no_results": {
+      "title": "No tours found",
+      "description": "No tours match your search criteria.",
+      "reset_filters": "Reset filters"
+    }
+  },
+
+  "profile": {
+    "title": "My Profile",
+    "subtitle": "Manage your personal information",
+    "loading": "Loading your profile...",
+    "error": "Error loading profile",
+    "retry": "Retry",
+    "buttons": {
+      "change_password": "Change password",
+      "change_password_mobile": "Password",
+      "edit": "Edit",
+      "cancel": "Cancel",
+      "save": "Save",
+      "change_password_submit": "Change password"
+    },
+    "navigation": {
+      "title": "Navigation",
+      "contact": "Contact",
+      "personal": "Personal",
+      "address": "Address"
+    },
+    "user_info": {
+      "member_since": "Member since {{date}}",
+      "client": "Client",
+      "admin": "Administrator"
+    },
+    "personal_info": {
+      "title": "Personal information",
+      "contact_info": "Contact information",
+      "personal_info": "Personal information",
+      "address_info": "Address",
+      "email": "Email",
+      "phone": "Phone",
+      "first_name": "First name",
+      "last_name": "Last name",
+      "address": "Address",
+      "city": "City",
+      "postal_code": "Postal code",
+      "country": "Country",
+      "not_provided": "Not provided"
+    },
+    "password_modal": {
+      "title": "Change password",
+      "current_password": "Current password",
+      "new_password": "New password",
+      "confirm_password": "Confirm password",
+      "current_placeholder": "Current password",
+      "new_placeholder": "New password",
+      "confirm_placeholder": "Confirm password",
+      "password_requirements": "Password must contain at least 6 characters.",
+      "password_mismatch": "New passwords do not match",
+      "password_length": "Password must contain at least 6 characters"
+    },
+    "messages": {
+      "profile_updated": "Profile updated successfully",
+      "password_changed": "Password changed successfully",
+      "update_error": "Error updating profile",
+      "password_error": "Error changing password"
+    }
+  }
+}
