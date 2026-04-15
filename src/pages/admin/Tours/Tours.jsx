@@ -215,9 +215,13 @@ export default function Tours() {
                     <TableCell className="px-4 py-3">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded bg-muted flex items-center justify-center overflow-hidden">
-                          {tour.photos?.[0] ? (
-                            <img src={getImageUrl(tour.photos[0].url)} className="w-full h-full object-cover" alt="" />
-                          ) : <MapPin className="w-4 h-4 text-muted-foreground opacity-50" />}
+                          {(() => {
+                            const firstImage = tour.photos?.find(p => !p.url.match(/\.(mp4|avi|mov|wmv|flv|webm)$/i));
+                            if (firstImage) {
+                              return <img src={getImageUrl(firstImage.url)} className="w-full h-full object-cover" alt="" />;
+                            }
+                            return <MapPin className="w-4 h-4 text-muted-foreground opacity-50" />;
+                          })()}
                         </div>
                         <span className="font-medium">{tour.nom_tour}</span>
                       </div>

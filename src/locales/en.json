@@ -22,11 +22,9 @@
     "subtitle": "The art of traveling, exploring a new culture, experiencing authentic Malagasy life",
     "price_per_person": "Price per person",
     "all_prices": "All budgets",
-    "price_0_50k": "Less than 50,000 Ar",
-    "price_50_100k": "50,000 - 100,000 Ar",
-    "price_100_200k": "100,000 - 200,000 Ar",
-    "price_200_500k": "200,000 - 500,000 Ar",
-    "price_500k_plus": "More than 500,000 Ar",
+    "price_under_500": "Less than 500 €",
+    "price_500_1000": "500 - 1000 €",
+    "price_over_1000": "More than 1000 €",
     "duration": "Duration",
     "all_durations": "All durations",
     "duration_1_3": "1-3 days",
@@ -153,7 +151,7 @@
       "no_items": "No necessary items specified.",
       "mandatory": "Mandatory"
     },
-    "pricing": "From {{price}} Ar/person",
+    "pricing": "From {{price}} €/person",
     "days": "days",
     "book_tour": "Book this tour",
     "admin": {
@@ -209,7 +207,7 @@
       "title": "Budget",
       "total_amount": "Total amount *",
       "estimated_budget": "Estimated budget *",
-      "currency": "Ariary"
+      "currency": "Euro"
     },
     "submit_button": {
       "confirm": "Confirm reservation",
@@ -225,8 +223,8 @@
       "address": "Your complete address",
       "days": "Duration in days",
       "total_people": "Total number",
-      "amount": "Total amount in Ariary",
-      "budget": "Estimated budget in Ariary"
+      "amount": "Total amount in Euro",
+      "budget": "Estimated budget in Euro"
     }
   },
 
@@ -358,7 +356,7 @@
       "reservation_placeholder": "Select a reservation",
       "reference": "Payment reference",
       "reference_placeholder": "Ex: PAY-2024-001",
-      "amount": "Amount (Ar)",
+      "amount": "Amount (€)",
       "amount_placeholder": "Ex: 50000",
       "payment_method": "Payment method",
       "method_placeholder": "Select a payment method",
@@ -410,17 +408,15 @@
       "all_budgets": "All budgets",
       "all_durations": "All durations",
       "price_ranges": {
-        "0-50000": "Less than 50,000 Ar",
-        "50000-100000": "50,000 - 100,000 Ar",
-        "100000-200000": "100,000 - 200,000 Ar",
-        "200000-500000": "200,000 - 500,000 Ar",
-        "500000": "More than 500,000 Ar"
+        "0-500": "Less than 500 €",
+        "500-1000": "500 - 1000 €",
+        "1000": "More than 1000 €"
       },
       "duration_ranges": {
         "1-3": "1-3 days",
         "4-7": "4-7 days",
         "8-14": "8-14 days",
-        "14": "More than 14 days"
+        "14": "14+ days"
       },
       "tour_name_placeholder": "Ex: Isalo Park, Tsingy, Baobabs...",
       "reset": "Reset",

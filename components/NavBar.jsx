@@ -1,6 +1,6 @@
 import { getAuthToken, removeAuthToken } from "../lib/api";
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate, useLocation } from "react-router";
 import logo from "../src/assets/logo.jpg";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Separator } from "@/components/ui/separator";
-import { Menu, ChevronDown, Check, LogOut, User, TicketCheck, CreditCard, Settings, Globe } from "lucide-react";
+import { Menu, ChevronDown, Check, LogOut, User, TicketCheck, CreditCard, Settings, Globe, LayoutDashboard } from "lucide-react";
 import { cn } from "../lib/utils";
 import { useRole } from "../src/hooks/useRole";
 
@@ -32,6 +32,7 @@ const languages = [
 export default function NavBar() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
   const { isClient, isAdmin } = useRole();
   const [activeSection, setActiveSection] = useState("home");
   const [scrolled, setScrolled] = useState(false);
@@ -42,13 +43,32 @@ export default function NavBar() {
   const currentLanguage = languages.find(lang => lang.code === i18n.language) || languages[0];
 
   const scrollToSection = (sectionId) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-      setActiveSection(sectionId);
+    if (location.pathname !== "/") {
+      navigate(`/#${sectionId}`);
       setIsSheetOpen(false);
+    } else {
+      const element = document.getElementById(sectionId);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+        setActiveSection(sectionId);
+        setIsSheetOpen(false);
+      }
     }
   };
+
+  useEffect(() => {
+    // Si on arrive sur la page d'accueil avec un hash, on scrolle vers la section
+    if (location.pathname === "/" && location.hash) {
+      const id = location.hash.replace("#", "");
+      setTimeout(() => {
+        const element = document.getElementById(id);
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth" });
+          setActiveSection(id);
+        }
+      }, 100);
+    }
+  }, [location.pathname, location.hash]);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -154,13 +174,9 @@ export default function NavBar() {
                   <DropdownMenuContent align="end" className="w-56 mt-2 p-1">
                     {isClient() && (
                       <div className="p-1 space-y-0.5">
-                        <DropdownMenuItem onClick={() => navigate("/client/reservations")} className="cursor-pointer">
-                          <TicketCheck className="w-4 h-4 mr-2 opacity-70" />
-                          <span>{t("navbar.reservations")}</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => navigate("/client/paiements")} className="cursor-pointer">
-                          <CreditCard className="w-4 h-4 mr-2 opacity-70" />
-                          <span>{t("navbar.payments")}</span>
+                        <DropdownMenuItem onClick={() => navigate("/client")} className="cursor-pointer bg-primary/5 text-primary font-medium">
+                          <LayoutDashboard className="w-4 h-4 mr-2" />
+                          <span>Espace Client</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => navigate("/client/profile")} className="cursor-pointer">
                           <User className="w-4 h-4 mr-2 opacity-70" />
@@ -272,11 +288,8 @@ export default function NavBar() {
                         <div className="grid gap-1">
                           {isClient() && (
                             <>
-                              <Button variant="ghost" className="justify-start h-12 px-4 font-normal text-muted-foreground" onClick={() => { navigate("/client/reservations"); setIsSheetOpen(false); }}>
-                                <TicketCheck className="w-5 h-5 mr-3 opacity-70" /> {t("navbar.reservations")}
-                              </Button>
-                              <Button variant="ghost" className="justify-start h-12 px-4 font-normal text-muted-foreground" onClick={() => { navigate("/client/paiements"); setIsSheetOpen(false); }}>
-                                <CreditCard className="w-5 h-5 mr-3 opacity-70" /> {t("navbar.payments")}
+                              <Button variant="ghost" className="justify-start h-12 px-4 font-medium text-primary bg-primary/5" onClick={() => { navigate("/client"); setIsSheetOpen(false); }}>
+                                <LayoutDashboard className="w-5 h-5 mr-3" /> Espace Client
                               </Button>
                               <Button variant="ghost" className="justify-start h-12 px-4 font-normal text-muted-foreground" onClick={() => { navigate("/client/profile"); setIsSheetOpen(false); }}>
                                 <User className="w-5 h-5 mr-3 opacity-70" /> {t("navbar.profile")}

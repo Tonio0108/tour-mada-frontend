@@ -8,9 +8,13 @@ import {
   Package,
   Plus,
   ArrowRight,
-  Loader,
+  Loader2,
   WalletCards,
   ChevronRight,
+  TrendingUp,
+  BarChart3,
+  PieChart as PieChartIcon,
+  ChevronDown
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -24,13 +28,31 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
+import { 
+  BarChart, 
+  Bar, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell
+} from 'recharts';
+
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
 
 export default function AdminDashboard() {
-  const [stats, setStats] = useState({
-    totalTours: 0,
-    totalReservations: 0,
-    totalRevenue: 0,
-    pendingPropositions: 0
+  const [analytics, setAnalytics] = useState({
+    stats: {
+      totalRevenue: 0,
+      totalReservations: 0,
+      totalTours: 0,
+      pendingPayments: 0
+    },
+    revenueByMonth: [],
+    popularTours: []
   });
 
   const [recentReservations, setRecentReservations] = useState([]);
@@ -45,30 +67,17 @@ export default function AdminDashboard() {
     setLoading(true);
     const token = await getAuthToken();
     try {
-      const [toursRes, propsRes, reservsRes, paymentsRes] = await Promise.all([
-        fetch(`${url}/tours-standards`, { headers: { Authorization: `Bearer ${token}` } }),
-        fetch(`${url}/tours-personnalises`, { headers: { Authorization: `Bearer ${token}` } }),
-        fetch(`${url}/reservation`, { headers: { Authorization: `Bearer ${token}` } }),
-        fetch(`${url}/paiements`, { headers: { Authorization: `Bearer ${token}` } })
+      const [analyticsRes, reservsRes] = await Promise.all([
+        fetch(`${url}/analytics/dashboard`, { headers: { Authorization: `Bearer ${token}` } }),
+        fetch(`${url}/reservation`, { headers: { Authorization: `Bearer ${token}` } })
       ]);
 
-      const [tours, propositions, reservations, paiements] = await Promise.all([
-        toursRes.json(),
-        propsRes.json(),
-        reservsRes.json(),
-        paymentsRes.json()
+      const [analyticsData, reservations] = await Promise.all([
+        analyticsRes.json(),
+        reservsRes.json()
       ]);
 
-      const totalRevenue = paiements.reduce((sum, p) => sum + parseFloat(p.montant || 0), 0);
-      const pendingPropositions = propositions.filter(p => p.statut === 'EN_ATTENTE' || !p.statut).length;
-
-      setStats({
-        totalTours: tours.length,
-        totalReservations: reservations.length,
-        totalRevenue,
-        pendingPropositions
-      });
-
+      setAnalytics(analyticsData);
       setRecentReservations(reservations.slice(0, 5));
     } catch (error) {
       console.error("Dashboard error:", error);
@@ -113,7 +122,7 @@ export default function AdminDashboard() {
 
   if (loading) return (
     <div className="h-[60vh] flex flex-col items-center justify-center gap-3">
-      <Loader className="h-8 w-8 animate-spin text-primary" />
+      <Loader2 className="h-8 w-8 animate-spin text-primary" />
       <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Chargement</p>
     </div>
   );
@@ -127,27 +136,93 @@ export default function AdminDashboard() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard 
-          title="Revenu" 
-          value={stats.totalRevenue} 
+          title="Revenu Total" 
+          value={analytics.stats.totalRevenue} 
           icon={WalletCards} 
           formatter={v => `${parseInt(v).toLocaleString()} Ar`}
           variant="primary"
         />
         <StatCard 
           title="Réservations" 
-          value={stats.totalReservations} 
+          value={analytics.stats.totalReservations} 
           icon={Calendar} 
         />
         <StatCard 
           title="Circuits" 
-          value={stats.totalTours} 
+          value={analytics.stats.totalTours} 
           icon={MapPin} 
         />
         <StatCard 
-          title="Demandes" 
-          value={stats.pendingPropositions} 
-          icon={Package} 
+          title="Paiements en attente" 
+          value={analytics.stats.pendingPayments} 
+          icon={DollarSign} 
         />
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card className="border-border shadow-none bg-card">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <BarChart3 className="w-4 h-4 text-primary" />
+              <CardTitle className="text-lg font-bold">Revenus par mois</CardTitle>
+            </div>
+            <CardDescription>Visualisation des revenus validés sur les 6 derniers mois</CardDescription>
+          </CardHeader>
+          <CardContent className="h-[300px] min-h-[300px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={[...analytics.revenueByMonth].reverse()}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                <XAxis dataKey="month" fontSize={12} tickLine={false} axisLine={false} />
+                <YAxis fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `${value / 1000000}M`} />
+                <Tooltip 
+                  formatter={(value) => [`${parseInt(value).toLocaleString()} Ar`, 'Revenu']}
+                  contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                />
+                <Bar dataKey="revenue" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        <Card className="border-border shadow-none bg-card">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <PieChartIcon className="w-4 h-4 text-primary" />
+              <CardTitle className="text-lg font-bold">Destinations populaires</CardTitle>
+            </div>
+            <CardDescription>Répartition des réservations par circuit</CardDescription>
+          </CardHeader>
+          <CardContent className="h-[300px] min-h-[300px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={analytics.popularTours}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60}
+                  outerRadius={80}
+                  paddingAngle={5}
+                  dataKey="count"
+                >
+                  {analytics.popularTours.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip 
+                   contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="flex flex-wrap justify-center gap-4 mt-4">
+              {analytics.popularTours.map((entry, index) => (
+                <div key={entry.name} className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS[index % COLORS.length] }} />
+                  <span className="text-xs font-medium">{entry.name}</span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -161,12 +236,15 @@ export default function AdminDashboard() {
           <CardContent className="p-0">
             <Table>
               <TableHeader>
+                <TableHeader>
                 <TableRow>
                   <TableHead className="px-6 py-3 font-bold text-[10px] uppercase">Client</TableHead>
                   <TableHead className="px-6 py-3 font-bold text-[10px] uppercase">Circuit</TableHead>
                   <TableHead className="px-6 py-3 font-bold text-[10px] uppercase text-right">Prix</TableHead>
+                  <TableHead className="px-6 py-3 font-bold text-[10px] uppercase text-center">Facture</TableHead>
                   <TableHead className="px-6 py-3 font-bold text-[10px] uppercase text-center">Statut</TableHead>
                 </TableRow>
+              </TableHeader>
               </TableHeader>
               <TableBody>
                 {recentReservations.map((r) => (
@@ -174,6 +252,28 @@ export default function AdminDashboard() {
                     <TableCell className="px-6 py-4 font-bold text-sm">{r.nom_complet}</TableCell>
                     <TableCell className="px-6 py-4 text-xs text-muted-foreground">{r.tour?.nom_tour || "Sur mesure"}</TableCell>
                     <TableCell className="px-6 py-4 text-right font-bold text-primary">{parseInt(r.montant_total)?.toLocaleString()} Ar</TableCell>
+                    <TableCell className="px-6 py-4 text-center">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={async () => {
+                          const token = await getAuthToken();
+                          const response = await fetch(`${url}/documents/invoice/${r.id_reservation}`, {
+                            headers: { Authorization: `Bearer ${token}` }
+                          });
+                          const blob = await response.blob();
+                          const downloadUrl = window.URL.createObjectURL(blob);
+                          const link = document.createElement('a');
+                          link.href = downloadUrl;
+                          link.setAttribute('download', `facture_${r.id_reservation}.pdf`);
+                          document.body.appendChild(link);
+                          link.click();
+                          link.remove();
+                        }}
+                      >
+                        <ArrowRight className="w-4 h-4" />
+                      </Button>
+                    </TableCell>
                     <TableCell className="px-6 py-4 text-center">{getStatusBadge(r.statut)}</TableCell>
                   </TableRow>
                 ))}
@@ -183,7 +283,7 @@ export default function AdminDashboard() {
         </Card>
 
         <div className="space-y-4">
-          <Card className="bg-white border-none">
+          <Card className="bg-white border-none shadow-sm">
             <CardHeader>
               <CardTitle className="text-lg font-bold">Actions rapides</CardTitle>
             </CardHeader>
@@ -200,11 +300,12 @@ export default function AdminDashboard() {
             </CardContent>
           </Card>
 
-          <Card className="bg-muted border-none text-muted-foreground">
+          <Card className="bg-primary/5 border-none text-primary">
             <CardContent className="p-6">
-              <p className="text-xs font-bold uppercase mb-2">Besoin d'assistance ?</p>
-              <Button variant="link" className="p-0 h-auto text-foreground font-bold" asChild>
-                <Link to="/admin/docs">Consulter la documentation <ArrowRight className="ml-2 w-3 h-3" /></Link>
+              <p className="text-xs font-bold uppercase mb-2">Gestion des stocks</p>
+              <p className="text-sm mb-4">La capacité maximale des circuits est désormais active pour éviter les sur-réservations.</p>
+              <Button variant="outline" className="w-full font-bold" asChild>
+                <Link to="/admin/tours">Gérer les circuits</Link>
               </Button>
             </CardContent>
           </Card>
@@ -213,3 +314,4 @@ export default function AdminDashboard() {
     </div>
   );
 }
+

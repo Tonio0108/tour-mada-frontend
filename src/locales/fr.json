@@ -24,12 +24,9 @@
 
     "price_per_person": "Prix par personne",
     "all_prices": "Tous les budgets",
-    "price_0_50k": "Moins de 50 000 Ar",
-    "price_50_100k": "50 000 - 100 000 Ar",
-    "price_100_200k": "100 000 - 200 000 Ar",
-    "price_200_500k": "200 000 - 500 000 Ar",
-    "price_500k_plus": "Plus de 500 000 Ar",
-
+    "price_under_500": "Moins de 500 €",
+    "price_500_1000": "500 - 1000 €",
+    "price_over_1000": "Plus de 1000 €",
     "duration": "Durée",
     "all_durations": "Toutes les durées",
     "duration_1_3": "1-3 jours",
@@ -159,7 +156,7 @@
       "no_items": "Aucun objet nécessaire spécifié.",
       "mandatory": "Obligatoire"
     },
-    "pricing": "À partir de {{price}} Ar/personne",
+    "pricing": "À partir de {{price}} €/personne",
     "days": "jours",
     "book_tour": "Réserver ce tour",
     "admin": {
@@ -215,7 +212,7 @@
       "title": "Budget",
       "total_amount": "Montant total *",
       "estimated_budget": "Budget estimé *",
-      "currency": "Ariary"
+      "currency": "Euro"
     },
     "submit_button": {
       "confirm": "Confirmer la réservation",
@@ -231,8 +228,8 @@
       "address": "Votre adresse complète",
       "days": "Durée en jours",
       "total_people": "Nombre total",
-      "amount": "Montant total en Ariary",
-      "budget": "Budget estimé en Ariary"
+      "amount": "Montant total en Euro",
+      "budget": "Budget estimé en Euro"
     }
   },
 
@@ -364,7 +361,7 @@
       "reservation_placeholder": "Sélectionnez une réservation",
       "reference": "Référence de paiement",
       "reference_placeholder": "Ex: PAY-2024-001",
-      "amount": "Montant (Ar)",
+      "amount": "Montant (€)",
       "amount_placeholder": "Ex: 50000",
       "payment_method": "Mode de paiement",
       "method_placeholder": "Sélectionnez un mode de paiement",
@@ -416,17 +413,15 @@
       "all_budgets": "Tous les budgets",
       "all_durations": "Toutes les durées",
       "price_ranges": {
-        "0-50000": "Moins de 50 000 Ar",
-        "50000-100000": "50 000 - 100 000 Ar",
-        "100000-200000": "100 000 - 200 000 Ar",
-        "200000-500000": "200 000 - 500 000 Ar",
-        "500000": "Plus de 500 000 Ar"
+        "0-500": "Moins de 500 €",
+        "500-1000": "500 - 1000 €",
+        "1000": "Plus de 1000 €"
       },
       "duration_ranges": {
         "1-3": "1-3 jours",
         "4-7": "4-7 jours",
         "8-14": "8-14 jours",
-        "14": "Plus de 14 jours"
+        "14": "14+ jours"
       },
       "tour_name_placeholder": "Ex: Parc Isalo, Tsingy, Baobabs...",
       "reset": "Réinitialiser",

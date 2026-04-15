@@ -1,12 +1,47 @@
 import { useTranslation } from "react-i18next";
+import { useState } from "react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/Input";
 import { Textarea } from "./ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { Mail, Phone, MapPin, Send, Facebook } from "lucide-react";
+import { Mail, Phone, MapPin, Send, Facebook, Loader2 } from "lucide-react";
+import { MailApi } from "../lib/api";
+import { toast } from "sonner";
 
 const ContactSection = () => {
   const { t } = useTranslation();
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    subject: "",
+    message: ""
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!formData.name || !formData.email || !formData.message) {
+      toast.error("Veuillez remplir tous les champs obligatoires.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      await MailApi.sendContactEmail(formData);
+      toast.success("Votre message a été envoyé avec succès !");
+      setFormData({ name: "", email: "", subject: "", message: "" });
+    } catch (error) {
+      console.error(error);
+      toast.error("Une erreur est survenue lors de l'envoi du message.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <section id="contact" className="py-20 bg-background">
@@ -74,22 +109,51 @@ const ContactSection = () => {
               <CardTitle className="text-xl font-bold">{t("contact.buttons.email")}</CardTitle>
             </CardHeader>
             <CardContent>
-              <form className="grid grid-cols-1 md:grid-cols-2 gap-6" onSubmit={(e) => e.preventDefault()}>
+              <form className="grid grid-cols-1 md:grid-cols-2 gap-6" onSubmit={handleSubmit}>
                 <div className="space-y-2">
-                  <Input placeholder={t("reservation.placeholders.full_name")} className="border-input focus-visible:ring-primary h-12" />
+                  <Input 
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    placeholder={t("reservation.placeholders.full_name")} 
+                    className="border-input focus-visible:ring-primary h-12" 
+                    required
+                  />
                 </div>
                 <div className="space-y-2">
-                  <Input type="email" placeholder={t("reservation.placeholders.email")} className="border-input focus-visible:ring-primary h-12" />
+                  <Input 
+                    name="email"
+                    type="email" 
+                    value={formData.email}
+                    onChange={handleChange}
+                    placeholder={t("reservation.placeholders.email")} 
+                    className="border-input focus-visible:ring-primary h-12" 
+                    required
+                  />
                 </div>
                 <div className="md:col-span-2 space-y-2">
-                  <Input placeholder="Sujet" className="border-input focus-visible:ring-primary h-12" />
+                  <Input 
+                    name="subject"
+                    value={formData.subject}
+                    onChange={handleChange}
+                    placeholder="Sujet" 
+                    className="border-input focus-visible:ring-primary h-12" 
+                  />
                 </div>
                 <div className="md:col-span-2 space-y-2">
-                  <Textarea placeholder="Votre message..." className="border-input focus-visible:ring-primary min-h-[150px]" />
+                  <Textarea 
+                    name="message"
+                    value={formData.message}
+                    onChange={handleChange}
+                    placeholder="Votre message..." 
+                    className="border-input focus-visible:ring-primary min-h-[150px]" 
+                    required
+                  />
                 </div>
                 <div className="md:col-span-2">
-                  <Button className="w-full md:w-auto px-10 h-12 font-bold gap-2">
-                    <Send className="w-4 h-4" /> {t("contact.buttons.email")}
+                  <Button type="submit" disabled={loading} className="w-full md:w-auto px-10 h-12 font-bold gap-2">
+                    {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                    {t("contact.buttons.email")}
                   </Button>
                 </div>
               </form>

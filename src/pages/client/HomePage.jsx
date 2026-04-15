@@ -10,6 +10,7 @@ import { TourSection } from "./../../../components/TourSection";
 import { CTASection } from "./../../../components/CTASection";
 import ContactSection from "./../../../components/ContactSection";
 import { getAuthToken } from "../../../lib/api";
+import { SEO } from "../../components/SEO";
 
 export default function HomePage() {
   const [tours, setTours] = useState([]);
@@ -50,9 +51,10 @@ export default function HomePage() {
     // Construire les paramètres de recherche
     const searchParams = new URLSearchParams();
 
-    if (filters.prix_par_pers)
+    if (filters.prix_par_pers && filters.prix_par_pers !== "all")
       searchParams.append("prix", filters.prix_par_pers);
-    if (filters.duree_jours) searchParams.append("duree", filters.duree_jours);
+    if (filters.duree_jours && filters.duree_jours !== "all") 
+      searchParams.append("duree", filters.duree_jours);
     if (filters.nom_tour) searchParams.append("nom", filters.nom_tour);
 
     // Naviguer vers la page des tours avec les paramètres de recherche
@@ -76,6 +78,11 @@ export default function HomePage() {
 
   return (
     <>
+      <SEO 
+        title="Leader du tourisme authentique" 
+        description="Découvrez Madagascar avec Tour Mada Découverte. Circuits authentiques à travers les parcs nationaux, les Tsingy et l'Allée des Baobabs."
+        keywords="voyage madagascar, circuit madagascar, trekking madagascar, safari madagascar, guide touristique madagascar"
+      />
       <HeroSection
         bgImage={bgImage}
         handleSearch={handleSearch}

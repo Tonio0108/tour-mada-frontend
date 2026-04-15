@@ -90,11 +90,11 @@ export default function Profile() {
     finally { setChangingPassword(false); }
   };
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center"><Loader className="animate-spin text-emerald-600" /></div>;
+  if (loading) return <div className="flex items-center justify-center h-64"><Loader className="animate-spin text-emerald-600" /></div>;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
-      <div className="max-w-4xl mx-auto">
+    <>
+      <div className="max-w-4xl mx-auto text-left">
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div>
@@ -152,6 +152,6 @@ export default function Profile() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 }

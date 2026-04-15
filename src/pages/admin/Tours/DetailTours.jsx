@@ -228,8 +228,8 @@ export default function DetailTours() {
                     <div className="absolute inset-0 bg-black/40 flex items-center justify-center z-10 opacity-0 group-hover:opacity-100 transition-opacity">
                       <PlayCircle className="w-10 h-10 text-white" />
                     </div>
-                    <video className="w-full h-full object-cover">
-                      <source src={`${url.replace('/api', '')}${video.url}`} />
+                    <video className="w-full h-full object-cover" preload="metadata">
+                      <source src={`${url.replace('/api', '')}${video.url}#t=0.1`} />
                     </video>
                   </div>
                 ))}

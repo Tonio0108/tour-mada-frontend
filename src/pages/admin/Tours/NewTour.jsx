@@ -16,6 +16,7 @@ import {
   Upload,
   Loader,
   CheckCircle2,
+  Users,
 } from "lucide-react";
 import { Tours as ToursService } from "../../../../lib/api";
 import { Input } from "../../../../components/ui/Input";
@@ -117,7 +118,8 @@ export default function NewTour() {
     setFileList(prev => prev.filter((_, i) => i !== index));
   };
 
-  const next = async () => {
+  const next = async (e) => {
+    e.preventDefault();
     const fieldsToValidate = {
       0: ["nom_tour", "description", "prix_par_pers", "duree_jours"],
       1: ["itineraries"],

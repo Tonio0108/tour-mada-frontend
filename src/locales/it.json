@@ -22,11 +22,9 @@
     "subtitle": "L'arte di viaggiare, esplorare una nuova cultura, vivere l'autenticità malgascia",
     "price_per_person": "Prezzo per persona",
     "all_prices": "Tutti i budget",
-    "price_0_50k": "Meno di 50.000 Ar",
-    "price_50_100k": "50.000 - 100.000 Ar",
-    "price_100_200k": "100.000 - 200.000 Ar",
-    "price_200_500k": "200.000 - 500.000 Ar",
-    "price_500k_plus": "Oltre 500.000 Ar",
+    "price_under_500": "Meno di 500 €",
+    "price_500_1000": "500 - 1000 €",
+    "price_over_1000": "Oltre 1000 €",
     "duration": "Durata",
     "all_durations": "Tutte le durate",
     "duration_1_3": "1-3 giorni",
@@ -154,7 +152,7 @@
       "no_items": "Nessun oggetto necessario specificato.",
       "mandatory": "Obbligatorio"
     },
-    "pricing": "Da {{price}} Ar/persona",
+    "pricing": "Da {{price}} €/persona",
     "days": "giorni",
     "book_tour": "Prenota questo tour",
     "admin": {
@@ -210,7 +208,7 @@
       "title": "Budget",
       "total_amount": "Importo totale *",
       "estimated_budget": "Budget stimato *",
-      "currency": "Ariary"
+      "currency": "Euro"
     },
     "submit_button": {
       "confirm": "Conferma prenotazione",
@@ -224,10 +222,10 @@
       "email": "tuo@email.com",
       "phone": "Il tuo numero di telefono",
       "address": "Il tuo indirizzo completo",
-      "days": "Durata in giorni",
+      "days": "Durée in giorni",
       "total_people": "Numero totale",
-      "amount": "Importo totale in Ariary",
-      "budget": "Budget stimato in Ariary"
+      "amount": "Importo totale in Euro",
+      "budget": "Budget stimato in Euro"
     }
   },
 
@@ -359,7 +357,7 @@
       "reservation_placeholder": "Seleziona una prenotazione",
       "reference": "Riferimento pagamento",
       "reference_placeholder": "Es: PAY-2024-001",
-      "amount": "Importo (Ar)",
+      "amount": "Importo (€)",
       "amount_placeholder": "Es: 50000",
       "payment_method": "Metodo di pagamento",
       "method_placeholder": "Seleziona un metodo di pagamento",
@@ -411,17 +409,15 @@
       "all_budgets": "Tutti i budget",
       "all_durations": "Tutte le durate",
       "price_ranges": {
-        "0-50000": "Meno di 50.000 Ar",
-        "50000-100000": "50.000 - 100.000 Ar",
-        "100000-200000": "100.000 - 200.000 Ar",
-        "200000-500000": "200.000 - 500.000 Ar",
-        "500000": "Oltre 500.000 Ar"
+        "0-500": "Meno di 500 €",
+        "500-1000": "500 - 1000 €",
+        "1000": "Oltre 1000 €"
       },
       "duration_ranges": {
         "1-3": "1-3 giorni",
         "4-7": "4-7 giorni",
         "8-14": "8-14 giorni",
-        "14": "Oltre 14 giorni"
+        "14": "14+ giorni"
       },
       "tour_name_placeholder": "Es: Parco Isalo, Tsingy, Baobab...",
       "reset": "Reimposta",
@@ -471,7 +467,7 @@
       "admin": "Amministratore"
     },
     "personal_info": {
-      "title": "Informazioni personali",
+      "title": "Informations personali",
       "contact_info": "Informazioni di contatto",
       "personal_info": "Informazioni personali",
       "address_info": "Indirizzo",

@@ -12,6 +12,9 @@ import {
   X,
   Upload,
   Loader,
+  Users,
+  Clock,
+  DollarSign,
 } from "lucide-react";
 import { getAuthToken } from "../../../../lib/api";
 import { Input } from "../../../../components/ui/Input";
@@ -86,7 +89,7 @@ export default function UpdateTour() {
 
   const { fields: itemFields, append: addItem, remove: removeItem } = useFieldArray({
     control: form.control,
-    name: "itemsToBring",
+    name: "itemFields",
   });
 
   useEffect(() => {
@@ -144,7 +147,8 @@ export default function UpdateTour() {
     setFileList(prev => prev.filter((_, i) => i !== index));
   };
 
-  const next = async () => {
+  const next = async (e) => {
+    e.preventDefault();
     const fieldsToValidate = {
       0: ["nom_tour", "description", "prix_par_pers", "duree_jours"],
       1: ["itineraries"],
@@ -170,7 +174,7 @@ export default function UpdateTour() {
       formData.append("prix_par_pers", String(values.prix_par_pers));
       formData.append("duree_jours", String(values.duree_jours));
 
-      formData.append("itineraries", JSON.stringify(values.itineraries.map((it, idx) => ({
+      formData.append("itineraires", JSON.stringify(values.itineraries.map((it, idx) => ({
         jour: idx + 1,
         titre: it.titre,
         description: it.description
@@ -183,8 +187,7 @@ export default function UpdateTour() {
 
       fileList.forEach(item => {
         if (!item.isExisting) {
-          if (item.file.type.startsWith("image/")) formData.append("images", item.file);
-          else formData.append("videos", item.file);
+          formData.append("medias", item.file);
         }
       });
 
@@ -402,7 +405,10 @@ export default function UpdateTour() {
               <div className="p-6 bg-primary text-primary-foreground">
                 <Badge variant="outline" className="mb-2 text-primary-foreground border-primary-foreground">Aperçu</Badge>
                 <h3 className="text-2xl font-bold">{form.watch("nom_tour")}</h3>
-                <div className="text-sm opacity-90 mt-1">{form.watch("duree_jours")} jours / {parseInt(form.watch("prix_par_pers"))?.toLocaleString()} Ar</div>
+                <div className="flex gap-4 mt-2 text-sm opacity-90">
+                  <span className="flex items-center gap-1"><Clock className="w-4 h-4" /> {form.watch("duree_jours")}j</span>
+                  <span className="flex items-center gap-1"><DollarSign className="w-4 h-4" /> {parseInt(form.watch("prix_par_pers"))?.toLocaleString()} Ar</span>
+                </div>
               </div>
               <div className="p-6 space-y-6">
                 <div>

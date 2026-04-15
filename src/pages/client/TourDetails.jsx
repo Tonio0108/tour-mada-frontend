@@ -1,11 +1,10 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router";
-import { useTranslation } from "react-i18next";
+import { useNavigate, useParams, Link } from "react-router";
+import { useTranslation, Trans } from "react-i18next";
 import { getAuthToken } from "@/lib/api";
-import { useRole } from "@src/hooks/useRole";
+import { useRole } from "../../hooks/useRole";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
@@ -21,21 +20,44 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { Calendar, Clock, DollarSign, Info, Trash2, Pencil, ArrowDown, PlayCircle, ImageIcon, X } from "lucide-react";
+import { 
+  Calendar, 
+  Clock, 
+  DollarSign, 
+  Info, 
+  Trash2, 
+  Pencil, 
+  ChevronDown, 
+  Loader2, 
+  AlertCircle, 
+  PlayCircle, 
+  MapPin, 
+  CheckCircle2,
+  ChevronRight,
+  Video,
+  Users,
+  Image as ImageIcon,
+  X,
+  FileText,
+  Map as MapIcon,
+  ShoppingBag,
+  Maximize2
+} from "lucide-react";
+import { SEO } from "../../components/SEO";
 
 export default function TourDetails() {
   const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const url = import.meta.env.VITE_API_URL;
+  const baseUrl = url.replace('/api', '');
   const [tour, setTour] = useState(null);
-  const [activeTab, setActiveTab] = useState("itineraire");
+  const [activeTab, setActiveTab] = useState("description");
   const { isAdmin } = useRole();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [videoModal, setVideoModal] = useState({ open: false, url: "" });
+  const [mediaModal, setMediaModal] = useState({ open: false, url: "", type: "image" });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -74,15 +96,22 @@ export default function TourDetails() {
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center">
-      <Loader className="h-12 w-12 animate-spin text-emerald-600" />
+      <SEO title="Chargement..." />
+      <div className="flex flex-col items-center gap-2">
+        <Loader2 className="h-10 w-10 animate-spin text-primary" />
+        <p className="text-sm text-muted-foreground">{t('tour_details.loading')}</p>
+      </div>
     </div>
   );
 
   if (!tour) return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4">
-      <AlertCircle className="h-12 w-12 text-red-500 mb-4" />
-      <p className="text-xl font-bold text-gray-900 mb-6">Tour introuvable</p>
-      <Button onClick={() => navigate("/admin/tours")}>Retour au catalogue</Button>
+      <SEO title="Tour introuvable" />
+      <AlertCircle className="h-10 w-10 text-destructive mb-4" />
+      <h2 className="text-lg font-bold mb-2">Tour introuvable</h2>
+      <Button onClick={() => navigate("/tours")} variant="outline" size="sm">
+        Retour aux tours
+      </Button>
     </div>
   );
 
@@ -90,151 +119,317 @@ export default function TourDetails() {
   const videos = tour.photos?.filter(m => m.url.match(/\.(mp4|avi|mov|wmv|flv|webm)$/i)) || [];
 
   return (
-    <section className="min-h-screen bg-gray-50 pt-20 pb-10 px-4">
-      <div className="max-w-6xl mx-auto">
-        <div className="bg-white rounded border border-border shadow-sm overflow-hidden mb-8">
-          <div className="flex flex-col md:flex-row">
-            <div className="md:w-1/2 bg-gray-100">
-              {images.length > 0 ? (
-                <Carousel className="w-full h-96">
-                  <CarouselContent>
-                    {images.map((img) => (
-                      <CarouselItem key={img.id_photo} className="h-96">
-                        <img src={`${url.replace('/api', '')}${img.url}`} alt={tour.nom_tour} className="w-full h-full object-cover" />
-                      </CarouselItem>
-                    ))}
-                  </CarouselContent>
-                  <CarouselPrevious className="left-4" />
-                  <CarouselNext className="right-4" />
-                </Carousel>
-              ) : (
-                <div className="h-96 flex items-center justify-center bg-emerald-800 text-white font-bold">{t('tour_details.media.no_media')}</div>
-              )}
-            </div>
-
-            <div className="md:w-1/2 p-6 flex flex-col">
-              <div className="flex-grow">
-                <h1 className="text-2xl md:text-3xl font-bold mb-4 text-gray-800">{tour.nom_tour}</h1>
-                <p className="text-gray-600 mb-6">{tour.description}</p>
-              </div>
-
-              <div className="space-y-4 mt-auto">
-                <div className="flex flex-wrap gap-4">
-                  <div className="flex items-center text-gray-700"><Clock className="h-5 w-5 mr-2 text-emerald-600" /><span>{tour.duree_jours} {t('tour_details.days')}</span></div>
-                  <div className="flex items-center text-gray-700"><DollarSign className="h-5 w-5 mr-2 text-emerald-600" /><span><Trans i18nKey="tour_details.pricing" values={{ price: tour.prix_par_pers?.toLocaleString() }} /></span></div>
-                </div>
-
-                {isAdmin && (
-                  <div className="flex gap-2">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button className="bg-blue-600 hover:bg-blue-700 text-white gap-2">
-                          {t('tour_details.admin.options')} <ChevronDown className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent>
-                        <DropdownMenuItem asChild>
-                          <Link to={`/admin/tours/${id}/edit`} className="flex items-center gap-2"><Pencil size={16} /> {t('tour_details.admin.edit')}</Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setIsModalOpen(true)} className="text-red-600 flex items-center gap-2"><Trash2 size={16} /> {t('tour_details.admin.delete')}</DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                )}
-
-                <Link to={`/tours/reservation/${tour.id_tour}`} className="w-full">
-                  <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white h-12 font-semibold">
-                    <Calendar className="w-5 h-5 mr-2" /> {t('tour_details.book_tour')}
-                  </Button>
-                </Link>
-              </div>
+    <div className="min-h-screen bg-muted/30 pb-20">
+      <SEO 
+        title={tour.nom_tour} 
+        description={tour.description?.substring(0, 160) || `Découvrez le circuit ${tour.nom_tour} à Madagascar.`}
+        image={images.length > 0 ? `${baseUrl}${images[0].url}` : "/logo.jpg"}
+        keywords={`${tour.nom_tour}, voyage madagascar, circuit touristique, ${tour.duree_jours} jours`}
+      />
+      {/* Hero Section */}
+      <div className="relative h-80 w-full overflow-hidden bg-black">
+        {images.length > 0 ? (
+          <img 
+            src={`${baseUrl}${images[0].url}`} 
+            alt={tour.nom_tour} 
+            className="w-full h-full object-cover"
+          />
+        ) : videos.length > 0 ? (
+          <video 
+            src={`${baseUrl}${videos[0].url}`} 
+            autoPlay 
+            muted 
+            loop 
+            className="w-full h-full object-cover opacity-60"
+          />
+        ) : (
+          <div className="w-full h-full bg-primary/20 flex items-center justify-center" />
+        )}
+        <div className="absolute inset-0 bg-black/40" />
+        
+        <div className="absolute bottom-0 left-0 w-full p-6">
+          <div className="max-w-7xl mx-auto">
+            <Badge className="mb-3 text-[10px] uppercase tracking-wider" variant="default">
+              <MapPin className="w-3 h-3 mr-1" /> Madagascar
+            </Badge>
+            <h1 className="text-2xl md:text-3xl font-bold text-white mb-4">
+              {tour.nom_tour}
+            </h1>
+            <div className="flex flex-wrap gap-2">
+              <Badge variant="secondary" className="px-3 py-1 text-xs font-medium flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5" />
+                {tour.duree_jours} {t('tour_details.days')}
+              </Badge>
+              <Badge variant="secondary" className="px-3 py-1 text-xs font-medium flex items-center gap-1.5">
+                <DollarSign className="w-3.5 h-3.5" />
+                <Trans i18nKey="tour_details.pricing" values={{ price: tour.prix_par_pers?.toLocaleString() }} />
+              </Badge>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="bg-white mb-8 overflow-hidden rounded border border-border">
-        <div className="flex flex-wrap border-b">
-          {["itineraire", "conseils", "description"].map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`px-6 py-3 font-medium transition-colors ${activeTab === tab ? "text-emerald-600 border-b-2 border-emerald-600" : "text-gray-500 hover:text-emerald-700"}`}
-            >
-              {t(`tour_details.tabs.${tab === 'itineraire' ? 'itinerary' : tab === 'conseils' ? 'tips' : 'description'}`)}
-            </button>
-          ))}
-        </div>
-
-        <div className="p-6">
-          {activeTab === "description" && (
-            <div className="prose max-w-none">
-              <h2 className="text-xl font-semibold mb-4 text-gray-800">{t('tour_details.description.title')}</h2>
-              <p className="text-gray-700 leading-relaxed">{tour.description}</p>
-            </div>
-          )}
-
-          {activeTab === "itineraire" && (
-            <div>
-              <h2 className="text-xl font-semibold mb-6 text-gray-800">{t('tour_details.itinerary.title')}</h2>
-              <div className="space-y-6">
-                {tour.itineraires?.map((step, index) => (
-                  <div key={index} className="flex gap-4">
-                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">{index + 1}</div>
-                    <div>
-                      <h3 className="font-bold text-emerald-800">{step.titre}</h3>
-                      <p className="text-gray-600 mt-1">{step.description}</p>
-                    </div>
+      <div className="max-w-7xl mx-auto px-4 -mt-4 relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          
+          <div className="lg:col-span-2 space-y-6">
+            {/* Admin Controls */}
+            {isAdmin && (
+              <Card className="border-primary/20 bg-primary/5">
+                <CardContent className="p-3 flex items-center justify-between">
+                  <Badge variant="outline" className="bg-background text-[10px] uppercase tracking-widest">Admin</Badge>
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="sm" asChild className="h-8 text-xs">
+                      <Link to={`/admin/tours/${id}/edit`}>
+                        <Pencil size={12} className="mr-1.5" /> Modifier
+                      </Link>
+                    </Button>
+                    <Button variant="destructive" size="sm" onClick={() => setIsModalOpen(true)} className="h-8 text-xs">
+                      <Trash2 size={12} className="mr-1.5" /> Supprimer
+                    </Button>
                   </div>
-                ))}
-              </div>
-            </div>
-          )}
+                </CardContent>
+              </Card>
+            )}
 
-          {activeTab === "conseils" && (
-            <div>
-              <h2 className="text-xl font-semibold mb-6 text-gray-800 flex items-center"><Info className="w-5 h-5 mr-2 text-yellow-500" /> {t('tour_details.tips.title')}</h2>
-              {tour.Choses_apporter?.length === 0 ? (
-                <p className="text-gray-600">{t('tour_details.tips.no_items')}</p>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {tour.Choses_apporter?.map((item) => (
-                    <div key={item.id_item} className={`p-4 rounded border ${item.obligatoire ? "border-red-200 bg-red-50" : "border-border bg-gray-50"}`}>
-                      <div className="flex justify-between items-start">
-                        <h3 className="font-medium text-gray-800">{item.nom_item}</h3>
-                        {item.obligatoire && <span className="px-2 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-full">{t('tour_details.tips.mandatory')}</span>}
+            {/* Gallery */}
+            {(images.length > 1 || videos.length > 0) && (
+              <Card>
+                <CardHeader className="py-4">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <ImageIcon className="w-4 h-4 text-primary" /> Galerie & Médias
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="grid grid-cols-3 md:grid-cols-5 gap-3">
+                  {images.slice(1).map((img) => (
+                    <div 
+                      key={img.id_photo} 
+                      onClick={() => setMediaModal({ open: true, url: `${baseUrl}${img.url}`, type: "image" })}
+                      className="aspect-square rounded-md overflow-hidden border cursor-pointer group relative"
+                    >
+                      <img src={`${baseUrl}${img.url}`} className="w-full h-full object-cover group-hover:scale-105 transition-transform" alt="Gallery" />
+                      <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                        <Maximize2 className="w-5 h-5 text-white" />
                       </div>
-                      {item.description && <p className="mt-2 text-sm text-gray-600">{item.description}</p>}
                     </div>
                   ))}
+                  {videos.map((vid) => (
+                    <div 
+                      key={vid.id_photo} 
+                      onClick={() => setMediaModal({ open: true, url: `${baseUrl}${vid.url}`, type: "video" })}
+                      onMouseEnter={(e) => e.currentTarget.querySelector('video').play()}
+                      onMouseLeave={(e) => {
+                        const v = e.currentTarget.querySelector('video');
+                        v.pause();
+                        v.currentTime = 0;
+                      }}
+                      className="aspect-square rounded-md overflow-hidden relative cursor-pointer border bg-black flex items-center justify-center group"
+                    >
+                      <video 
+                        src={`${baseUrl}${vid.url}`} 
+                        muted 
+                        playsInline 
+                        className="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition-opacity"
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center group-hover:bg-black/20 transition-all">
+                        <PlayCircle className="w-8 h-8 text-white group-hover:scale-110 transition-transform shadow-lg" />
+                      </div>
+                      <Badge className="absolute bottom-1.5 right-1.5 text-[8px] px-1 py-0 bg-primary/80 border-none">VIDEO</Badge>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Content Tabs */}
+            <Card>
+              <div className="flex border-b bg-muted/20">
+                {[
+                  { id: "description", icon: FileText, key: "description" },
+                  { id: "itineraire", icon: MapIcon, key: "itinerary" },
+                  { id: "conseils", icon: ShoppingBag, key: "tips" }
+                ].map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={cn(
+                      "flex-1 px-4 py-3 text-xs font-semibold transition-colors border-b-2 flex items-center justify-center gap-2",
+                      activeTab === tab.id 
+                        ? "border-primary text-primary bg-background" 
+                        : "border-transparent text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    <tab.icon className="w-3.5 h-3.5" />
+                    <span>{t(`tour_details.tabs.${tab.key}`)}</span>
+                  </button>
+                ))}
+              </div>
+
+              <CardContent className="p-6">
+                {activeTab === "description" && (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline" className="rounded-full px-2 text-[9px] uppercase tracking-wider font-bold">Aperçu</Badge>
+                    </div>
+                    <h2 className="text-lg font-bold text-foreground">{t('tour_details.description.title')}</h2>
+                    <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap text-sm">{tour.description}</p>
+                  </div>
+                )}
+
+                {activeTab === "itineraire" && (
+                  <div className="space-y-6">
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline" className="rounded-full px-2 text-[9px] uppercase tracking-wider font-bold">Programme</Badge>
+                    </div>
+                    <h2 className="text-lg font-bold text-foreground">{t('tour_details.itinerary.title')}</h2>
+                    <div className="space-y-6">
+                      {tour.itineraires?.sort((a, b) => a.jour - b.jour).map((step, index) => (
+                        <div key={index} className="flex gap-4 group">
+                          <div className="flex flex-col items-center">
+                            <Badge className="w-7 h-7 rounded-full flex items-center justify-center p-0 text-xs font-bold shrink-0">
+                              {step.jour || index + 1}
+                            </Badge>
+                            <div className="w-px flex-grow bg-muted mt-2 group-last:hidden" />
+                          </div>
+                          <div className="space-y-1 pb-6">
+                            <h3 className="text-sm font-bold text-foreground group-hover:text-primary transition-colors">{step.titre}</h3>
+                            <p className="text-muted-foreground leading-relaxed text-xs">{step.description}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {activeTab === "conseils" && (
+                  <div className="space-y-6">
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline" className="rounded-full px-2 text-[9px] uppercase tracking-wider font-bold">Préparation</Badge>
+                    </div>
+                    <h2 className="text-lg font-bold text-foreground">{t('tour_details.tips.title')}</h2>
+                    {tour.Choses_apporter?.length === 0 ? (
+                      <p className="text-muted-foreground italic text-xs">{t('tour_details.tips.no_items')}</p>
+                    ) : (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {tour.Choses_apporter?.map((item) => (
+                          <div key={item.id_item} className={cn(
+                            "p-3 rounded-md border flex flex-col gap-1 transition-colors",
+                            item.obligatoire ? "bg-destructive/5 border-destructive/20" : "bg-muted/10 border-transparent"
+                          )}>
+                            <div className="flex justify-between items-start">
+                              <h3 className="font-bold text-xs">{item.nom_item}</h3>
+                              {item.obligatoire && (
+                                <Badge variant="destructive" className="text-[8px] px-1 py-0 font-bold uppercase">
+                                  {t('tour_details.tips.mandatory')}
+                                </Badge>
+                              )}
+                            </div>
+                            {item.description && <p className="text-[11px] text-muted-foreground leading-tight">{item.description}</p>}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="space-y-6">
+            <Card className="border-primary sticky top-20 overflow-hidden shadow-md">
+              <CardContent className="p-6 space-y-6">
+                <div className="space-y-1">
+                  <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">{t('hero.price_per_person')}</p>
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-2xl font-bold text-primary">{parseFloat(tour.prix_par_pers).toLocaleString()}</span>
+                    <span className="text-xs font-bold text-muted-foreground">€</span>
+                  </div>
                 </div>
-              )}
-            </div>
-          )}
+
+                <div className="space-y-3 pt-4 border-t">
+                  <div className="flex justify-between items-center">
+                    <span className="text-muted-foreground text-xs font-medium flex items-center gap-2">
+                      <Clock className="w-3.5 h-3.5 text-primary" /> Durée
+                    </span>
+                    <Badge variant="outline" className="font-bold px-2 py-0 text-[10px]">{tour.duree_jours} jours</Badge>
+                  </div>
+                </div>
+
+                <Button 
+                  onClick={() => navigate(`/tours/reservation/${tour.id_tour}`)}
+                  className="w-full py-5 text-sm font-bold shadow-sm"
+                  size="default"
+                >
+                  <Calendar className="w-4 h-4 mr-2" /> 
+                  {t('tour_details.book_tour')}
+                </Button>
+                
+                <p className="text-[9px] text-center text-muted-foreground font-semibold uppercase tracking-tight">
+                  Disponibilités limitées
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-primary/5 border-none">
+              <CardContent className="p-4">
+                <h4 className="text-[10px] font-bold mb-3 uppercase tracking-widest text-primary">Inclus</h4>
+                <ul className="space-y-2">
+                  {["Guide local certifié", "Activités", "Transport", "Support 24/7"].map((f, i) => (
+                    <li key={i} className="flex items-center gap-2 text-[11px] font-medium text-muted-foreground">
+                      <CheckCircle2 className="w-3 h-3 text-primary/60" /> {f}
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
+
+      {/* Modals */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-[95vw] sm:max-w-md">
           <DialogHeader>
-            <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center text-red-600 mb-4">
-              <AlertCircle className="w-6 h-6" />
-            </div>
-            <DialogTitle className="text-2xl font-bold text-gray-900 tracking-tight">Supprimer ce tour ?</DialogTitle>
-            <DialogDescription className="text-gray-500 mt-2 leading-relaxed">
-              Vous allez supprimer définitivement <span className="font-bold text-gray-900">{tour.nom_tour}</span>. Cette action est irréversible.
+            <DialogTitle className="text-base">Confirmer la suppression</DialogTitle>
+            <DialogDescription className="text-xs">
+              Voulez-vous vraiment supprimer le tour <strong>{tour.nom_tour}</strong> ?
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter className="mt-8 gap-3">
-            <Button variant="ghost" onClick={() => setIsModalOpen(false)} className="h-12 px-6 font-bold text-gray-500">Annuler</Button>
-            <Button variant="destructive" onClick={handleDelete} className="h-12 px-8 font-bold flex-1">Supprimer définitivement</Button>
+          <DialogFooter className="gap-2 pt-4">
+            <Button variant="outline" size="sm" onClick={() => setIsModalOpen(false)} className="text-xs">Annuler</Button>
+            <Button variant="destructive" size="sm" onClick={handleDelete} className="text-xs">Supprimer</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      <Dialog open={videoModal.open} onOpenChange={(open) => !open && setVideoModal({ open: false, url: "" })}>
-        <DialogContent className="max-w-4xl p-0 overflow-hidden bg-black border-none">
-          <video controls autoPlay className="w-full h-auto max-h-[80vh]"><source src={videoModal.url} type="video/mp4" /></video>
+
+      {/* Media Preview Modal (Image & Video) */}
+      <Dialog open={mediaModal.open} onOpenChange={(open) => !open && setMediaModal({ ...mediaModal, open: false })}>
+        <DialogContent className="max-w-5xl p-0 bg-black overflow-hidden border-none shadow-2xl">
+          <DialogHeader className="sr-only">
+            <DialogTitle>Aperçu média</DialogTitle>
+            <DialogDescription>Aperçu de l'image ou vidéo du tour</DialogDescription>
+          </DialogHeader>
+          <div className="relative aspect-auto flex items-center justify-center bg-black/90">
+            {mediaModal.type === "image" ? (
+              <img src={mediaModal.url} className="max-w-full max-h-[85vh] object-contain" alt="Full Preview" />
+            ) : (
+              <div className="aspect-video w-full">
+                <video controls autoPlay className="w-full h-full">
+                  <source src={mediaModal.url} type="video/mp4" />
+                </video>
+              </div>
+            )}
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={() => setMediaModal({ ...mediaModal, open: false })}
+              className="absolute top-2 right-2 text-white hover:bg-white/20 rounded-full h-8 w-8"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
-    </section>
+    </div>
   );
 }

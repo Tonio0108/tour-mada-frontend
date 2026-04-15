@@ -1,7 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import { reservationAPI } from "../../../lib/api";
 import {
+  Plus,
+  Search,
+  Filter,
+  Eye,
   Calendar,
   MapPin,
   Users,
@@ -11,72 +15,93 @@ import {
   CheckCircle,
   XCircle,
   Loader,
+  MoreVertical,
+  ChevronDown,
   Mail,
   Phone,
   User,
-  ChevronDown,
-  ChevronUp,
 } from "lucide-react";
 import { useTranslation, Trans } from 'react-i18next';
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/Input";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 export const Reservations = () => {
   const { t } = useTranslation();
   const { user, isAuthenticated } = useAuth();
   const [reservations, setReservations] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [expandedReservation, setExpandedReservation] = useState(null);
+  const [searchText, setSearchText] = useState("");
+  const [selectedReservation, setSelectedReservation] = useState(null);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
-  useEffect(() => {
-    const fetchReservations = async () => {
-      if (!isAuthenticated || !user) {
-        setLoading(false);
-        return;
-      }
+  const fetchReservations = useCallback(async () => {
+    if (!isAuthenticated || !user) {
+      setLoading(false);
+      return;
+    }
 
-      try {
-        const clientId = user.Clients.id_client;
-        const data = await reservationAPI.getClientReservations(clientId);
-        setReservations(data);
-      } catch (err) {
-        setError(err.message);
-        console.error("Erreur lors du chargement des réservations:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchReservations();
+    try {
+      setLoading(true);
+      const clientId = user.Clients.id_client;
+      const data = await reservationAPI.getClientReservations(clientId);
+      setReservations(data);
+      setFilteredData(data);
+    } catch (err) {
+      console.error("Erreur lors du chargement des réservations:", err);
+    } finally {
+      setLoading(false);
+    }
   }, [isAuthenticated, user]);
 
-  const toggleReservationDetails = (reservationId) => {
-    setExpandedReservation(expandedReservation === reservationId ? null : reservationId);
-  };
+  useEffect(() => {
+    fetchReservations();
+  }, [fetchReservations]);
 
-  const getStatusIcon = (statut) => {
+  useEffect(() => {
+    const filtered = reservations.filter(item => {
+      const tourName = item.tour?.nom_tour || item.tour_personnalise?.interets || "";
+      return (
+        tourName.toLowerCase().includes(searchText.toLowerCase()) ||
+        item.id_reservation.toString().includes(searchText) ||
+        item.statut.toLowerCase().includes(searchText.toLowerCase())
+      );
+    });
+    setFilteredData(filtered);
+  }, [searchText, reservations]);
+
+  const getStatusBadge = (statut) => {
     switch (statut) {
       case "CONFIRMER":
-        return <CheckCircle className="h-4 w-4 text-green-500" />;
+        return <Badge className="bg-green-500 hover:bg-green-600 text-white border-none">{t('reservations.status.confirmed')}</Badge>;
       case "EN_ATTENTE":
-        return <AlertCircle className="h-4 w-4 text-yellow-500" />;
+        return <Badge variant="secondary" className="bg-yellow-500/10 text-yellow-600 border-yellow-200/50">{t('reservations.status.pending')}</Badge>;
       case "ANNULER":
-        return <XCircle className="h-4 w-4 text-red-500" />;
+        return <Badge variant="destructive">{t('reservations.status.cancelled')}</Badge>;
       default:
-        return <AlertCircle className="h-4 w-4 text-gray-500" />;
-    }
-  };
-
-  const getStatusText = (statut) => {
-    switch (statut) {
-      case "CONFIRMER":
-        return t('reservations.status.confirmed');
-      case "EN_ATTENTE":
-        return t('reservations.status.pending');
-      case "ANNULER":
-        return t('reservations.status.cancelled');
-      default:
-        return statut;
+        return <Badge variant="outline">{statut}</Badge>;
     }
   };
 
@@ -91,228 +116,184 @@ export const Reservations = () => {
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat("fr-FR", {
       style: "currency",
-      currency: "MGA",
+      currency: "EUR",
+      minimumFractionDigits: 0,
     }).format(amount);
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 pt-20 pb-10 px-4">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex items-center justify-center h-64">
-            <Loader className="h-8 w-8 animate-spin text-emerald-600" />
-            <span className="ml-2 text-gray-600">{t('reservations.loading')}</span>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gray-50 pt-20 pb-10 px-4">
-        <div className="max-w-4xl mx-auto">
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-            <div className="flex items-center">
-              <AlertCircle className="h-5 w-5 text-red-400 mr-2" />
-              <h3 className="text-red-800 font-medium">{t('reservations.error')}</h3>
-            </div>
-            <p className="text-red-600 mt-2">{error}</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-gray-50 pt-20 pb-10 px-4">
-      <div className="max-w-4xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">
-            {t('reservations.title')}
-          </h1>
-          <p className="text-gray-600">
-            {reservations.length === 0 ? (
-              t('reservations.no_reservations')
-            ) : (
-              <Trans 
-                i18nKey="reservations.reservations_count" 
-                values={{ count: reservations.length }}
-              />
-            )}
-          </p>
+    <div className="space-y-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="text-left">
+          <h2 className="text-2xl font-bold text-foreground">{t('reservations.title')}</h2>
+          <p className="text-sm text-muted-foreground mt-1">Consultez et gérez vos réservations de voyage</p>
         </div>
-
-        <div className="space-y-4">
-          {reservations.map((reservation) => (
-            <div
-              key={reservation.id_reservation}
-              className="bg-white rounded-lg shadow-md p-4"
-            >
-              {/* En-tête de la réservation */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  {getStatusIcon(reservation.statut)}
-                  <div>
-                    <h3 className="font-semibold text-gray-800 text-sm">
-                      {reservation.tour?.nom_tour ||
-                        reservation.tour_personnalise?.interets ||
-                        t('reservations.reservation_card.custom_reservation')}
-                    </h3>
-                    <p className="text-xs text-gray-500">
-                      {formatDate(reservation.date_tour_prevue)}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-center space-x-2">
-                  <span className={`text-xs font-medium px-2 py-1 rounded-full ${
-                    reservation.statut === "CONFIRMER" ? "bg-green-100 text-green-800" :
-                    reservation.statut === "EN_ATTENTE" ? "bg-yellow-100 text-yellow-800" :
-                    reservation.statut === "ANNULER" ? "bg-red-100 text-red-800" :
-                    "bg-gray-100 text-gray-800"
-                  }`}>
-                    {getStatusText(reservation.statut)}
-                  </span>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => toggleReservationDetails(reservation.id_reservation)}
-                    className="h-8 w-8"
-                    aria-label={
-                      expandedReservation === reservation.id_reservation 
-                        ? t('reservations.reservation_card.collapse_details')
-                        : t('reservations.reservation_card.expand_details')
-                    }
-                  >
-                    {expandedReservation === reservation.id_reservation ? (
-                      <ChevronUp className="h-4 w-4 text-gray-500" />
-                    ) : (
-                      <ChevronDown className="h-4 w-4 text-gray-500" />
-                    )}
-                  </Button>
-                </div>
-              </div>
-
-              {/* Informations basiques */}
-              <div className="grid grid-cols-2 gap-2 mt-3 text-xs text-gray-600">
-                <div className="flex items-center">
-                  <Users className="h-3 w-3 mr-1" />
-                  <span>{reservation.nombre_pers} {t('reservations.reservation_card.persons')}</span>
-                </div>
-                <div className="flex items-center">
-                  <Clock className="h-3 w-3 mr-1" />
-                  <span>{reservation.nbre_jours} {t('reservations.reservation_card.days')}</span>
-                </div>
-                <div className="flex items-center">
-                  <DollarSign className="h-3 w-3 mr-1" />
-                  <span>{formatCurrency(reservation.montant_total)}</span>
-                </div>
-                <div className="flex items-center">
-                  <User className="h-3 w-3 mr-1" />
-                  <span className="truncate">{reservation.nom_complet}</span>
-                </div>
-              </div>
-
-              {/* Détails expandables */}
-              {expandedReservation === reservation.id_reservation && (
-                <div className="mt-4 pt-4 border-t border-gray-100">
-                  <div className="grid grid-cols-1 gap-3 text-sm">
-                    {/* Informations de contact */}
-                    <div className="space-y-2">
-                      <h4 className="font-medium text-gray-700">
-                        {t('reservations.details.contact')}
-                      </h4>
-                      <div className="flex items-center text-gray-600">
-                        <Mail className="h-4 w-4 mr-2" />
-                        <span>{reservation.email}</span>
-                      </div>
-                      <div className="flex items-center text-gray-600">
-                        <Phone className="h-4 w-4 mr-2" />
-                        <span>{reservation.num_tel}</span>
-                      </div>
-                      <div className="flex items-center text-gray-600">
-                        <MapPin className="h-4 w-4 mr-2" />
-                        <span className="truncate">{reservation.adresse}</span>
-                      </div>
-                    </div>
-
-                    {/* Détails de répartition */}
-                    <div className="space-y-2">
-                      <h4 className="font-medium text-gray-700">
-                        {t('reservations.details.details')}
-                      </h4>
-                      <div className="grid grid-cols-2 gap-2 text-gray-600">
-                        <span>{t('reservations.details.adults')}: {reservation.nombre_adulte || 0}</span>
-                        <span>{t('reservations.details.youth')}: {reservation.nombre_jeune || 0}</span>
-                        <span>{t('reservations.details.children')}: {reservation.nombre_enfant || 0}</span>
-                        <span>{t('reservations.details.budget')}: {formatCurrency(reservation.budget_estime)}</span>
-                        <span>{t('reservations.details.men')}: {reservation.nombre_homme || 0}</span>
-                        <span>{t('reservations.details.women')}: {reservation.nombre_femme || 0}</span>
-                        <span>{t('reservations.details.oldest_age')}: {reservation.age_plus_age || 0}</span>
-                        <span>{t('reservations.details.youngest_age')}: {reservation.age_moins_age || 0}</span>
-                      </div>
-                    </div>
-
-                    {/* Tour details */}
-                    {reservation.tour && (
-                      <div className="space-y-1">
-                        <h4 className="font-medium text-gray-700">
-                          {t('reservations.details.tour')}
-                        </h4>
-                        <p className="text-sm text-gray-600">{reservation.tour.description?.substring(0, 100)}...</p>
-                      </div>
-                    )}
-
-                    {reservation.tour_personnalise && (
-                      <div className="space-y-1">
-                        <h4 className="font-medium text-gray-700">
-                          {t('reservations.details.custom')}
-                        </h4>
-                        <p className="text-sm text-gray-600">{reservation.tour_personnalise.interets}</p>
-                      </div>
-                    )}
-
-                    <div className="text-xs text-gray-500">
-                      {t('reservations.details.reserved_on')} {formatDate(reservation.createdAt)}
-                    </div>
-                  </div>
-
-                  {/* Actions */}
-                  <div className="mt-4 flex space-x-2">
-                    {reservation.statut === "EN_ATTENTE" && (
-                      <Button variant="destructive" size="sm" className="h-8 text-xs">
-                        {t('reservations.actions.cancel')}
-                      </Button>
-                    )}
-                    <Button size="sm" className="h-8 text-xs bg-emerald-600 hover:bg-emerald-700">
-                      {t('reservations.actions.contact')}
-                    </Button>
-                  </div>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-
-        {reservations.length === 0 && (
-          <div className="text-center py-12">
-            <Calendar className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-600 mb-2">
-              {t('reservations.empty_state.title')}
-            </h3>
-            <p className="text-gray-500 mb-4">
-              {t('reservations.empty_state.description')}
-            </p>
-            <Button asChild className="bg-emerald-600 hover:bg-emerald-700">
-              <a href="/tours">
-                {t('reservations.empty_state.discover_tours')}
-              </a>
-            </Button>
-          </div>
-        )}
+        <Button asChild>
+          <a href="/tours"><Plus className="w-4 h-4 mr-2" /> Nouveau Voyage</a>
+        </Button>
       </div>
+
+      <div className="bg-white rounded border border-border overflow-hidden">
+        <div className="p-4 border-b border-border">
+          <div className="relative max-w-sm">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
+            <Input
+              placeholder="Rechercher une réservation..."
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              className="pl-9"
+            />
+          </div>
+        </div>
+
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="px-4 py-3 font-medium">Circuit / Destination</TableHead>
+                <TableHead className="px-4 py-3 font-medium">Date prévue</TableHead>
+                <TableHead className="px-4 py-3 font-medium">Personnes</TableHead>
+                <TableHead className="px-4 py-3 font-medium text-right">Montant Total</TableHead>
+                <TableHead className="px-4 py-3 font-medium text-center">Statut</TableHead>
+                <TableHead className="w-12 px-4 py-3 text-right"></TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {loading ? (
+                Array.from({length: 3}).map((_, i) => (
+                  <TableRow key={i}>
+                    <TableCell colSpan={6} className="h-16 bg-muted/5 animate-pulse" />
+                  </TableRow>
+                ))
+              ) : filteredData.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="h-32 text-center text-muted-foreground">
+                    {searchText ? "Aucun résultat trouvé" : t('reservations.no_reservations')}
+                  </TableCell>
+                </TableRow>
+              ) : (
+                filteredData.map((res) => (
+                  <TableRow key={res.id_reservation} className="border-border group">
+                    <TableCell className="px-4 py-4">
+                      <div className="flex flex-col text-left">
+                        <span className="font-semibold text-gray-900">
+                          {res.tour?.nom_tour || res.tour_personnalise?.interets || "Circuit Personnalisé"}
+                        </span>
+                        <span className="text-xs text-muted-foreground">ID: #{res.id_reservation}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="px-4 py-4 text-left">
+                      <div className="flex items-center gap-2 text-sm">
+                        <Calendar className="w-3.5 h-3.5 text-primary" />
+                        {formatDate(res.date_tour_prevue)}
+                      </div>
+                    </TableCell>
+                    <TableCell className="px-4 py-4 text-left">
+                      <div className="flex items-center gap-2 text-sm">
+                        <Users className="w-3.5 h-3.5 text-muted-foreground" />
+                        {res.nombre_pers} pers.
+                      </div>
+                    </TableCell>
+                    <TableCell className="px-4 py-4 text-right font-medium text-primary">
+                      {formatCurrency(res.montant_total)}
+                    </TableCell>
+                    <TableCell className="px-4 py-4 text-center">
+                      {getStatusBadge(res.statut)}
+                    </TableCell>
+                    <TableCell className="px-4 py-4 text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon">
+                            <MoreVertical className="w-4 h-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => { setSelectedReservation(res); setIsDetailsOpen(true); }}>
+                            <Eye className="w-4 h-4 mr-2" /> Voir Détails
+                          </DropdownMenuItem>
+                          {res.statut === "CONFIRMER" && (
+                            <DropdownMenuItem asChild>
+                              <a href="/client/paiements">Effectuer un paiement</a>
+                            </DropdownMenuItem>
+                          )}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
+      </div>
+
+      {/* Details Modal */}
+      <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Détails de la Réservation #{selectedReservation?.id_reservation}</DialogTitle>
+          </DialogHeader>
+          <div className="max-h-[70vh] overflow-y-auto pr-4">
+            {selectedReservation && (
+              <div className="space-y-6 py-4 text-left">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider">Circuit</p>
+                    <p className="font-medium">{selectedReservation.tour?.nom_tour || "Personnalisé"}</p>
+                  </div>
+                  <div className="space-y-1 text-right">
+                    <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider">Statut</p>
+                    <div>{getStatusBadge(selectedReservation.statut)}</div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-3 gap-4 p-4 bg-muted/30 rounded-lg">
+                  <div className="text-center space-y-1">
+                    <Calendar className="w-4 h-4 mx-auto text-primary" />
+                    <p className="text-xs text-muted-foreground">Date</p>
+                    <p className="text-sm font-medium">{formatDate(selectedReservation.date_tour_prevue)}</p>
+                  </div>
+                  <div className="text-center space-y-1 border-x border-border">
+                    <Users className="w-4 h-4 mx-auto text-primary" />
+                    <p className="text-xs text-muted-foreground">Voyageurs</p>
+                    <p className="text-sm font-medium">{selectedReservation.nombre_pers}</p>
+                  </div>
+                  <div className="text-center space-y-1">
+                    <Clock className="w-4 h-4 mx-auto text-primary" />
+                    <p className="text-xs text-muted-foreground">Durée</p>
+                    <p className="text-sm font-medium">{selectedReservation.nbre_jours} jours</p>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <h4 className="font-bold text-sm border-b pb-1">Répartition des voyageurs</h4>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                    <div><span className="text-muted-foreground">Adultes:</span> {selectedReservation.nombre_adulte || 0}</div>
+                    <div><span className="text-muted-foreground">Jeunes:</span> {selectedReservation.nombre_jeune || 0}</div>
+                    <div><span className="text-muted-foreground">Enfants:</span> {selectedReservation.nombre_enfant || 0}</div>
+                    <div><span className="text-muted-foreground">Hommes:</span> {selectedReservation.nombre_homme || 0}</div>
+                    <div><span className="text-muted-foreground">Femmes:</span> {selectedReservation.nombre_femme || 0}</div>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <h4 className="font-bold text-sm border-b pb-1">Coordonnées</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+                    <div className="flex items-center gap-2"><Mail className="w-4 h-4 text-muted-foreground" /> {selectedReservation.email}</div>
+                    <div className="flex items-center gap-2"><Phone className="w-4 h-4 text-muted-foreground" /> {selectedReservation.num_tel}</div>
+                    <div className="flex items-center gap-2 md:col-span-2"><MapPin className="w-4 h-4 text-muted-foreground" /> {selectedReservation.adresse}</div>
+                  </div>
+                </div>
+
+                <div className="p-4 bg-primary/5 rounded-lg border border-primary/10 flex justify-between items-center">
+                  <span className="font-bold text-primary">Montant Total</span>
+                  <span className="text-xl font-black text-primary">{formatCurrency(selectedReservation.montant_total)}</span>
+                </div>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
-

@@ -16,7 +16,7 @@ const HeroSection = ({ bgImage, handleSearch, handleFilterChange, filters }) => 
   const { t } = useTranslation();
 
   return (
-    <section id="home" className="relative min-h-screen flex flex-col items-center justify-center pt-16">
+    <section id="home" className="relative min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center py-12 md:py-20">
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat -z-10"
         style={{ backgroundImage: `url(${bgImage})` }}
@@ -51,11 +51,9 @@ const HeroSection = ({ bgImage, handleSearch, handleFilterChange, filters }) => 
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">{t("hero.all_prices")}</SelectItem>
-                    <SelectItem value="0-50000">{t("hero.price_0_50k")}</SelectItem>
-                    <SelectItem value="50000-100000">{t("hero.price_50_100k")}</SelectItem>
-                    <SelectItem value="100000-200000">{t("hero.price_100_200k")}</SelectItem>
-                    <SelectItem value="200000-500000">{t("hero.price_200_500k")}</SelectItem>
-                    <SelectItem value="500000">{t("hero.price_500k_plus")}</SelectItem>
+                    <SelectItem value="0-500">{t("hero.price_under_500")}</SelectItem>
+                    <SelectItem value="500-1000">{t("hero.price_500_1000")}</SelectItem>
+                    <SelectItem value="1000">{t("hero.price_over_1000")}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

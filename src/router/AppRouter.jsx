@@ -23,6 +23,9 @@ import Profile from "../pages/admin/profile/Profile.jsx";
 import Accounts from "../pages/admin/accounts/Accounts.jsx";
 import ClientList from "../pages/admin/client/ClientList.jsx";
 import ClientProfile from "../pages/client/ClientProfile.jsx";
+import ClientLayout from "../pages/client/ClientLayout.jsx";
+import ClientDashboard from "../pages/client/ClientDashboard.jsx";
+
 export const AppRouter = () => {
   return (
     <Routes>
@@ -49,30 +52,21 @@ export const AppRouter = () => {
             </ClientRoute>
           }
         />
-        <Route
-          path="/client/reservations"
-          element={
-            <ClientRoute>
-              <Reservations />
-            </ClientRoute>
-          }
-        />
-        <Route
-          path="/client/paiements"
-          element={
-            <ClientRoute>
-              <Paiement />
-            </ClientRoute>
-          }
-        />
-        <Route
-          path="/client/profile"
-          element={
-            <ClientRoute>
-              <ClientProfile />
-            </ClientRoute>
-          }
-        />
+      </Route>
+
+      {/* Client Space */}
+      <Route
+        path="/client"
+        element={
+          <ClientRoute>
+            <ClientLayout />
+          </ClientRoute>
+        }
+      >
+        <Route index element={<ClientDashboard />} />
+        <Route path="reservations" element={<Reservations />} />
+        <Route path="paiements" element={<Paiement />} />
+        <Route path="profile" element={<ClientProfile />} />
       </Route>
 
       <Route
