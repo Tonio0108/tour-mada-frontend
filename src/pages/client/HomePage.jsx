@@ -80,7 +80,7 @@ export default function HomePage() {
   };
 
   return (
-    <div className="overflow-x-hidden">
+    <div className="w-full max-w-full overflow-x-hidden">
       <SEO 
         title={t("home.seo.title")} 
         description={t("home.seo.description")}
@@ -93,7 +93,7 @@ export default function HomePage() {
         filters={filters}
       ></HeroSection>
 
-      <div className="px-6 md:px-0">
+      <div className="w-full max-w-full px-4 md:px-0 overflow-x-hidden">
         <AboutSection></AboutSection>
 
         <TourSection tours={tours}></TourSection>

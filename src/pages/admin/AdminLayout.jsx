@@ -30,12 +30,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { useNotifications } from "../../context/NotificationContext";
 import { cn } from "../../../lib/utils";
-import ChatSidebar from "../../../components/ChatSidebar";
+import ChatSidebar from "@/components/ChatSidebar.jsx";
 
 const languages = [
   { code: "fr", name: "Français", flag: "🇫🇷" },
@@ -45,7 +45,7 @@ const languages = [
 
 function AdminLayout() {
   const { t, i18n } = useTranslation();
-  const { notifications, unreadNotifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
+  const { notifications, unreadNotifications, unreadCount, unreadMessagesCount, markAsRead, markAllAsRead } = useNotifications();
   const [isChatOpen, setIsChatOpen] = useState(false);
   
   const currentLanguage = languages.find(lang => lang.code === i18n.language) || languages[0];
@@ -58,6 +58,7 @@ function AdminLayout() {
     { name: t('admin_common.client') + 's', href: "/admin/clients", icon: Users },
     { name: t('tour_details.tabs.reviews'), href: "/admin/avis", icon: MessageSquare },
     { name: t('notifications.title'), href: "/admin/notifications", icon: Bell, isNotificationTrigger: true },
+    { name: t('chat.title') || "Chat", href: "/admin/chat", icon: MessageSquareText },
   ];
 
   const accountNavigation = [
@@ -234,13 +235,15 @@ function AdminLayout() {
                   </Button>
                 </SheetTrigger>
                 <SheetContent side="left" className="w-64 p-0">
-                  <div className="h-16 flex items-center px-6 border-b border-border">
-                    <span className="font-bold">TOUR MADA</span>
-                  </div>
+                  <SheetHeader className="p-4 border-b">
+                    <SheetTitle>TOUR MADA</SheetTitle>
+                    <SheetDescription className="sr-only">Navigation principale de l'administration</SheetDescription>
+                  </SheetHeader>
                   <nav className="p-4 space-y-1">
                     {mainNavigation.map((item) => (
                       <NavItem key={item.name} item={item} mobile />
                     ))}
+                    
                     <Separator className="my-4" />
                     {accountNavigation.map((item) => (
                       <NavItem key={item.name} item={item} mobile />
@@ -267,14 +270,21 @@ function AdminLayout() {
               </span>
 
               <div className="flex items-center gap-2">
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="h-8 w-8 rounded-full text-muted-foreground hover:text-primary transition-colors"
-                  onClick={() => setIsChatOpen(true)}
-                >
-                  <MessageSquareText className="w-4 h-4" />
-                </Button>
+                <div className="relative overflow-visible">
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="h-8 w-8 rounded-full text-muted-foreground hover:text-primary transition-colors"
+                    onClick={() => setIsChatOpen(true)}
+                  >
+                    <MessageSquareText className="w-4 h-4" />
+                  </Button>
+                  {unreadMessagesCount > 0 && (
+                    <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-green-500 text-[10px] font-bold text-white shadow-[0_0_0_2px_white] z-[100] pointer-events-none animate-in zoom-in duration-300">
+                      {unreadMessagesCount > 9 ? '9+' : unreadMessagesCount}
+                    </span>
+                  )}
+                </div>
 
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>

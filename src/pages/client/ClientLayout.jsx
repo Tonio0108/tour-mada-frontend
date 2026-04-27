@@ -43,7 +43,7 @@ const languages = [
 
 export default function ClientLayout() {
   const { t, i18n } = useTranslation();
-  const { unreadNotifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
+  const { notifications, unreadNotifications, unreadCount, unreadMessagesCount, markAsRead, markAllAsRead } = useNotifications();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isSidebarHovered, setIsSidebarHovered] = useState(false);
@@ -58,6 +58,7 @@ export default function ClientLayout() {
     { name: t("client_common.my_reservations"), href: "/client/reservations", icon: CalendarDays },
     { name: t("client_common.my_payments"), href: "/client/paiements", icon: WalletCards },
     { name: t("client_common.notifications"), href: "/client/notifications", icon: Bell, isNotificationTrigger: true },
+    { name: t("chat.title") || "Messages", href: "/client/chat", icon: MessageSquareText, isChatTrigger: true },
   ];
 
   const accountNavigation = [
@@ -215,9 +216,9 @@ export default function ClientLayout() {
       </aside>
 
       {/* Main Content */}
-      <main className={`transition-all duration-300 lg:ml-16 ${isSidebarHovered ? "lg:ml-64" : "lg:ml-16"} flex flex-col min-h-screen`}>
+      <main className={`transition-all duration-300 lg:ml-16 ${isSidebarHovered ? "lg:ml-64" : "lg:ml-16"} flex flex-col min-h-screen max-w-full overflow-x-hidden`}>
         {/* Header */}
-        <header className="h-16 bg-background border-b border-border sticky top-0 z-10 px-4">
+        <header className="h-16 bg-background border-b border-border sticky top-0 z-10 px-4 w-full">
           <div className="h-full flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Sheet>
@@ -238,6 +239,7 @@ export default function ClientLayout() {
                     {mainNavigation.map((item) => (
                       <NavItem key={item.name} item={item} mobile />
                     ))}
+
                     <Separator className="my-4" />
                     {accountNavigation.map((item) => (
                       <NavItem key={item.name} item={item} mobile />
@@ -264,14 +266,21 @@ export default function ClientLayout() {
               </span>
 
               <div className="flex items-center gap-2">
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="h-8 w-8 rounded-full text-muted-foreground hover:text-primary transition-colors"
-                  onClick={() => setIsChatOpen(true)}
-                >
-                  <MessageSquareText className="w-4 h-4" />
-                </Button>
+                <div className="relative overflow-visible">
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="h-8 w-8 rounded-full text-muted-foreground hover:text-primary transition-colors"
+                    onClick={() => setIsChatOpen(true)}
+                  >
+                    <MessageSquareText className="w-4 h-4" />
+                  </Button>
+                  {unreadMessagesCount > 0 && (
+                    <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-green-500 text-[10px] font-bold text-white shadow-[0_0_0_2px_white] z-[100] pointer-events-none animate-in zoom-in duration-300">
+                      {unreadMessagesCount > 9 ? '9+' : unreadMessagesCount}
+                    </span>
+                  )}
+                </div>
 
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>

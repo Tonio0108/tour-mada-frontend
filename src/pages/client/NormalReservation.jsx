@@ -207,11 +207,12 @@ export default function NormalReservation() {
             </div>
 
             <div className="mt-6 p-4 bg-emerald-50 rounded-lg border border-emerald-100 flex items-center justify-between">
-              <div className="flex items-center gap-2">
+              <label htmlFor="total-people" className="flex items-center gap-2 cursor-pointer">
                 <Users className="h-5 w-5 text-emerald-600" />
                 <span className="font-semibold text-emerald-900">{t('reservation.reservation_details.total_people')}</span>
-              </div>
+              </label>
               <Input 
+                id="total-people"
                 type="number" 
                 readOnly 
                 className="w-24 bg-white font-bold text-center border-emerald-200" 

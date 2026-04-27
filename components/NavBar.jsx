@@ -17,7 +17,7 @@ import { cn } from "../lib/utils";
 import { useRole } from "../src/hooks/useRole";
 import { useNotifications } from "../src/context/NotificationContext";
 import { Badge } from "@/components/ui/badge";
-import ChatSidebar from "./ChatSidebar";
+import ChatSidebar from "@/components/ChatSidebar.jsx";
 
 const sections = [
   { id: "home", label: "navbar.home" },
@@ -37,7 +37,7 @@ export default function NavBar() {
   const navigate = useNavigate();
   const location = useLocation();
   const { isClient, isAdmin } = useRole();
-  const { unreadNotifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
+  const { unreadNotifications, unreadCount, unreadMessagesCount, markAsRead, markAllAsRead } = useNotifications();
   const [activeSection, setActiveSection] = useState("home");
   const [scrolled, setScrolled] = useState(false);
   const [user, setUser] = useState(null);
@@ -159,15 +159,6 @@ export default function NavBar() {
             ))}
 
             <Separator orientation="vertical" className="h-4 mx-1 bg-border/50" />
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsChatOpen(true)}
-              className="rounded-full transition-all font-bold text-[10px] uppercase tracking-wider px-3 flex items-center gap-2 text-primary hover:bg-primary/10"
-            >
-              <MessageSquareText className="w-3.5 h-3.5" />
-              <span>{t("chat.discussion_center")}</span>
-            </Button>
           </div>
 
           {/* Desktop Actions */}
@@ -201,7 +192,11 @@ export default function NavBar() {
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" size="icon" className="relative rounded-full h-9 w-9">
                         <MessageCircle className="w-5 h-5" />
-                        {/* On pourra ajouter un badge ici plus tard */}
+                        {unreadMessagesCount > 0 && (
+                          <Badge className="absolute -top-1 -right-1 h-4 w-4 flex items-center justify-center p-0 bg-green-500 hover:bg-green-600 border-2 border-background text-[9px]">
+                            {unreadMessagesCount > 9 ? '9+' : unreadMessagesCount}
+                          </Badge>
+                        )}
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-80 p-0 mt-2">
@@ -211,14 +206,37 @@ export default function NavBar() {
                           variant="ghost" 
                           size="sm" 
                           className="h-auto p-0 text-xs text-primary hover:bg-transparent"
-                          onClick={() => navigate(isAdmin ? "/admin/chat" : "/client/chat")}
+                          onClick={() => {
+                            setIsChatOpen(true);
+                          }}
                         >
-                          Tout voir
+                          {t("chat.view_all")}
                         </Button>
                       </div>
-                      <div className="max-h-[350px] overflow-y-auto p-8 text-center text-muted-foreground">
-                        <MessageCircle className="w-8 h-8 mx-auto mb-2 opacity-20" />
-                        <p className="text-xs">{t("chat.no_messages")}</p>
+                      <div className="max-h-[350px] overflow-y-auto">
+                        {unreadNotifications.filter(n => n.lien?.includes('chat') || n.titre?.includes('Message')).length > 0 ? (
+                          unreadNotifications.filter(n => n.lien?.includes('chat') || n.titre?.includes('Message')).map((n) => (
+                            <div 
+                              key={n.id_notification} 
+                              className="p-4 border-b last:border-0 hover:bg-muted/50 cursor-pointer transition-colors"
+                              onClick={() => {
+                                markAsRead(n.id_notification);
+                                setIsChatOpen(true);
+                              }}
+                            >
+                              <div className="flex justify-between items-start mb-1">
+                                <span className="text-xs font-bold text-primary">{n.titre}</span>
+                                <span className="text-[10px] text-muted-foreground">{new Date(n.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                              </div>
+                              <p className="text-xs text-foreground line-clamp-2">{n.message}</p>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="p-8 text-center text-muted-foreground">
+                            <MessageCircle className="w-8 h-8 mx-auto mb-2 opacity-20" />
+                            <p className="text-xs">{t("chat.no_messages")}</p>
+                          </div>
+                        )}
                       </div>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -350,10 +368,15 @@ export default function NavBar() {
               <Button 
                 variant="ghost" 
                 size="icon" 
-                className="rounded-full h-9 w-9 text-primary bg-primary/10"
+                className="relative rounded-full h-9 w-9 text-primary bg-primary/10"
                 onClick={() => setIsChatOpen(true)}
               >
                 <MessageSquareText className="w-5 h-5" />
+                {unreadMessagesCount > 0 && (
+                  <Badge className="absolute -top-1 -right-1 h-4 w-4 flex items-center justify-center p-0 bg-green-500 border-2 border-background text-[9px] text-white">
+                    {unreadMessagesCount}
+                  </Badge>
+                )}
               </Button>
             )}
 

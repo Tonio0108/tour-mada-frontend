@@ -1121,7 +1121,18 @@
     "view": "Vedi",
     "new": "Nuova notifica"
   },
+  "payments": {
+    "form": {
+      "proof": "Visualizza giustificativo"
+    },
+    "methods": {
+      "mobile_money": "Mobile Money",
+      "transfer": "Bonifico",
+      "cash": "Contanti"
+    }
+  },
   "chat": {
+
     "title": "Messaggi",
     "discussion_center": "Centro discussioni",
     "no_messages": "Nessun messaggio per ora",
@@ -1130,7 +1141,20 @@
     "contacts": "Discussioni",
     "admin_support": "Supporto MADA",
     "online": "Online",
-    "offline": "Offline"
+    "offline": "Offline",
+    "view_all": "Vedi tutto",
+    "search_discussion": "Cerca una discussione...",
+    "search_messages": "Cerca nella discussione...",
+    "search_placeholder": "Cerca...",
+    "no_results": "Nessun risultato",
+    "active_session": "Sessione Attiva",
+    "file_sent": "📎 File inviato",
+    "file_received": "📎 File ricevuto",
+    "secure_messaging": "Messaggistica Protetta",
+    "select_conversation": "Seleziona una conversazione per iniziare a chattare con il nostro team.",
+    "file_ready": "Pronto",
+    "user_default": "Utente"
   }
+
 }
 

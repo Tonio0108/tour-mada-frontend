@@ -58,10 +58,14 @@ export default function AdminDashboard() {
 
   const [recentReservations, setRecentReservations] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [mounted, setMounted] = useState(false);
   const url = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
     fetchDashboardData();
+    // Utiliser un micro-délai pour laisser le layout se stabiliser
+    const timer = setTimeout(() => setMounted(true), 100);
+    return () => clearTimeout(timer);
   }, []);
 
   const fetchDashboardData = async () => {
@@ -176,19 +180,25 @@ export default function AdminDashboard() {
             </div>
             <CardDescription className="text-left">{t('admin_dashboard.charts.revenue_desc')}</CardDescription>
           </CardHeader>
-          <CardContent className="h-[300px] min-h-[300px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={[...analytics.revenueByMonth].reverse()}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
-                <XAxis dataKey="month" fontSize={12} tickLine={false} axisLine={false} />
-                <YAxis fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `${value / 1000000}M`} />
-                <Tooltip 
-                  formatter={(value) => [`${parseInt(value).toLocaleString()} ${t('admin_common.currency')}`, 'Revenu']}
-                  contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
-                />
-                <Bar dataKey="revenue" fill="#3b82f6" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+          <CardContent className="h-[300px] min-h-[300px] w-full" style={{ minWidth: 0 }}>
+            {mounted ? (
+              <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+                <BarChart data={[...analytics.revenueByMonth].reverse()}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                  <XAxis dataKey="month" fontSize={12} tickLine={false} axisLine={false} />
+                  <YAxis fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `${value / 1000000}M`} />
+                  <Tooltip 
+                    formatter={(value) => [`${parseInt(value).toLocaleString()} ${t('admin_common.currency')}`, 'Revenu']}
+                    contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                  />
+                  <Bar dataKey="revenue" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -200,28 +210,34 @@ export default function AdminDashboard() {
             </div>
             <CardDescription className="text-left text-xs">{t('admin_dashboard.charts.popular_desc')}</CardDescription>
           </CardHeader>
-          <CardContent className="flex-1 flex flex-col pt-0">
-            <div className="h-[200px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={analytics.popularTours}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={55}
-                    outerRadius={75}
-                    paddingAngle={5}
-                    dataKey="count"
-                  >
-                    {analytics.popularTours.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip 
-                     contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', fontSize: '12px' }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
+          <CardContent className="flex-1 flex flex-col pt-0" style={{ minWidth: 0 }}>
+            <div className="h-[200px] w-full" style={{ minWidth: 0 }}>
+              {mounted ? (
+                <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+                  <PieChart>
+                    <Pie
+                      data={analytics.popularTours}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={55}
+                      outerRadius={75}
+                      paddingAngle={5}
+                      dataKey="count"
+                    >
+                      {analytics.popularTours.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip 
+                       contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', fontSize: '12px' }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="w-full h-full flex items-center justify-center">
+                   <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                </div>
+              )}
             </div>
             <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-2 px-2">
               {analytics.popularTours.map((entry, index) => (

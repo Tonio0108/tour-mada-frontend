@@ -121,7 +121,7 @@ export default function ClientDashboard() {
             <div className="space-y-4">
               {recentReservations.length > 0 ? (
                 recentReservations.map((res) => (
-                  <div key={res.id_reservation} className="flex items-center justify-between p-4 border rounded-lg">
+                  <div key={res.id_reservation} className="flex items-center justify-between p-4 border border-border hover:shadow-md transition-all rounded-lg">
                     <div className="flex items-center gap-4">
                       <div className="bg-primary/10 p-2 rounded">
                         <MapPin className="w-4 h-4 text-primary" />

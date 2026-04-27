@@ -6,7 +6,7 @@ function Input({
   className,
   type,
   label,
-  id,
+  id: providedId,
   icon: Icon,
   error,
   showPasswordToggle,
@@ -14,6 +14,8 @@ function Input({
   showPassword,
   ...props
 }) {
+  const generatedId = React.useId();
+  const id = providedId || generatedId;
   const isPassword = type === "password" || (showPasswordToggle && (type === "text" || type === "password"));
 
   return (

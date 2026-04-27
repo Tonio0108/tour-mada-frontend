@@ -29,6 +29,8 @@ import ClientDashboard from "../pages/client/ClientDashboard.jsx";
 import AdminReviews from "../pages/admin/Reviews/AdminReviews.jsx";
 import Notifications from "../pages/client/Notifications.jsx";
 import AdminNotifications from "../pages/admin/Notifications.jsx";
+import AdminChat from "../pages/admin/Chat.jsx";
+import ClientChat from "../pages/client/Chat.jsx";
 
 export const AppRouter = () => {
   return (
@@ -73,6 +75,7 @@ export const AppRouter = () => {
         <Route path="paiements" element={<Paiement />} />
         <Route path="profile" element={<ClientProfile />} />
         <Route path="notifications" element={<Notifications />} />
+        <Route path="chat" element={<ClientChat />} />
       </Route>
 
       <Route
@@ -100,6 +103,7 @@ export const AppRouter = () => {
         <Route path="clients" element={<ClientList />}/>
         <Route path="avis" element={<AdminReviews />} />
         <Route path="notifications" element={<AdminNotifications />} />
+        <Route path="chat" element={<AdminChat />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />
