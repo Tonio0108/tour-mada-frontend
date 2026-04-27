@@ -13,9 +13,11 @@ import {
   CheckCircle2,
   Clock,
 } from "lucide-react";
-import { reservationAPI } from "../../../../lib/api";
+import { useTranslation } from "react-i18next";
+import { reservationAPI, MailApi } from "../../../../lib/api";
 import { Input } from "../../../../components/ui/Input";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Table,
   TableBody,
@@ -46,6 +48,7 @@ import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
 
 export const AdminReservation = () => {
+  const { t } = useTranslation();
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -54,6 +57,10 @@ export const AdminReservation = () => {
   const [updatingStatus, setUpdatingStatus] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedReservation, setSelectedReservation] = useState(null);
+  
+  const [isActionModalOpen, setIsActionModalOpen] = useState(false);
+  const [actionType, setActionType] = useState(""); // "CONFIRMER" or "ANNULER"
+  const [commentaire, setCommentaire] = useState("");
 
   useEffect(() => {
     fetchReservations();
@@ -66,7 +73,7 @@ export const AdminReservation = () => {
       setReservations(data);
     } catch (err) {
       console.error("Erreur:", err);
-      toast.error("Impossible de charger les réservations");
+      toast.error(t('admin_reservations.toast.load_error'));
     } finally {
       setLoading(false);
     }
@@ -114,37 +121,51 @@ export const AdminReservation = () => {
     }
   };
 
-  const updateStatus = async (status) => {
+  const showActionModal = (type, reservation = null) => {
+    if (reservation) {
+      setSelectedReservations(new Set([reservation.id_reservation]));
+    }
+    setActionType(type);
+    setCommentaire("");
+    setIsActionModalOpen(true);
+  };
+
+  const updateStatus = async () => {
     if (selectedReservations.size === 0) return;
     setUpdatingStatus(true);
-    const url = import.meta.env.VITE_API_URL;
 
     try {
       const promises = Array.from(selectedReservations).map(async (id) => {
-        await reservationAPI.updateReservation(id, { statut: status });
+        await reservationAPI.updateReservation(id, { statut: actionType });
         const res = reservations.find(r => r.id_reservation === id);
         if (!res) return;
 
-        const endpoint = status === "CONFIRMER" ? "confirm-reservation" : "refuse-reservation";
         try {
-          await fetch(`${url}/mail/${endpoint}`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
+          if (actionType === "CONFIRMER") {
+            await MailApi.confirmReservation({
               nomClient: `${res.client?.nom || res.nom_complet}`,
-              nomTour: res.tour?.nom_tour || "Tour personnalisé",
-              email: res.email
-            }),
-          });
+              nomTour: res.tour?.nom_tour || t('tour.custom_tour'),
+              email: res.email,
+              message: commentaire.trim()
+            });
+          } else if (actionType === "ANNULER") {
+            await MailApi.refuseReservation({
+              nomClient: `${res.client?.nom || res.nom_complet}`,
+              nomTour: res.tour?.nom_tour || t('tour.custom_tour'),
+              email: res.email,
+              message: commentaire.trim()
+            });
+          }
         } catch (e) { console.error("Mail error", e); }
       });
 
       await Promise.all(promises);
-      toast.success(`Statut mis à jour`);
+      toast.success(t('admin_reservations.toast.update_success'));
       fetchReservations();
       setSelectedReservations(new Set());
+      setIsActionModalOpen(false);
     } catch (err) {
-      toast.error("Erreur lors de la mise à jour");
+      toast.error(t('admin_reservations.toast.update_error'));
     } finally {
       setUpdatingStatus(false);
     }
@@ -152,25 +173,25 @@ export const AdminReservation = () => {
 
   const getStatusBadge = (status) => {
     const s = status?.toUpperCase();
-    if (s === "CONFIRMER") return <Badge variant="outline" className="bg-primary text-primary-foreground border-none">Confirmé</Badge>;
-    if (s === "ANNULER") return <Badge variant="destructive">Annulé</Badge>;
-    return <Badge variant="secondary">En attente</Badge>;
+    if (s === "CONFIRMER") return <Badge variant="outline" className="bg-primary text-primary-foreground border-none">{t('reservations.status.confirmed')}</Badge>;
+    if (s === "ANNULER") return <Badge variant="destructive">{t('reservations.status.cancelled')}</Badge>;
+    return <Badge variant="secondary">{t('reservations.status.pending')}</Badge>;
   };
 
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
-    return new Date(dateString).toLocaleDateString("fr-FR");
+    return new Date(dateString).toLocaleDateString();
   };
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-foreground">Gestion des réservations</h2>
+          <h2 className="text-2xl font-bold text-foreground">{t('admin_reservations.title')}</h2>
         </div>
         <Button variant="outline" onClick={fetchReservations} disabled={loading} className="gap-2">
           <RefreshCw className={cn("w-4 h-4", loading && "animate-spin")} />
-          Actualiser
+          {t('admin_common.refresh')}
         </Button>
       </div>
 
@@ -179,7 +200,7 @@ export const AdminReservation = () => {
           <div className="relative flex-1 min-w-75">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
             <Input
-              placeholder="Rechercher..."
+              placeholder={t('admin_common.search')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-9"
@@ -187,22 +208,22 @@ export const AdminReservation = () => {
           </div>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-48">
-              <SelectValue placeholder="Statut" />
+              <SelectValue placeholder={t('admin_common.status')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Tous les statuts</SelectItem>
-              <SelectItem value="EN_ATTENTE">En attente</SelectItem>
-              <SelectItem value="CONFIRMER">Confirmé</SelectItem>
-              <SelectItem value="ANNULER">Annulé</SelectItem>
+              <SelectItem value="all">{t('admin_common.all_status')}</SelectItem>
+              <SelectItem value="EN_ATTENTE">{t('reservations.status.pending')}</SelectItem>
+              <SelectItem value="CONFIRMER">{t('reservations.status.confirmed')}</SelectItem>
+              <SelectItem value="ANNULER">{t('reservations.status.cancelled')}</SelectItem>
             </SelectContent>
           </Select>
           {selectedReservations.size > 0 && (
             <div className="flex items-center gap-2">
-              <Button size="sm" onClick={() => updateStatus("CONFIRMER")} disabled={updatingStatus}>
-                Confirmer ({selectedReservations.size})
+              <Button size="sm" onClick={() => showActionModal("CONFIRMER")} disabled={updatingStatus}>
+                {t('admin_common.confirm')} ({selectedReservations.size})
               </Button>
-              <Button size="sm" variant="destructive" onClick={() => updateStatus("ANNULER")} disabled={updatingStatus}>
-                Annuler
+              <Button size="sm" variant="destructive" onClick={() => showActionModal("ANNULER")} disabled={updatingStatus}>
+                {t('admin_common.reject')}
               </Button>
             </div>
           )}
@@ -218,11 +239,11 @@ export const AdminReservation = () => {
                     onCheckedChange={handleSelectAllPending} 
                   />
                 </TableHead>
-                <TableHead className="px-4 py-3 font-medium">Client</TableHead>
-                <TableHead className="px-4 py-3 font-medium">Tour</TableHead>
-                <TableHead className="px-4 py-3 font-medium">Date</TableHead>
-                <TableHead className="px-4 py-3 font-medium text-right">Montant</TableHead>
-                <TableHead className="px-4 py-3 font-medium text-center">Statut</TableHead>
+                <TableHead className="px-4 py-3 font-medium">{t('admin_common.client')}</TableHead>
+                <TableHead className="px-4 py-3 font-medium">{t('tour.tour_name')}</TableHead>
+                <TableHead className="px-4 py-3 font-medium">{t('admin_common.date')}</TableHead>
+                <TableHead className="px-4 py-3 font-medium text-right">{t('admin_common.amount')}</TableHead>
+                <TableHead className="px-4 py-3 font-medium text-center">{t('admin_common.status')}</TableHead>
                 <TableHead className="w-12 px-4 py-3 text-right"></TableHead>
               </TableRow>
             </TableHeader>
@@ -235,7 +256,7 @@ export const AdminReservation = () => {
                 ))
               ) : filteredReservations.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="h-32 text-center text-muted-foreground">Aucune réservation</TableCell>
+                  <TableCell colSpan={7} className="h-32 text-center text-muted-foreground">{t('admin_reservations.no_reservations')}</TableCell>
                 </TableRow>
               ) : (
                 filteredReservations.map((r) => (
@@ -250,13 +271,13 @@ export const AdminReservation = () => {
                       <div className="text-xs text-muted-foreground">{r.email}</div>
                     </TableCell>
                     <TableCell className="px-4 py-3 text-sm text-muted-foreground">
-                      {r.tour?.nom_tour || "Tour sur mesure"}
+                      {r.tour?.nom_tour || t('tour.custom_tour')}
                     </TableCell>
                     <TableCell className="px-4 py-3 text-sm text-muted-foreground">
                       {formatDate(r.date_tour_prevue)}
                     </TableCell>
                     <TableCell className="px-4 py-3 text-right font-medium text-primary">
-                      {parseInt(r.montant_total)?.toLocaleString()} Ar
+                      {parseInt(r.montant_total)?.toLocaleString()} {t('admin_common.currency')}
                     </TableCell>
                     <TableCell className="px-4 py-3 text-center">{getStatusBadge(r.statut)}</TableCell>
                     <TableCell className="px-4 py-3 text-right">
@@ -278,18 +299,18 @@ export const AdminReservation = () => {
             <>
               <DialogHeader>
                 <div className="flex items-center justify-between">
-                  <DialogTitle className="text-xl font-bold">Détails de la réservation</DialogTitle>
+                  <DialogTitle className="text-xl font-bold">{t('admin_reservations.details.title')}</DialogTitle>
                   {getStatusBadge(selectedReservation.statut)}
                 </div>
                 <DialogDescription>
-                  Reçue le {formatDate(selectedReservation.createdAt)}
+                  {t('admin_reservations.details.received_on')} {formatDate(selectedReservation.createdAt)}
                 </DialogDescription>
               </DialogHeader>
 
               <div className="space-y-6 py-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <h4 className="text-xs font-bold uppercase text-muted-foreground">Client</h4>
+                    <h4 className="text-xs font-bold uppercase text-muted-foreground">{t('admin_reservations.details.client')}</h4>
                     <div className="text-sm space-y-1">
                       <p className="font-medium">{selectedReservation.nom_complet}</p>
                       <p className="flex items-center gap-2"><Phone className="w-3 h-3" /> {selectedReservation.num_tel}</p>
@@ -297,10 +318,10 @@ export const AdminReservation = () => {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="text-xs font-bold uppercase text-muted-foreground">Finance</h4>
+                    <h4 className="text-xs font-bold uppercase text-muted-foreground">{t('admin_reservations.details.finance')}</h4>
                     <div className="text-sm space-y-1">
-                      <p>Montant: <span className="font-bold text-primary">{parseInt(selectedReservation.montant_total)?.toLocaleString()} Ar</span></p>
-                      <p>Budget: {parseInt(selectedReservation.budget_estime)?.toLocaleString()} Ar</p>
+                      <p>{t('admin_common.amount')}: <span className="font-bold text-primary">{parseInt(selectedReservation.montant_total)?.toLocaleString()} {t('admin_common.currency')}</span></p>
+                      <p>{t('admin_reservations.details.budget')}: {parseInt(selectedReservation.budget_estime)?.toLocaleString()} {t('admin_common.currency')}</p>
                     </div>
                   </div>
                 </div>
@@ -308,34 +329,73 @@ export const AdminReservation = () => {
                 <Separator />
 
                 <div className="space-y-2">
-                  <h4 className="text-xs font-bold uppercase text-muted-foreground">Circuit</h4>
+                  <h4 className="text-xs font-bold uppercase text-muted-foreground">{t('admin_reservations.details.tour')}</h4>
                   <div className="text-sm grid grid-cols-2 gap-4">
                     <div>
-                      <p className="font-medium">{selectedReservation.tour?.nom_tour || "Tour personnalisé"}</p>
-                      <p className="text-xs text-muted-foreground">Départ: {formatDate(selectedReservation.date_tour_prevue)}</p>
+                      <p className="font-medium">{selectedReservation.tour?.nom_tour || t('tour.custom_tour')}</p>
+                      <p className="text-xs text-muted-foreground">{t('admin_reservations.details.departure')}: {formatDate(selectedReservation.date_tour_prevue)}</p>
                     </div>
                     <div className="text-right">
-                      <p>{selectedReservation.nbre_jours} Jours / {selectedReservation.nombre_pers} Pers.</p>
+                      <p>{selectedReservation.nbre_jours} {t('tour.days_plural')} / {selectedReservation.nombre_pers} {t('reservations.reservation_card.persons')}</p>
                     </div>
                   </div>
                 </div>
               </div>
 
               <DialogFooter>
-                <Button variant="ghost" onClick={() => setIsModalOpen(false)}>Fermer</Button>
+                <Button variant="ghost" onClick={() => setIsModalOpen(false)}>{t('admin_common.close')}</Button>
                 {selectedReservation.statut === "EN_ATTENTE" && (
                   <div className="flex gap-2">
-                    <Button variant="destructive" onClick={() => { setSelectedReservations(new Set([selectedReservation.id_reservation])); updateStatus("ANNULER"); setIsModalOpen(false); }}>
-                      Annuler
+                    <Button variant="destructive" onClick={() => { setIsModalOpen(false); showActionModal("ANNULER", selectedReservation); }}>
+                      {t('admin_common.reject')}
                     </Button>
-                    <Button onClick={() => { setSelectedReservations(new Set([selectedReservation.id_reservation])); updateStatus("CONFIRMER"); setIsModalOpen(false); }}>
-                      Confirmer
+                    <Button onClick={() => { setIsModalOpen(false); showActionModal("CONFIRMER", selectedReservation); }}>
+                      {t('admin_common.confirm')}
                     </Button>
                   </div>
                 )}
               </DialogFooter>
             </>
           )}
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isActionModalOpen} onOpenChange={setIsActionModalOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>
+              {actionType === 'CONFIRMER' ? t('admin_reservations.actions.confirm_title') : t('admin_reservations.actions.refuse_title')}
+            </DialogTitle>
+            <DialogDescription>
+              {selectedReservations.size > 1 
+                ? t('admin_reservations.actions.selected_count', { count: selectedReservations.size })
+                : `${t('admin_common.client')}: ${reservations.find(r => r.id_reservation === Array.from(selectedReservations)[0])?.nom_complet}`}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <label className="text-xs font-bold uppercase text-muted-foreground">{t('admin_common.message_to_client')}</label>
+              <Textarea
+                placeholder={t('admin_common.message_placeholder')}
+                value={commentaire}
+                onChange={(e) => setCommentaire(e.target.value)}
+                className="min-h-[120px]"
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setIsActionModalOpen(false)} disabled={updatingStatus}>{t('admin_common.cancel')}</Button>
+            <Button 
+              onClick={updateStatus} 
+              disabled={updatingStatus || (actionType === "ANNULER" && !commentaire.trim())}
+              variant={actionType === "ANNULER" ? "destructive" : "default"}
+            >
+              {updatingStatus ? <RefreshCw className="w-4 h-4 animate-spin mr-2" /> : null}
+              {actionType === 'CONFIRMER' ? t('admin_common.confirm') : t('admin_common.reject')}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

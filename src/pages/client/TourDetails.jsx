@@ -43,9 +43,11 @@ import {
   FileText,
   Map as MapIcon,
   ShoppingBag,
-  Maximize2
+  Maximize2,
+  MessageSquare
 } from "lucide-react";
 import { SEO } from "../../components/SEO";
+import ReviewSection from "../../components/ReviewSection";
 
 export default function TourDetails() {
   const { t } = useTranslation();
@@ -65,18 +67,18 @@ export default function TourDetails() {
       try {
         setLoading(true);
         const response = await fetch(`${url}/tours-standards/${id}`);
-        if (!response.ok) throw new Error("Erreur lors du chargement du tour");
+        if (!response.ok) throw new Error(t("tour_details.messages.load_error"));
         const data = await response.json();
         setTour(data);
       } catch (err) {
         console.error(err);
-        toast.error("Impossible de charger les détails du tour");
+        toast.error(t("tour_details.messages.load_details_error"));
       } finally {
         setLoading(false);
       }
     };
     fetchTour();
-  }, [id, url]);
+  }, [id, url, t]);
 
   const handleDelete = async () => {
     try {
@@ -85,18 +87,18 @@ export default function TourDetails() {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
-      toast.success("Le tour a été supprimé avec succès.");
+      toast.success(t("tour_details.messages.delete_success"));
       setIsModalOpen(false);
       setTimeout(() => navigate("/admin/tours"), 1500);
     } catch (err) {
       console.error(err);
-      toast.error("Erreur lors de la suppression");
+      toast.error(t("tour_details.messages.delete_error"));
     }
   };
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center">
-      <SEO title="Chargement..." />
+      <SEO title={t('admin_common.loading')} />
       <div className="flex flex-col items-center gap-2">
         <Loader2 className="h-10 w-10 animate-spin text-primary" />
         <p className="text-sm text-muted-foreground">{t('tour_details.loading')}</p>
@@ -106,11 +108,11 @@ export default function TourDetails() {
 
   if (!tour) return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4">
-      <SEO title="Tour introuvable" />
+      <SEO title={t('tour_details.not_found')} />
       <AlertCircle className="h-10 w-10 text-destructive mb-4" />
-      <h2 className="text-lg font-bold mb-2">Tour introuvable</h2>
+      <h2 className="text-lg font-bold mb-2">{t('tour_details.not_found')}</h2>
       <Button onClick={() => navigate("/tours")} variant="outline" size="sm">
-        Retour aux tours
+        {t('tour_details.back_to_tours')}
       </Button>
     </div>
   );
@@ -119,12 +121,12 @@ export default function TourDetails() {
   const videos = tour.photos?.filter(m => m.url.match(/\.(mp4|avi|mov|wmv|flv|webm)$/i)) || [];
 
   return (
-    <div className="min-h-screen bg-muted/30 pb-20">
+    <div className="min-h-screen bg-muted/30 pb-20 overflow-x-hidden">
       <SEO 
         title={tour.nom_tour} 
-        description={tour.description?.substring(0, 160) || `Découvrez le circuit ${tour.nom_tour} à Madagascar.`}
+        description={tour.description?.substring(0, 160) || t('home.seo.description')}
         image={images.length > 0 ? `${baseUrl}${images[0].url}` : "/logo.jpg"}
-        keywords={`${tour.nom_tour}, voyage madagascar, circuit touristique, ${tour.duree_jours} jours`}
+        keywords={`${tour.nom_tour}, voyage madagascar, circuit touristique, ${tour.duree_jours} ${t('tour_details.days')}`}
       />
       {/* Hero Section */}
       <div className="relative h-80 w-full overflow-hidden bg-black">
@@ -169,7 +171,7 @@ export default function TourDetails() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 -mt-4 relative z-10">
+      <div className="max-w-7xl mx-auto px-6 md:px-4 -mt-4 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
           <div className="lg:col-span-2 space-y-6">
@@ -181,11 +183,11 @@ export default function TourDetails() {
                   <div className="flex gap-2">
                     <Button variant="outline" size="sm" asChild className="h-8 text-xs">
                       <Link to={`/admin/tours/${id}/edit`}>
-                        <Pencil size={12} className="mr-1.5" /> Modifier
+                        <Pencil size={12} className="mr-1.5" /> {t('admin_common.details')}
                       </Link>
                     </Button>
                     <Button variant="destructive" size="sm" onClick={() => setIsModalOpen(true)} className="h-8 text-xs">
-                      <Trash2 size={12} className="mr-1.5" /> Supprimer
+                      <Trash2 size={12} className="mr-1.5" /> {t('admin_common.delete')}
                     </Button>
                   </div>
                 </CardContent>
@@ -197,7 +199,7 @@ export default function TourDetails() {
               <Card>
                 <CardHeader className="py-4">
                   <CardTitle className="text-base flex items-center gap-2">
-                    <ImageIcon className="w-4 h-4 text-primary" /> Galerie & Médias
+                    <ImageIcon className="w-4 h-4 text-primary" /> {t('tour_details.media.gallery_title')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="grid grid-cols-3 md:grid-cols-5 gap-3">
@@ -234,7 +236,7 @@ export default function TourDetails() {
                       <div className="absolute inset-0 flex items-center justify-center group-hover:bg-black/20 transition-all">
                         <PlayCircle className="w-8 h-8 text-white group-hover:scale-110 transition-transform shadow-lg" />
                       </div>
-                      <Badge className="absolute bottom-1.5 right-1.5 text-[8px] px-1 py-0 bg-primary/80 border-none">VIDEO</Badge>
+                      <Badge className="absolute bottom-1.5 right-1.5 text-[8px] px-1 py-0 bg-primary/80 border-none">{t('tour_details.media.video_badge')}</Badge>
                     </div>
                   ))}
                 </CardContent>
@@ -242,18 +244,19 @@ export default function TourDetails() {
             )}
 
             {/* Content Tabs */}
-            <Card>
-              <div className="flex border-b bg-muted/20">
+            <Card className="overflow-hidden">
+              <div className="flex border-b bg-muted/20 overflow-x-auto scrollbar-hide">
                 {[
                   { id: "description", icon: FileText, key: "description" },
                   { id: "itineraire", icon: MapIcon, key: "itinerary" },
-                  { id: "conseils", icon: ShoppingBag, key: "tips" }
+                  { id: "conseils", icon: ShoppingBag, key: "tips" },
+                  { id: "avis", icon: MessageSquare, key: "reviews" }
                 ].map((tab) => (
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
                     className={cn(
-                      "flex-1 px-4 py-3 text-xs font-semibold transition-colors border-b-2 flex items-center justify-center gap-2",
+                      "px-6 py-3 text-xs font-semibold transition-colors border-b-2 flex items-center justify-center gap-2 shrink-0 whitespace-nowrap",
                       activeTab === tab.id 
                         ? "border-primary text-primary bg-background" 
                         : "border-transparent text-muted-foreground hover:text-foreground"
@@ -269,7 +272,7 @@ export default function TourDetails() {
                 {activeTab === "description" && (
                   <div className="space-y-3">
                     <div className="flex items-center gap-2">
-                      <Badge variant="outline" className="rounded-full px-2 text-[9px] uppercase tracking-wider font-bold">Aperçu</Badge>
+                      <Badge variant="outline" className="rounded-full px-2 text-[9px] uppercase tracking-wider font-bold">{t('tour_details.description.badge')}</Badge>
                     </div>
                     <h2 className="text-lg font-bold text-foreground">{t('tour_details.description.title')}</h2>
                     <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap text-sm">{tour.description}</p>
@@ -279,7 +282,7 @@ export default function TourDetails() {
                 {activeTab === "itineraire" && (
                   <div className="space-y-6">
                     <div className="flex items-center gap-2">
-                      <Badge variant="outline" className="rounded-full px-2 text-[9px] uppercase tracking-wider font-bold">Programme</Badge>
+                      <Badge variant="outline" className="rounded-full px-2 text-[9px] uppercase tracking-wider font-bold">{t('tour_details.itinerary.badge')}</Badge>
                     </div>
                     <h2 className="text-lg font-bold text-foreground">{t('tour_details.itinerary.title')}</h2>
                     <div className="space-y-6">
@@ -304,7 +307,7 @@ export default function TourDetails() {
                 {activeTab === "conseils" && (
                   <div className="space-y-6">
                     <div className="flex items-center gap-2">
-                      <Badge variant="outline" className="rounded-full px-2 text-[9px] uppercase tracking-wider font-bold">Préparation</Badge>
+                      <Badge variant="outline" className="rounded-full px-2 text-[9px] uppercase tracking-wider font-bold">{t('tour_details.tips.badge')}</Badge>
                     </div>
                     <h2 className="text-lg font-bold text-foreground">{t('tour_details.tips.title')}</h2>
                     {tour.Choses_apporter?.length === 0 ? (
@@ -331,6 +334,10 @@ export default function TourDetails() {
                     )}
                   </div>
                 )}
+
+                {activeTab === "avis" && (
+                  <ReviewSection tourId={id} />
+                )}
               </CardContent>
             </Card>
           </div>
@@ -349,9 +356,9 @@ export default function TourDetails() {
                 <div className="space-y-3 pt-4 border-t">
                   <div className="flex justify-between items-center">
                     <span className="text-muted-foreground text-xs font-medium flex items-center gap-2">
-                      <Clock className="w-3.5 h-3.5 text-primary" /> Durée
+                      <Clock className="w-3.5 h-3.5 text-primary" /> {t('hero.duration')}
                     </span>
-                    <Badge variant="outline" className="font-bold px-2 py-0 text-[10px]">{tour.duree_jours} jours</Badge>
+                    <Badge variant="outline" className="font-bold px-2 py-0 text-[10px]">{tour.duree_jours} {t('tour_details.days')}</Badge>
                   </div>
                 </div>
 
@@ -361,22 +368,27 @@ export default function TourDetails() {
                   size="default"
                 >
                   <Calendar className="w-4 h-4 mr-2" /> 
-                  {t('tour_details.book_tour')}
+                  {t('tour_details.booking.reserve_button')}
                 </Button>
                 
                 <p className="text-[9px] text-center text-muted-foreground font-semibold uppercase tracking-tight">
-                  Disponibilités limitées
+                  {t('tour_details.booking.limited_availability')}
                 </p>
               </CardContent>
             </Card>
 
             <Card className="bg-primary/5 border-none">
               <CardContent className="p-4">
-                <h4 className="text-[10px] font-bold mb-3 uppercase tracking-widest text-primary">Inclus</h4>
+                <h4 className="text-[10px] font-bold mb-3 uppercase tracking-widest text-primary">{t('tour_details.inclusion.title')}</h4>
                 <ul className="space-y-2">
-                  {["Guide local certifié", "Activités", "Transport", "Support 24/7"].map((f, i) => (
+                  {[
+                    { key: 'guide', icon: CheckCircle2 },
+                    { key: 'activities', icon: CheckCircle2 },
+                    { key: 'transport', icon: CheckCircle2 },
+                    { key: 'support', icon: CheckCircle2 }
+                  ].map((f, i) => (
                     <li key={i} className="flex items-center gap-2 text-[11px] font-medium text-muted-foreground">
-                      <CheckCircle2 className="w-3 h-3 text-primary/60" /> {f}
+                      <f.icon className="w-3 h-3 text-primary/60" /> {t(`tour_details.inclusion.${f.key}`)}
                     </li>
                   ))}
                 </ul>
@@ -390,14 +402,14 @@ export default function TourDetails() {
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent className="max-w-[95vw] sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-base">Confirmer la suppression</DialogTitle>
+            <DialogTitle className="text-base">{t('tour_details.delete_modal.title')}</DialogTitle>
             <DialogDescription className="text-xs">
-              Voulez-vous vraiment supprimer le tour <strong>{tour.nom_tour}</strong> ?
+              <Trans i18nKey="tour_details.delete_modal.description" values={{ tourName: tour.nom_tour }} components={{ strong: <strong /> }} />
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2 pt-4">
-            <Button variant="outline" size="sm" onClick={() => setIsModalOpen(false)} className="text-xs">Annuler</Button>
-            <Button variant="destructive" size="sm" onClick={handleDelete} className="text-xs">Supprimer</Button>
+            <Button variant="outline" size="sm" onClick={() => setIsModalOpen(false)} className="text-xs">{t('tour_details.delete_modal.cancel')}</Button>
+            <Button variant="destructive" size="sm" onClick={handleDelete} className="text-xs">{t('tour_details.delete_modal.confirm')}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -406,8 +418,8 @@ export default function TourDetails() {
       <Dialog open={mediaModal.open} onOpenChange={(open) => !open && setMediaModal({ ...mediaModal, open: false })}>
         <DialogContent className="max-w-5xl p-0 bg-black overflow-hidden border-none shadow-2xl">
           <DialogHeader className="sr-only">
-            <DialogTitle>Aperçu média</DialogTitle>
-            <DialogDescription>Aperçu de l'image ou vidéo du tour</DialogDescription>
+            <DialogTitle>{t("tour_details.media.preview_title")}</DialogTitle>
+            <DialogDescription>{t("tour_details.media.preview_desc")}</DialogDescription>
           </DialogHeader>
           <div className="relative aspect-auto flex items-center justify-center bg-black/90">
             {mediaModal.type === "image" ? (

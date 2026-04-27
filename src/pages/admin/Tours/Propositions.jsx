@@ -16,6 +16,7 @@ import {
   Info,
 } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Tours as ToursApi, reservationAPI } from "./../../../../lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -48,6 +49,7 @@ import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
 
 export default function Propositions() {
+  const { t } = useTranslation();
   const [propositions, setPropositions] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -72,7 +74,7 @@ export default function Propositions() {
       setFilteredData(data);
     } catch (error) {
       console.error("Erreur:", error);
-      toast.error("Impossible de charger les propositions");
+      toast.error(t('admin_propositions.toast.load_error'));
     } finally {
       setLoading(false);
     }
@@ -107,7 +109,7 @@ export default function Propositions() {
     if (!selectedProposition) return;
 
     if (actionType === "reject" && !commentaire.trim()) {
-      toast.error("Veuillez ajouter un commentaire");
+      toast.error(t('admin_propositions.actions.comment_required'));
       return;
     }
 
@@ -141,7 +143,7 @@ export default function Propositions() {
 
       const nomClient = selectedProposition.client
         ? `${selectedProposition.client.prenom} ${selectedProposition.client.nom}`
-        : reservation?.nom_complet || "Client";
+        : reservation?.nom_complet || t('navbar.user');
       const email = selectedProposition.client?.utilisateur?.email || reservation?.email || "";
 
       try {
@@ -160,10 +162,10 @@ export default function Propositions() {
       );
 
       setPropositions(updatedPropositions);
-      toast.success(`Proposition mise à jour`);
+      toast.success(t('admin_propositions.toast.update_success'));
       setIsActionModalOpen(false);
     } catch (error) {
-      toast.error("Erreur lors de la mise à jour");
+      toast.error(t('admin_propositions.toast.update_error'));
     } finally {
       setActionLoading(false);
     }
@@ -172,15 +174,15 @@ export default function Propositions() {
   const getStatusBadge = (status) => {
     const s = status?.toUpperCase();
     if (s === "CONFIRMÉ" || s === "CONFIRME") 
-      return <Badge variant="outline" className="bg-primary text-primary-foreground border-none">Confirmé</Badge>;
+      return <Badge variant="outline" className="bg-primary text-primary-foreground border-none">{t('reservations.status.confirmed')}</Badge>;
     if (s === "REJETÉ" || s === "REJETE")
-      return <Badge variant="destructive">Rejeté</Badge>;
-    return <Badge variant="secondary">En attente</Badge>;
+      return <Badge variant="destructive">{t('admin_common.reject')}</Badge>;
+    return <Badge variant="secondary">{t('reservations.status.pending')}</Badge>;
   };
 
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
-    return new Date(dateString).toLocaleDateString("fr-FR");
+    return new Date(dateString).toLocaleDateString();
   };
 
   const canPerformAction = (proposition) => {
@@ -192,12 +194,12 @@ export default function Propositions() {
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-foreground">Propositions</h2>
-          <p className="text-sm text-muted-foreground mt-1">Demandes de tours sur mesure</p>
+          <h2 className="text-2xl font-bold text-foreground">{t('admin_propositions.title')}</h2>
+          <p className="text-sm text-muted-foreground mt-1">{t('admin_propositions.subtitle')}</p>
         </div>
         <Button variant="outline" onClick={fetchPropositions} disabled={loading} className="gap-2">
           <RefreshCw className={cn("w-4 h-4", loading && "animate-spin")} />
-          Actualiser
+          {t('admin_common.refresh')}
         </Button>
       </div>
 
@@ -206,7 +208,7 @@ export default function Propositions() {
           <div className="relative max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
             <Input
-              placeholder="Rechercher..."
+              placeholder={t('admin_common.search')}
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
               className="pl-9"
@@ -219,9 +221,9 @@ export default function Propositions() {
             <TableHeader>
               <TableRow>
                 <TableHead className="px-4 py-3 font-medium">ID</TableHead>
-                <TableHead className="px-4 py-3 font-medium">Client</TableHead>
-                <TableHead className="px-4 py-3 font-medium">Intérêts</TableHead>
-                <TableHead className="px-4 py-3 font-medium text-center">Statut</TableHead>
+                <TableHead className="px-4 py-3 font-medium">{t('admin_common.client')}</TableHead>
+                <TableHead className="px-4 py-3 font-medium">{t('admin_propositions.table.interests')}</TableHead>
+                <TableHead className="px-4 py-3 font-medium text-center">{t('admin_common.status')}</TableHead>
                 <TableHead className="w-12 px-4 py-3 text-right"></TableHead>
               </TableRow>
             </TableHeader>
@@ -234,7 +236,7 @@ export default function Propositions() {
                 ))
               ) : filteredData.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="h-32 text-center text-muted-foreground">Aucune proposition</TableCell>
+                  <TableCell colSpan={5} className="h-32 text-center text-muted-foreground">{t('admin_propositions.no_propositions')}</TableCell>
                 </TableRow>
               ) : (
                 filteredData.map((prop) => (
@@ -244,7 +246,7 @@ export default function Propositions() {
                       {prop.client ? `${prop.client.prenom} ${prop.client.nom}` : prop.Reservations?.[0]?.nom_complet || "N/A"}
                     </TableCell>
                     <TableCell className="px-4 py-3 text-sm text-muted-foreground line-clamp-1">
-                      {prop.interets || "Non spécifié"}
+                      {prop.interets || t('tour.not_specified')}
                     </TableCell>
                     <TableCell className="px-4 py-3 text-center">{getStatusBadge(prop.statut)}</TableCell>
                     <TableCell className="px-4 py-3 text-right">
@@ -256,15 +258,15 @@ export default function Propositions() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem onClick={() => showDetails(prop)}>
-                            Détails
+                            {t('admin_common.details')}
                           </DropdownMenuItem>
                           {canPerformAction(prop) && (
                             <>
                               <DropdownMenuItem onClick={() => showActionModal("confirm", prop)} className="text-primary font-bold">
-                                Confirmer
+                                {t('admin_common.confirm')}
                               </DropdownMenuItem>
                               <DropdownMenuItem onClick={() => showActionModal("reject", prop)} className="text-destructive font-bold">
-                                Rejeter
+                                {t('admin_common.reject')}
                               </DropdownMenuItem>
                             </>
                           )}
@@ -285,25 +287,25 @@ export default function Propositions() {
             <>
               <DialogHeader>
                 <div className="flex items-center justify-between">
-                  <DialogTitle className="text-xl font-bold">Proposition #{selectedProposition.id_tour_perso}</DialogTitle>
+                  <DialogTitle className="text-xl font-bold">{t('admin_propositions.details.title', { id: selectedProposition.id_tour_perso })}</DialogTitle>
                   {getStatusBadge(selectedProposition.statut)}
                 </div>
-                <DialogDescription>Demande de tour sur mesure</DialogDescription>
+                <DialogDescription>{t('admin_propositions.details.subtitle')}</DialogDescription>
               </DialogHeader>
 
               <div className="space-y-6 py-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <h4 className="text-xs font-bold uppercase text-muted-foreground">Client</h4>
+                    <h4 className="text-xs font-bold uppercase text-muted-foreground">{t('admin_common.client')}</h4>
                     <div className="text-sm space-y-1">
                       <p className="font-medium">{selectedProposition.client ? `${selectedProposition.client.prenom} ${selectedProposition.client.nom}` : selectedProposition.Reservations?.[0]?.nom_complet || "N/A"}</p>
                       <p className="text-muted-foreground">{selectedProposition.client?.telephone || selectedProposition.Reservations?.[0]?.num_tel}</p>
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="text-xs font-bold uppercase text-muted-foreground">Infos</h4>
+                    <h4 className="text-xs font-bold uppercase text-muted-foreground">{t('admin_propositions.details.info')}</h4>
                     <div className="text-sm">
-                      <p>Durée: {selectedProposition.nombre_jours || selectedProposition.Reservations?.[0]?.nbre_jours || "N/A"} Jours</p>
+                      <p>{t('admin_propositions.details.duration')}: {selectedProposition.nombre_jours || selectedProposition.Reservations?.[0]?.nbre_jours || "N/A"} {t('tour.days_plural')}</p>
                     </div>
                   </div>
                 </div>
@@ -311,15 +313,15 @@ export default function Propositions() {
                 <Separator />
 
                 <div className="space-y-2">
-                  <h4 className="text-xs font-bold uppercase text-muted-foreground">Intérêts & Souhaits</h4>
+                  <h4 className="text-xs font-bold uppercase text-muted-foreground">{t('admin_propositions.details.interests_wishes')}</h4>
                   <p className="text-sm italic text-muted-foreground leading-relaxed">
-                    {selectedProposition.interets || "Non spécifié"}
+                    {selectedProposition.interets || t('tour.not_specified')}
                   </p>
                 </div>
 
                 {selectedProposition.itineraire_propose && (
                   <div className="space-y-2">
-                    <h4 className="text-xs font-bold uppercase text-muted-foreground">Itinéraire Proposé</h4>
+                    <h4 className="text-xs font-bold uppercase text-muted-foreground">{t('admin_propositions.details.proposed_itinerary')}</h4>
                     <div className="text-sm p-4 rounded bg-muted/20 border">
                       {selectedProposition.itineraire_propose}
                     </div>
@@ -328,11 +330,11 @@ export default function Propositions() {
               </div>
 
               <DialogFooter>
-                <Button variant="ghost" onClick={() => setIsModalOpen(false)}>Fermer</Button>
+                <Button variant="ghost" onClick={() => setIsModalOpen(false)}>{t('admin_common.close')}</Button>
                 {canPerformAction(selectedProposition) && (
                   <div className="flex gap-2">
-                    <Button variant="destructive" onClick={() => { setIsModalOpen(false); showActionModal('reject', selectedProposition); }}>Rejeter</Button>
-                    <Button onClick={() => { setIsModalOpen(false); showActionModal('confirm', selectedProposition); }}>Confirmer</Button>
+                    <Button variant="destructive" onClick={() => { setIsModalOpen(false); showActionModal('reject', selectedProposition); }}>{t('admin_common.reject')}</Button>
+                    <Button onClick={() => { setIsModalOpen(false); showActionModal('confirm', selectedProposition); }}>{t('admin_common.confirm')}</Button>
                   </div>
                 )}
               </DialogFooter>
@@ -345,18 +347,18 @@ export default function Propositions() {
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>
-              {actionType === 'confirm' ? "Confirmer la proposition" : "Rejeter la proposition"}
+              {actionType === 'confirm' ? t('admin_propositions.actions.confirm_title') : t('admin_propositions.actions.reject_title')}
             </DialogTitle>
             <DialogDescription>
-              Client: {selectedProposition?.client ? `${selectedProposition.client.prenom} ${selectedProposition.client.nom}` : "N/A"}
+              {t('admin_common.client')}: {selectedProposition?.client ? `${selectedProposition.client.prenom} ${selectedProposition.client.nom}` : "N/A"}
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <label className="text-xs font-bold uppercase text-muted-foreground">Message au client</label>
+              <label className="text-xs font-bold uppercase text-muted-foreground">{t('admin_common.message_to_client')}</label>
               <Textarea
-                placeholder="Écrivez votre message ici..."
+                placeholder={t('admin_common.message_placeholder')}
                 value={commentaire}
                 onChange={(e) => setCommentaire(e.target.value)}
                 className="min-h-[100px]"
@@ -365,14 +367,14 @@ export default function Propositions() {
           </div>
 
           <DialogFooter>
-            <Button variant="ghost" onClick={() => setIsActionModalOpen(false)} disabled={actionLoading}>Annuler</Button>
+            <Button variant="ghost" onClick={() => setIsActionModalOpen(false)} disabled={actionLoading}>{t('admin_common.cancel')}</Button>
             <Button 
               onClick={handleAction} 
               disabled={actionLoading || (actionType === "reject" && !commentaire.trim())}
               variant={actionType === 'reject' ? "destructive" : "default"}
             >
               {actionLoading ? <RefreshCw className="w-4 h-4 animate-spin mr-2" /> : null}
-              {actionType === 'confirm' ? "Confirmer" : "Rejeter"}
+              {actionType === 'confirm' ? t('admin_common.confirm') : t('admin_common.reject')}
             </Button>
           </DialogFooter>
         </DialogContent>

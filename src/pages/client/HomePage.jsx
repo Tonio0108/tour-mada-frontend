@@ -3,16 +3,19 @@ import bgImage from "../../assets/bg.jpg";
 import { useState } from "react";
 import { useEffect } from "react";
 import { Link, useNavigate } from "react-router";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "../../hooks/useAuth";
 import HeroSection from "./../../../components/HeroSection";
 import AboutSection from "./../../../components/AboutSection";
 import { TourSection } from "./../../../components/TourSection";
 import { CTASection } from "./../../../components/CTASection";
+import TopReviewsSection from "./../../../components/TopReviewsSection";
 import ContactSection from "./../../../components/ContactSection";
 import { getAuthToken } from "../../../lib/api";
 import { SEO } from "../../components/SEO";
 
 export default function HomePage() {
+  const { t } = useTranslation();
   const [tours, setTours] = useState([]);
   const [filters, setFilters] = useState({
     prix_par_pers: "",
@@ -33,7 +36,7 @@ export default function HomePage() {
           }
         });
         if (!res.ok) {
-          throw new Error("impossible de récupérer les tours");
+          throw new Error(t("tour.loading_error"));
         }
         const data = await res.json();
         setTours(data);
@@ -77,11 +80,11 @@ export default function HomePage() {
   };
 
   return (
-    <>
+    <div className="overflow-x-hidden">
       <SEO 
-        title="Leader du tourisme authentique" 
-        description="Découvrez Madagascar avec Tour Mada Découverte. Circuits authentiques à travers les parcs nationaux, les Tsingy et l'Allée des Baobabs."
-        keywords="voyage madagascar, circuit madagascar, trekking madagascar, safari madagascar, guide touristique madagascar"
+        title={t("home.seo.title")} 
+        description={t("home.seo.description")}
+        keywords={t("home.seo.keywords")}
       />
       <HeroSection
         bgImage={bgImage}
@@ -90,14 +93,18 @@ export default function HomePage() {
         filters={filters}
       ></HeroSection>
 
-      <AboutSection></AboutSection>
+      <div className="px-6 md:px-0">
+        <AboutSection></AboutSection>
 
-      <TourSection tours={tours}></TourSection>
+        <TourSection tours={tours}></TourSection>
 
-      <CTASection handleCustomTourClick={handleCustomTourClick}></CTASection>
+        <TopReviewsSection />
 
-      <ContactSection bgImage={bgImage}></ContactSection>
-    </>
+        <CTASection handleCustomTourClick={handleCustomTourClick}></CTASection>
+
+        <ContactSection bgImage={bgImage}></ContactSection>
+      </div>
+    </div>
   );
 }
 

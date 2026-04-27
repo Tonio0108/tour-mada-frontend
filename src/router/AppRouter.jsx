@@ -19,12 +19,16 @@ import ClientRoute from "./ClientRoute";
 import { AdminReservation } from "../pages/admin/Reservations/AdminReservation.jsx";
 import NormalReservation from "../pages/client/NormalReservation.jsx";
 import { Paiement } from "../pages/client/Paiement.jsx";
+import ReviewsPage from "../pages/client/ReviewsPage.jsx";
 import Profile from "../pages/admin/profile/Profile.jsx";
 import Accounts from "../pages/admin/accounts/Accounts.jsx";
 import ClientList from "../pages/admin/client/ClientList.jsx";
 import ClientProfile from "../pages/client/ClientProfile.jsx";
 import ClientLayout from "../pages/client/ClientLayout.jsx";
 import ClientDashboard from "../pages/client/ClientDashboard.jsx";
+import AdminReviews from "../pages/admin/Reviews/AdminReviews.jsx";
+import Notifications from "../pages/client/Notifications.jsx";
+import AdminNotifications from "../pages/admin/Notifications.jsx";
 
 export const AppRouter = () => {
   return (
@@ -36,6 +40,7 @@ export const AppRouter = () => {
         <Route index element={<HomePage />} />
         <Route path="/tours" element={<ClientTours />} />
         <Route path="/tours/:id" element={<TourDetails />} />
+        <Route path="/avis" element={<ReviewsPage />} />
         <Route
           path="/tours/reservation/:id"
           element={
@@ -67,6 +72,7 @@ export const AppRouter = () => {
         <Route path="reservations" element={<Reservations />} />
         <Route path="paiements" element={<Paiement />} />
         <Route path="profile" element={<ClientProfile />} />
+        <Route path="notifications" element={<Notifications />} />
       </Route>
 
       <Route
@@ -92,6 +98,8 @@ export const AppRouter = () => {
         <Route path="profile" element={<Profile />} />
         <Route path="accounts" element={<Accounts />} />
         <Route path="clients" element={<ClientList />}/>
+        <Route path="avis" element={<AdminReviews />} />
+        <Route path="notifications" element={<AdminNotifications />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />

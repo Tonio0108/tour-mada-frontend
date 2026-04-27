@@ -1,19 +1,11 @@
-import {
-  Eye,
-  Download,
-  Search,
-  Filter,
-  RefreshCw,
-  Calendar as CalendarIcon,
-  X,
-  MoreVertical,
-  CreditCard,
-} from "lucide-react";
-import { useState, useEffect } from "react";
+import { PaiementApi, MailApi } from "../../../../lib/api";
 import dayjs from "dayjs";
-import { PaiementApi } from "../../../../lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { RefreshCw,Search,Filter,MoreVertical,Download,CalendarIcon } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -32,6 +24,7 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -56,6 +49,7 @@ import { Separator } from "@/components/ui/separator";
 import { getImageUrl } from "../../../utils/imageUrl";
 
 export default function Paiements() {
+  const { t } = useTranslation();
   const [paiementsData, setPaiementsData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -72,6 +66,11 @@ export default function Paiements() {
     typeTour: "all",
   });
 
+  const [isActionModalOpen, setIsActionModalOpen] = useState(false);
+  const [actionType, setActionType] = useState(""); // "VALIDE" or "REJETE"
+  const [commentaire, setCommentaire] = useState("");
+  const [actionLoading, setActionLoading] = useState(false);
+
   useEffect(() => {
     fetchPaiements();
   }, []);
@@ -84,7 +83,7 @@ export default function Paiements() {
       setFilteredData(data);
     } catch (error) {
       console.error("Erreur:", error);
-      toast.error("Impossible de charger les paiements");
+      toast.error(t('admin_payments.toast.load_error'));
     } finally {
       setLoading(false);
     }
@@ -106,7 +105,7 @@ export default function Paiements() {
     }
 
     if (filters.statut !== "all") {
-      result = result.filter((p) => p.reservation?.statut === filters.statut);
+      result = result.filter((p) => p.statut === filters.statut);
     }
 
     if (filters.modePaiement !== "all") {
@@ -137,6 +136,57 @@ export default function Paiements() {
     setFilteredData(result);
   }, [searchText, filters, paiementsData]);
 
+  const showActionModal = (type, record) => {
+    setSelectedRecord(record);
+    setActionType(type);
+    setCommentaire("");
+    setIsActionModalOpen(true);
+  };
+
+  const handleUpdateStatus = async () => {
+    if (!selectedRecord) return;
+    setActionLoading(true);
+
+    try {
+      await PaiementApi.updatePaiementStatus(selectedRecord.id_paiement, {
+        statut: actionType,
+      });
+
+      const nomClient = `${selectedRecord.reservation?.client?.prenom} ${selectedRecord.reservation?.client?.nom}`;
+      const email = selectedRecord.reservation?.client?.utilisateur?.email || selectedRecord.reservation?.email;
+      const montant = parseFloat(selectedRecord.montant).toLocaleString();
+
+      try {
+        if (actionType === "VALIDE") {
+          await MailApi.confirmPayment({
+            nomClient,
+            email,
+            montant,
+            message: commentaire.trim()
+          });
+        } else {
+          await MailApi.refusePayment({
+            nomClient,
+            email,
+            montant,
+            message: commentaire.trim()
+          });
+        }
+      } catch (e) {
+        console.error("Mail error:", e);
+      }
+
+      toast.success(t('admin_payments.toast.update_success'));
+      fetchPaiements();
+      setIsActionModalOpen(false);
+    } catch (error) {
+      console.error("Erreur:", error);
+      toast.error(t('admin_payments.toast.update_error'));
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     return dayjs(dateString).format("DD/MM/YYYY HH:mm");
@@ -144,9 +194,9 @@ export default function Paiements() {
 
   const getStatusBadge = (status) => {
     const s = status?.toUpperCase();
-    if (s === "CONFIRMER") return <Badge variant="outline" className="bg-primary text-primary-foreground border-none">Confirmé</Badge>;
-    if (s === "ANNULE" || s === "ANNULER") return <Badge variant="destructive">Annulé</Badge>;
-    return <Badge variant="secondary">En attente</Badge>;
+    if (s === "VALIDE") return <Badge variant="outline" className="bg-primary text-primary-foreground border-none">{t('admin_common.validate')}</Badge>;
+    if (s === "REJETE") return <Badge variant="destructive">{t('admin_common.reject')}</Badge>;
+    return <Badge variant="secondary">{t('reservations.status.pending')}</Badge>;
   };
 
   const clearFilters = () => {
@@ -170,21 +220,21 @@ export default function Paiements() {
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-foreground">Paiements</h2>
-          <p className="text-sm text-muted-foreground mt-1">Suivi des règlements clients</p>
+          <h2 className="text-2xl font-bold text-foreground">{t('admin_payments.title')}</h2>
+          <p className="text-sm text-muted-foreground mt-1">{t('admin_payments.subtitle')}</p>
         </div>
         <Button variant="outline" onClick={fetchPaiements} disabled={loading} className="gap-2">
           <RefreshCw className={cn("w-4 h-4", loading && "animate-spin")} />
-          Actualiser
+          {t('admin_common.refresh')}
         </Button>
       </div>
 
       <div className="bg-white rounded border border-border overflow-hidden">
         <div className="p-4 border-b border-border flex flex-wrap items-center gap-4">
-          <div className="relative flex-1 min-w-[300px]">
+          <div className="relative flex-1 min-w-75">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
             <Input
-              placeholder="Rechercher..."
+              placeholder={t('admin_common.search')}
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
               className="pl-9"
@@ -195,7 +245,7 @@ export default function Paiements() {
             onClick={() => setIsFilterVisible(!isFilterVisible)}
             className="gap-2"
           >
-            <Filter className="w-4 h-4" /> Filtres
+            <Filter className="w-4 h-4" /> {t('admin_common.filters')}
           </Button>
         </div>
 
@@ -204,13 +254,13 @@ export default function Paiements() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <Select value={filters.statut} onValueChange={(v) => setFilters(f => ({...f, statut: v}))}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Statut" />
+                  <SelectValue placeholder={t('admin_common.status')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Tous les statuts</SelectItem>
-                  <SelectItem value="EN_ATTENTE">En attente</SelectItem>
-                  <SelectItem value="CONFIRMER">Confirmé</SelectItem>
-                  <SelectItem value="ANNULE">Annulé</SelectItem>
+                  <SelectItem value="all">{t('admin_common.all_status')}</SelectItem>
+                  <SelectItem value="EN_ATTENTE">{t('reservations.status.pending')}</SelectItem>
+                  <SelectItem value="VALIDE">{t('admin_common.validate')}</SelectItem>
+                  <SelectItem value="REJETE">{t('admin_common.reject')}</SelectItem>
                 </SelectContent>
               </Select>
 
@@ -218,7 +268,7 @@ export default function Paiements() {
                 <PopoverTrigger asChild>
                   <Button variant="outline" className={cn("justify-start text-left font-normal", !filters.date && "text-muted-foreground")}>
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {filters.date ? dayjs(filters.date).format("DD/MM/YYYY") : "Choisir une date"}
+                    {filters.date ? dayjs(filters.date).format("DD/MM/YYYY") : t('admin_payments.filters.date_placeholder')}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
@@ -232,17 +282,17 @@ export default function Paiements() {
 
               <Select value={filters.typeTour} onValueChange={(v) => setFilters(f => ({...f, typeTour: v}))}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Type de tour" />
+                  <SelectValue placeholder={t('admin_payments.filters.type_tour')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Tous les types</SelectItem>
-                  <SelectItem value="standard">Standard</SelectItem>
-                  <SelectItem value="personnalise">Personnalisé</SelectItem>
+                  <SelectItem value="all">{t('admin_payments.filters.all_types')}</SelectItem>
+                  <SelectItem value="standard">{t('admin_payments.filters.standard')}</SelectItem>
+                  <SelectItem value="personnalise">{t('admin_payments.filters.custom')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="flex justify-end">
-              <Button variant="ghost" size="sm" onClick={clearFilters}>Effacer les filtres</Button>
+              <Button variant="ghost" size="sm" onClick={clearFilters}>{t('admin_common.clear_filters')}</Button>
             </div>
           </div>
         )}
@@ -251,11 +301,11 @@ export default function Paiements() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="px-4 py-3 font-medium">Référence</TableHead>
-                <TableHead className="px-4 py-3 font-medium">Client</TableHead>
-                <TableHead className="px-4 py-3 font-medium">Circuit</TableHead>
-                <TableHead className="px-4 py-3 font-medium text-right">Montant</TableHead>
-                <TableHead className="px-4 py-3 font-medium text-center">Statut</TableHead>
+                <TableHead className="px-4 py-3 font-medium">{t('admin_payments.table.reference')}</TableHead>
+                <TableHead className="px-4 py-3 font-medium">{t('admin_common.client')}</TableHead>
+                <TableHead className="px-4 py-3 font-medium">{t('admin_payments.table.circuit')}</TableHead>
+                <TableHead className="px-4 py-3 font-medium text-right">{t('admin_common.amount')}</TableHead>
+                <TableHead className="px-4 py-3 font-medium text-center">{t('admin_common.status')}</TableHead>
                 <TableHead className="w-12 px-4 py-3 text-right"></TableHead>
               </TableRow>
             </TableHeader>
@@ -268,7 +318,7 @@ export default function Paiements() {
                 ))
               ) : filteredData.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="h-32 text-center text-muted-foreground">Aucun paiement</TableCell>
+                  <TableCell colSpan={6} className="h-32 text-center text-muted-foreground">{t('admin_payments.table.no_payments')}</TableCell>
                 </TableRow>
               ) : (
                 filteredData.map((p) => (
@@ -278,13 +328,13 @@ export default function Paiements() {
                       <div className="text-sm font-medium">{p.reservation?.client?.prenom} {p.reservation?.client?.nom}</div>
                     </TableCell>
                     <TableCell className="px-4 py-3 text-sm text-muted-foreground">
-                      {p.reservation?.tour?.nom_tour || "Tour Personnalisé"}
+                      {p.reservation?.tour?.nom_tour || t('tour.custom_tour')}
                     </TableCell>
                     <TableCell className="px-4 py-3 text-right font-medium text-primary">
                       {parseFloat(p.montant).toLocaleString()} Ar
                     </TableCell>
                     <TableCell className="px-4 py-3 text-center">
-                      {getStatusBadge(p.reservation?.statut)}
+                      {getStatusBadge(p.statut)}
                     </TableCell>
                     <TableCell className="px-4 py-3 text-right">
                       <DropdownMenu>
@@ -295,12 +345,22 @@ export default function Paiements() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem onClick={() => { setSelectedRecord(p); setIsModalOpen(true); }}>
-                            Détails
+                            {t('admin_common.details')}
                           </DropdownMenuItem>
                           {p.fichier_justificatif_path && (
                             <DropdownMenuItem onClick={() => handleDownload(p.fichier_justificatif_path)}>
-                              Justificatif
+                              {t('payments.form.proof')}
                             </DropdownMenuItem>
+                          )}
+                          {(!p.statut || p.statut === "EN_ATTENTE") && (
+                            <>
+                              <DropdownMenuItem onClick={() => showActionModal("VALIDE", p)} className="text-primary font-bold">
+                                {t('admin_common.validate')}
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => showActionModal("REJETE", p)} className="text-destructive font-bold">
+                                {t('admin_common.reject')}
+                              </DropdownMenuItem>
+                            </>
                           )}
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -319,23 +379,23 @@ export default function Paiements() {
             <>
               <DialogHeader>
                 <div className="flex items-center justify-between">
-                  <DialogTitle className="text-xl font-bold">Détails du paiement</DialogTitle>
-                  {getStatusBadge(selectedRecord.reservation?.statut)}
+                  <DialogTitle className="text-xl font-bold">{t('admin_payments.details.title')}</DialogTitle>
+                  {getStatusBadge(selectedRecord.statut)}
                 </div>
-                <DialogDescription>Réf: {selectedRecord.reference_paiement}</DialogDescription>
+                <DialogDescription>{t('admin_payments.table.reference')}: {selectedRecord.reference_paiement}</DialogDescription>
               </DialogHeader>
 
               <div className="space-y-6 py-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <h4 className="text-xs font-bold uppercase text-muted-foreground">Paiement</h4>
+                    <h4 className="text-xs font-bold uppercase text-muted-foreground">{t('admin_payments.details.payment_info')}</h4>
                     <div className="text-sm">
                       <p className="text-2xl font-bold text-primary">{parseFloat(selectedRecord.montant).toLocaleString()} Ar</p>
-                      <p className="text-muted-foreground">Via {selectedRecord.mode_paiement}</p>
+                      <p className="text-muted-foreground">{t('navbar.payments')} {selectedRecord.mode_paiement}</p>
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="text-xs font-bold uppercase text-muted-foreground">Client</h4>
+                    <h4 className="text-xs font-bold uppercase text-muted-foreground">{t('admin_payments.details.client_info')}</h4>
                     <div className="text-sm">
                       <p className="font-medium">{selectedRecord.reservation?.client?.prenom} {selectedRecord.reservation?.client?.nom}</p>
                       <p className="text-muted-foreground">{selectedRecord.reservation?.client?.telephone}</p>
@@ -346,25 +406,75 @@ export default function Paiements() {
                 <Separator />
 
                 <div className="space-y-2">
-                  <h4 className="text-xs font-bold uppercase text-muted-foreground">Circuit lié</h4>
+                  <h4 className="text-xs font-bold uppercase text-muted-foreground">{t('admin_payments.details.linked_tour')}</h4>
                   <div className="text-sm flex justify-between items-center">
-                    <p className="font-medium">{selectedRecord.reservation?.tour?.nom_tour || "Tour Personnalisé"}</p>
-                    <p className="text-muted-foreground">Prévu le {dayjs(selectedRecord.reservation?.date_tour_prevue).format("DD/MM/YYYY")}</p>
+                    <p className="font-medium">{selectedRecord.reservation?.tour?.nom_tour || t('tour.custom_tour')}</p>
+                    <p className="text-muted-foreground">{t('admin_payments.details.planned_for')} {dayjs(selectedRecord.reservation?.date_tour_prevue).format("DD/MM/YYYY")}</p>
                   </div>
                 </div>
 
                 {selectedRecord.fichier_justificatif_path && (
                   <Button onClick={() => handleDownload(selectedRecord.fichier_justificatif_path)} className="w-full">
-                    <Download className="mr-2 h-4 w-4" /> Télécharger le justificatif
+                    <Download className="mr-2 h-4 w-4" /> {t('admin_payments.details.download_proof')}
                   </Button>
                 )}
               </div>
 
-              <div className="flex justify-end">
-                <Button variant="ghost" onClick={() => setIsModalOpen(false)}>Fermer</Button>
-              </div>
+              <DialogFooter className="flex justify-end gap-2">
+                <Button variant="ghost" onClick={() => setIsModalOpen(false)}>{t('admin_common.close')}</Button>
+                {(!selectedRecord.statut || selectedRecord.statut === "EN_ATTENTE") && (
+                  <>
+                    <Button variant="destructive" onClick={() => { setIsModalOpen(false); showActionModal("REJETE", selectedRecord); }}>
+                      {t('admin_common.reject')}
+                    </Button>
+                    <Button onClick={() => { setIsModalOpen(false); showActionModal("VALIDE", selectedRecord); }}>
+                      {t('admin_common.validate')}
+                    </Button>
+                  </>
+                )}
+              </DialogFooter>
             </>
           )}
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isActionModalOpen} onOpenChange={setIsActionModalOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>
+              {actionType === 'VALIDE' ? t('admin_payments.actions.validate_title') : t('admin_payments.actions.reject_title')}
+            </DialogTitle>
+            <DialogDescription>
+              {t('admin_common.client')}: {selectedRecord?.reservation?.client?.prenom} {selectedRecord?.reservation?.client?.nom}
+              <br />
+              {t('admin_common.amount')}: {parseFloat(selectedRecord?.montant || 0).toLocaleString()} Ar
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <label className="text-xs font-bold uppercase text-muted-foreground">{t('admin_common.message_to_client')}</label>
+              <span className="text-[10px] text-muted-foreground ml-2">({t('admin_common.mail_included')})</span>
+              <Textarea
+                placeholder={t('admin_common.message_placeholder')}
+                value={commentaire}
+                onChange={(e) => setCommentaire(e.target.value)}
+                className="min-h-[120px]"
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setIsActionModalOpen(false)} disabled={actionLoading}>{t('admin_common.cancel')}</Button>
+            <Button 
+              onClick={handleUpdateStatus} 
+              disabled={actionLoading || (actionType === "REJETE" && !commentaire.trim())}
+              variant={actionType === 'REJETE' ? "destructive" : "default"}
+            >
+              {actionLoading ? <RefreshCw className="w-4 h-4 animate-spin mr-2" /> : null}
+              {actionType === 'VALIDE' ? t('admin_common.validate') : t('admin_common.reject')}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

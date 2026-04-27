@@ -91,9 +91,9 @@ const Tours = () => {
   return (
     <div className="space-y-8 max-w-7xl mx-auto py-6">
       <SEO 
-        title="Nos Circuits" 
-        description="Parcourez notre catalogue de circuits touristiques à Madagascar. Des aventures inoubliables adaptées à tous les budgets et durées."
-        keywords="circuits madagascar, tours madagascar, voyage organisé madagascar, visiter madagascar"
+        title={t("tours_page.seo.title")} 
+        description={t("tours_page.seo.description")}
+        keywords={t("tours_page.seo.keywords")}
       />
       {/* Hero Mini Section avec variables CSS */}
       <div className="relative py-10 px-8 rounded-lg border bg-primary text-primary-foreground text-left overflow-hidden shadow-sm">
@@ -102,10 +102,10 @@ const Tours = () => {
             {t("tours_page.title").replace(/<0>|<\/0>/g, "")} {new Date().getFullYear()}
           </Badge>
           <h1 className="text-2xl font-semibold mb-2 tracking-tight">
-            Circuits Standards Madagascar
+            {t("tours_page.hero_title")}
           </h1>
           <p className="text-primary-foreground/80 text-sm max-w-lg leading-relaxed">
-            {t("tour.description")}
+            {t("tours_page.hero_subtitle")}
           </p>
         </div>
         <Compass className="absolute -right-2.5 -bottom-2.5 w-48 h-48 text-primary-foreground/5 rotate-12" />

@@ -1,20 +1,20 @@
 import { getAuthToken } from "../../../lib/api";
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
+import { useTranslation } from "react-i18next";
 import { 
   MapPin, 
   DollarSign, 
   Calendar, 
   Package,
   Plus,
-  ArrowRight,
   Loader2,
   WalletCards,
   ChevronRight,
-  TrendingUp,
   BarChart3,
   PieChart as PieChartIcon,
-  ChevronDown
+  Eye,
+  Clock
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -44,6 +44,7 @@ import {
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
 
 export default function AdminDashboard() {
+  const { t } = useTranslation();
   const [analytics, setAnalytics] = useState({
     stats: {
       totalRevenue: 0,
@@ -88,9 +89,16 @@ export default function AdminDashboard() {
 
   const getStatusBadge = (status) => {
     const s = status?.toUpperCase();
-    if (s === "CONFIRMER") return <Badge className="bg-primary text-primary-foreground border-none">Confirmé</Badge>;
-    if (s === "ANNULER") return <Badge variant="destructive">Annulé</Badge>;
-    return <Badge variant="secondary">En attente</Badge>;
+    if (s === "CONFIRMER") return <Badge className="bg-emerald-500 hover:bg-emerald-600 text-white border-none text-[10px]">{t('reservations.status.confirmed')}</Badge>;
+    if (s === "ANNULER") return <Badge variant="destructive" className="text-[10px]">{t('reservations.status.cancelled')}</Badge>;
+    return <Badge variant="secondary" className="bg-amber-100 text-amber-700 hover:bg-amber-100 border-none text-[10px]">{t('reservations.status.pending')}</Badge>;
+  };
+
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString("fr-FR", {
+      day: "2-digit",
+      month: "2-digit",
+    });
   };
 
   const StatCard = ({ title, value, icon: Icon, formatter, variant = "default" }) => (
@@ -123,37 +131,37 @@ export default function AdminDashboard() {
   if (loading) return (
     <div className="h-[60vh] flex flex-col items-center justify-center gap-3">
       <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Chargement</p>
+      <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">{t('admin_common.loading')}</p>
     </div>
   );
 
   return (
     <div className="space-y-8">
       <div>
-        <h2 className="text-2xl font-bold">Tableau de bord</h2>
+        <h2 className="text-2xl font-bold text-left">{t('admin_dashboard.title')}</h2>
         <div className="h-1 w-12 bg-primary mt-2"></div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard 
-          title="Revenu Total" 
+          title={t('admin_dashboard.stats.total_revenue')}
           value={analytics.stats.totalRevenue} 
           icon={WalletCards} 
-          formatter={v => `${parseInt(v).toLocaleString()} Ar`}
+          formatter={v => `${parseInt(v).toLocaleString()} ${t('admin_common.currency')}`}
           variant="primary"
         />
         <StatCard 
-          title="Réservations" 
+          title={t('admin_dashboard.stats.reservations')}
           value={analytics.stats.totalReservations} 
           icon={Calendar} 
         />
         <StatCard 
-          title="Circuits" 
+          title={t('admin_dashboard.stats.tours')}
           value={analytics.stats.totalTours} 
           icon={MapPin} 
         />
         <StatCard 
-          title="Paiements en attente" 
+          title={t('admin_dashboard.stats.pending_payments')}
           value={analytics.stats.pendingPayments} 
           icon={DollarSign} 
         />
@@ -164,9 +172,9 @@ export default function AdminDashboard() {
           <CardHeader>
             <div className="flex items-center gap-2">
               <BarChart3 className="w-4 h-4 text-primary" />
-              <CardTitle className="text-lg font-bold">Revenus par mois</CardTitle>
+              <CardTitle className="text-lg font-bold">{t('admin_dashboard.charts.revenue_monthly')}</CardTitle>
             </div>
-            <CardDescription>Visualisation des revenus validés sur les 6 derniers mois</CardDescription>
+            <CardDescription className="text-left">{t('admin_dashboard.charts.revenue_desc')}</CardDescription>
           </CardHeader>
           <CardContent className="h-[300px] min-h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
@@ -175,7 +183,7 @@ export default function AdminDashboard() {
                 <XAxis dataKey="month" fontSize={12} tickLine={false} axisLine={false} />
                 <YAxis fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `${value / 1000000}M`} />
                 <Tooltip 
-                  formatter={(value) => [`${parseInt(value).toLocaleString()} Ar`, 'Revenu']}
+                  formatter={(value) => [`${parseInt(value).toLocaleString()} ${t('admin_common.currency')}`, 'Revenu']}
                   contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
                 />
                 <Bar dataKey="revenue" fill="#3b82f6" radius={[4, 4, 0, 0]} />
@@ -184,40 +192,47 @@ export default function AdminDashboard() {
           </CardContent>
         </Card>
 
-        <Card className="border-border shadow-none bg-card">
+        <Card className="border-border shadow-none bg-card flex flex-col">
           <CardHeader>
             <div className="flex items-center gap-2">
               <PieChartIcon className="w-4 h-4 text-primary" />
-              <CardTitle className="text-lg font-bold">Destinations populaires</CardTitle>
+              <CardTitle className="text-lg font-bold">{t('admin_dashboard.charts.popular_destinations')}</CardTitle>
             </div>
-            <CardDescription>Répartition des réservations par circuit</CardDescription>
+            <CardDescription className="text-left text-xs">{t('admin_dashboard.charts.popular_desc')}</CardDescription>
           </CardHeader>
-          <CardContent className="h-[300px] min-h-[300px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={analytics.popularTours}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={80}
-                  paddingAngle={5}
-                  dataKey="count"
-                >
-                  {analytics.popularTours.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip 
-                   contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
-                />
-              </PieChart>
-            </ResponsiveContainer>
-            <div className="flex flex-wrap justify-center gap-4 mt-4">
+          <CardContent className="flex-1 flex flex-col pt-0">
+            <div className="h-[200px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={analytics.popularTours}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={55}
+                    outerRadius={75}
+                    paddingAngle={5}
+                    dataKey="count"
+                  >
+                    {analytics.popularTours.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip 
+                     contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', fontSize: '12px' }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-2 px-2">
               {analytics.popularTours.map((entry, index) => (
-                <div key={entry.name} className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS[index % COLORS.length] }} />
-                  <span className="text-xs font-medium">{entry.name}</span>
+                <div key={entry.name} className="flex items-center gap-2 overflow-hidden">
+                  <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: COLORS[index % COLORS.length] }} />
+                  <span className="text-[10px] font-medium truncate whitespace-nowrap" title={entry.name}>
+                    {entry.name}
+                  </span>
+                  <span className="text-[10px] text-muted-foreground ml-auto tabular-nums font-bold">
+                    {entry.count}
+                  </span>
                 </div>
               ))}
             </div>
@@ -227,85 +242,105 @@ export default function AdminDashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <Card className="lg:col-span-2 border-border shadow-none bg-card">
-          <CardHeader className="border-b border-border/50 flex flex-row items-center justify-between space-y-0">
-            <CardTitle className="text-lg font-bold">Activités Récentes</CardTitle>
+          <CardHeader className="border-b border-border/50 flex flex-row items-center justify-between space-y-0 py-4 px-6">
+            <div className="flex items-center gap-2">
+              <Clock className="w-4 h-4 text-primary" />
+              <CardTitle className="text-lg font-bold">{t('admin_dashboard.recent_activities.title')}</CardTitle>
+            </div>
             <Button variant="ghost" size="sm" className="text-xs font-bold uppercase tracking-tighter" asChild>
-              <Link to="/admin/reservations">Voir tout <ChevronRight className="ml-1 w-3 h-3" /></Link>
+              <Link to="/admin/reservations">{t('admin_dashboard.recent_activities.view_all')} <ChevronRight className="ml-1 w-3 h-3" /></Link>
             </Button>
           </CardHeader>
-          <CardContent className="p-0">
-            <Table>
-              <TableHeader>
+          <CardContent className="p-0 text-left">
+            <div className="overflow-x-auto">
+              <Table>
                 <TableHeader>
-                <TableRow>
-                  <TableHead className="px-6 py-3 font-bold text-[10px] uppercase">Client</TableHead>
-                  <TableHead className="px-6 py-3 font-bold text-[10px] uppercase">Circuit</TableHead>
-                  <TableHead className="px-6 py-3 font-bold text-[10px] uppercase text-right">Prix</TableHead>
-                  <TableHead className="px-6 py-3 font-bold text-[10px] uppercase text-center">Facture</TableHead>
-                  <TableHead className="px-6 py-3 font-bold text-[10px] uppercase text-center">Statut</TableHead>
-                </TableRow>
-              </TableHeader>
-              </TableHeader>
-              <TableBody>
-                {recentReservations.map((r) => (
-                  <TableRow key={r.id_reservation} className="border-border">
-                    <TableCell className="px-6 py-4 font-bold text-sm">{r.nom_complet}</TableCell>
-                    <TableCell className="px-6 py-4 text-xs text-muted-foreground">{r.tour?.nom_tour || "Sur mesure"}</TableCell>
-                    <TableCell className="px-6 py-4 text-right font-bold text-primary">{parseInt(r.montant_total)?.toLocaleString()} Ar</TableCell>
-                    <TableCell className="px-6 py-4 text-center">
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        onClick={async () => {
-                          const token = await getAuthToken();
-                          const response = await fetch(`${url}/documents/invoice/${r.id_reservation}`, {
-                            headers: { Authorization: `Bearer ${token}` }
-                          });
-                          const blob = await response.blob();
-                          const downloadUrl = window.URL.createObjectURL(blob);
-                          const link = document.createElement('a');
-                          link.href = downloadUrl;
-                          link.setAttribute('download', `facture_${r.id_reservation}.pdf`);
-                          document.body.appendChild(link);
-                          link.click();
-                          link.remove();
-                        }}
-                      >
-                        <ArrowRight className="w-4 h-4" />
-                      </Button>
-                    </TableCell>
-                    <TableCell className="px-6 py-4 text-center">{getStatusBadge(r.statut)}</TableCell>
+                  <TableRow className="bg-muted/30">
+                    <TableHead className="px-6 py-3 font-bold text-[10px] uppercase">{t('admin_common.date')}</TableHead>
+                    <TableHead className="px-6 py-3 font-bold text-[10px] uppercase">{t('admin_common.client')}</TableHead>
+                    <TableHead className="px-6 py-3 font-bold text-[10px] uppercase">{t('admin_payments.table.circuit')}</TableHead>
+                    <TableHead className="px-6 py-3 font-bold text-[10px] uppercase text-right">{t('admin_common.amount')}</TableHead>
+                    <TableHead className="px-6 py-3 font-bold text-[10px] uppercase text-center">{t('admin_common.actions')}</TableHead>
+                    <TableHead className="px-6 py-3 font-bold text-[10px] uppercase text-center">{t('admin_common.status')}</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {recentReservations.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={6} className="h-32 text-center text-muted-foreground italic text-sm">
+                        {t('admin_dashboard.recent_activities.no_activity')}
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    recentReservations.map((r) => (
+                      <TableRow key={r.id_reservation} className="border-border hover:bg-muted/20 transition-colors">
+                        <TableCell className="px-6 py-4 text-xs font-medium text-muted-foreground whitespace-nowrap">
+                          {formatDate(r.createdAt)}
+                        </TableCell>
+                        <TableCell className="px-6 py-4">
+                          <div className="flex flex-col">
+                            <span className="font-bold text-sm leading-tight">{r.nom_complet}</span>
+                            <span className="text-[10px] text-muted-foreground">{r.num_tel}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="px-6 py-4">
+                          <span className="text-xs font-medium block max-w-[150px] truncate">
+                            {r.tour?.nom_tour || r.tour_personnalise?.interets || "Sur mesure"}
+                          </span>
+                        </TableCell>
+                        <TableCell className="px-6 py-4 text-right">
+                          <span className="font-bold text-sm text-primary tabular-nums">
+                            {parseInt(r.montant_total)?.toLocaleString()} {t('admin_common.currency')}
+                          </span>
+                        </TableCell>
+                        <TableCell className="px-6 py-4 text-center">
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="h-8 gap-1 text-xs font-bold g hover:text-primary"
+                            asChild
+                          >
+                            <Link to="/admin/reservations">
+                              <Eye className="w-3.5 h-3.5" /> {t('admin_common.details')}
+                            </Link>
+                          </Button>
+                        </TableCell>
+                        <TableCell className="px-6 py-4 text-center">
+                          {getStatusBadge(r.statut)}
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </div>
           </CardContent>
         </Card>
 
         <div className="space-y-4">
           <Card className="bg-white border-none shadow-sm">
             <CardHeader>
-              <CardTitle className="text-lg font-bold">Actions rapides</CardTitle>
+              <CardTitle className="text-lg font-bold text-left">{t('admin_dashboard.quick_actions.title')}</CardTitle>
             </CardHeader>
             <CardContent className="grid gap-2">
               <Button variant="secondary" className="w-full justify-start font-bold" asChild>
-                <Link to="/admin/tours/new"><Plus className="w-4 h-4 mr-2" /> Nouveau Circuit</Link>
+                <Link to="/admin/tours/new"><Plus className="w-4 h-4 mr-2" /> {t('admin_dashboard.quick_actions.new_tour')}</Link>
               </Button>
               <Button variant="secondary" className="w-full justify-start font-bold" asChild>
-                <Link to="/admin/paiements"><DollarSign className="w-4 h-4 mr-2" /> Voir les paiements</Link>
+                <Link to="/admin/paiements"><DollarSign className="w-4 h-4 mr-2" /> {t('admin_dashboard.quick_actions.view_payments')}</Link>
               </Button>
               <Button variant="secondary" className="w-full justify-start font-bold" asChild>
-                <Link to="/admin/tours/propositions"><Package className="w-4 h-4 mr-2" /> Propositions</Link>
+                <Link to="/admin/tours/propositions"><Package className="w-4 h-4 mr-2" /> {t('admin_dashboard.quick_actions.propositions')}</Link>
               </Button>
             </CardContent>
           </Card>
 
           <Card className="bg-primary/5 border-none text-primary">
-            <CardContent className="p-6">
-              <p className="text-xs font-bold uppercase mb-2">Gestion des stocks</p>
-              <p className="text-sm mb-4">La capacité maximale des circuits est désormais active pour éviter les sur-réservations.</p>
+            <CardContent className="p-6 text-left">
+              <p className="text-xs font-bold uppercase mb-2">{t('admin_dashboard.stock.title')}</p>
+              <p className="text-sm mb-4">{t('admin_dashboard.stock.desc')}</p>
               <Button variant="outline" className="w-full font-bold" asChild>
-                <Link to="/admin/tours">Gérer les circuits</Link>
+                <Link to="/admin/tours">{t('admin_dashboard.stock.manage_tours')}</Link>
               </Button>
             </CardContent>
           </Card>
@@ -314,4 +349,3 @@ export default function AdminDashboard() {
     </div>
   );
 }
-

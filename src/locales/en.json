@@ -1,4 +1,24 @@
 {
+  "reservations": {
+    "title": "My Reservations",
+    "loading": "Loading reservations...",
+    "error": "Error",
+    "no_reservations": "You don't have any reservations at the moment.",
+    "reservations_count": "You have {{count}} reservation(s)",
+    "status": {
+      "confirmed": "Confirmed",
+      "pending": "Pending",
+      "cancelled": "Cancelled"
+    },
+    "reservation_card": {
+      "custom_reservation": "Custom reservation",
+      "persons": "pers.",
+      "days": "days",
+      "expand_details": "Details",
+      "collapse_details": "Collapse"
+    }
+  },
+
   "navbar": {
     "brand": "Tour Mada Discovery",
     "home": "Home",
@@ -14,6 +34,7 @@
     "user": "User",
     "language": "Language",
     "account": "Account",
+    "notifications": "Notifications",
     "connected_as": "Logged in as",
     "select_language" : "Choose a language"
   },
@@ -70,7 +91,9 @@
     "videos_count_plural": "videos",
     "learn_more": "Learn more",
     "view_all_tours": "View all our tours",
-    "loading": "Loading tours..."
+    "loading": "Loading tours...",
+    "custom_tour": "Custom Tour",
+    "agency": "Agency"
   },
 
   "cta": {
@@ -138,7 +161,8 @@
     "tabs": {
       "itinerary": "Itinerary",
       "tips": "Tips",
-      "description": "Description"
+      "description": "Description",
+      "reviews": "Reviews"
     },
     "description": {
       "title": "Detailed description"
@@ -168,6 +192,88 @@
         "title": "Tour deletion",
         "message": "The tour has been successfully deleted."
       }
+    }
+  },
+
+  "reviews": {
+    "title": "Reviews from our travelers",
+    "write_review": "Write a review",
+    "write_agency_review": "Give an agency review",
+    "write_agency_review_long": "Give my review on the agency",
+    "share_experience": "Share your experience with us and help other travelers.",
+    "your_rating": "Your rating",
+    "your_comment": "Your comment",
+    "placeholder": "Tell us about your trip...",
+    "submit": "Post my review",
+    "success": "Thank you! Your review has been published.",
+    "error": "An error occurred during publication.",
+    "no_reviews": "No reviews yet. Be the first to leave one!",
+    "login_to_review": "Log in to leave a review for this tour.",
+    "login_required": "You must be logged in to post a review.",
+    "deleted": "Review successfully deleted.",
+    "confirm_delete": "Are you sure you want to delete this review?",
+    "error_delete": "Error deleting the review.",
+    "view_all_reviews": "View all reviews",
+    "agency": "Agency",
+    "agency_name": "Tour Mada Discovery",
+    "choose_tour_to_review": "Choose a tour to review",
+    "testimonials": "Experiences",
+    "what_travelers_say_start": "Reviews from",
+    "what_travelers_say_end": "our travelers",
+    "satisfaction_reward": "Your satisfaction is our greatest reward. Here are the testimonials of those who trusted us.",
+    "write_agency_review_long": "Give my review on the agency",
+    "header": {
+      "title": "What <0>our travelers</0> say",
+      "description": "Discover the experiences of our customers during their adventures in Madagascar."
+    }
+  },
+
+  "footer": {
+    "description": "Your trusted partner for discovering the wonders of Madagascar through authentic and personalized tours.",
+    "navigation": "Navigation",
+    "services": "Services",
+    "contact": "Contact",
+    "legal": "Legal Notice",
+    "privacy": "Privacy Policy",
+    "all_rights": "© {{year}} {{brand}}. All rights reserved."
+  },
+
+  "home": {
+    "seo": {
+      "title": "Leader in Authentic Tourism",
+      "description": "Discover Madagascar with Tour Mada Discovery. Authentic tours through national parks, Tsingy and the Baobab Avenue.",
+      "keywords": "madagascar travel, madagascar tour, madagascar trekking, madagascar safari, madagascar tour guide"
+    }
+  },
+
+  "contact": {
+    "title": "Contact us",
+    "call_to_action": "A question? A travel project? Feel free to contact us, our team will answer you as soon as possible.",
+    "phone": {
+      "title": "Phone",
+      "value": "+261 34 12 345 67"
+    },
+    "email": {
+      "title": "Email",
+      "value": "contact@tourmada.com"
+    },
+    "address": {
+      "title": "Address",
+      "value": "Antananarivo, Madagascar"
+    },
+    "social": {
+      "title": "Social Networks",
+      "facebook": "Tour Mada Discovery"
+    },
+    "buttons": {
+      "email": "Send us a message"
+    },
+    "form": {
+      "subject": "Subject",
+      "message": "Your message...",
+      "success": "Your message has been sent successfully!",
+      "error": "An error occurred while sending the message.",
+      "required_fields": "Please fill in all required fields."
     }
   },
 
@@ -335,6 +441,13 @@
       "cancel": "Cancel",
       "contact": "Contact"
     },
+    "cancel_dialog": {
+      "title": "Cancel Reservation",
+      "description": "Please let us know the reason for your cancellation. This message will be sent to the administration.",
+      "placeholder": "Reason for cancellation (optional)...",
+      "confirm": "Confirm Cancellation",
+      "cancel": "Keep Reservation"
+    },
     "empty_state": {
       "title": "No reservations",
       "description": "You haven't made any reservations yet.",
@@ -498,5 +611,534 @@
       "update_error": "Error updating profile",
       "password_error": "Error changing password"
     }
+  },
+
+  "admin_common": {
+    "search": "Search...",
+    "filters": "Filters",
+    "clear_filters": "Clear filters",
+    "refresh": "Refresh",
+    "actions": "Actions",
+    "details": "Details",
+    "confirm": "Confirm",
+    "reject": "Reject",
+    "validate": "Validate",
+    "delete": "Delete",
+    "close": "Close",
+    "cancel": "Cancel",
+    "save": "Save",
+    "status": "Status",
+    "date": "Date",
+    "client": "Client",
+    "amount": "Amount",
+    "currency": "Ar",
+    "loading": "Loading",
+    "no_data": "No data available",
+    "success_update": "Update successful",
+    "error_update": "Error during update",
+    "message_to_client": "Custom message to client",
+    "message_placeholder": "Write your message here...",
+    "mail_included": "Will be included in the email",
+    "all_status": "All statuses"
+  },
+
+  "admin_dashboard": {
+    "title": "Dashboard",
+    "stats": {
+      "total_revenue": "Total Revenue",
+      "reservations": "Reservations",
+      "tours": "Tours",
+      "pending_payments": "Pending Payments"
+    },
+    "charts": {
+      "revenue_monthly": "Revenue by month",
+      "revenue_desc": "Visualization of validated revenue over the last 6 months",
+      "popular_destinations": "Popular destinations",
+      "popular_desc": "Distribution of reservations by tour"
+    },
+    "recent_activities": {
+      "title": "Recent Activities",
+      "view_all": "View all",
+      "no_activity": "No recent activity"
+    },
+    "quick_actions": {
+      "title": "Quick actions",
+      "new_tour": "New Tour",
+      "view_payments": "View payments",
+      "propositions": "Propositions"
+    },
+    "stock": {
+      "title": "Stock Management",
+      "desc": "Maximum tour capacity is now active to prevent over-booking.",
+      "manage_tours": "Manage tours"
+    }
+  },
+
+  "admin_reviews": {
+  "title": "Reviews Management",
+  "subtitle": "Moderate and manage customer reviews.",
+  "search_placeholder": "Search a review...",
+  "all_stars": "All ratings",
+  "stars": "stars",
+  "star": "star",
+  "no_reviews": "No reviews found",
+    "no_reviews_desc": "Your customer reviews will appear here.",
+    "published": "Published",
+    "hidden": "Hidden",
+    "concerning": "Concerning:",
+    "publish": "Publish",
+    "hide": "Hide",
+    "delete_confirm": "Are you sure you want to delete this review?",
+    "toast": {
+      "fetch_error": "Error retrieving reviews",
+      "hidden_success": "Review hidden",
+      "published_success": "Review published",
+      "status_error": "Error modifying status",
+      "delete_success": "Review deleted",
+      "delete_error": "Error during deletion"
+    }
+  },
+
+  "admin_payments": {
+    "title": "Payments",
+    "subtitle": "Customer payment tracking",
+    "filters": {
+      "method": "Payment method",
+      "all_methods": "All methods",
+      "date_placeholder": "Choose a date",
+      "type_tour": "Tour type",
+      "all_types": "All types",
+      "standard": "Standard",
+      "custom": "Custom"
+    },
+    "table": {
+      "reference": "Reference",
+      "circuit": "Tour",
+      "no_payments": "No payments"
+    },
+    "details": {
+      "title": "Payment Details",
+      "payment_info": "Payment",
+      "client_info": "Client",
+      "linked_tour": "Linked tour",
+      "planned_for": "Planned for",
+      "download_proof": "Download proof"
+    },
+    "actions": {
+      "validate_title": "Validate payment",
+      "reject_title": "Reject payment"
+    },
+    "toast": {
+      "load_error": "Unable to load payments",
+      "update_success": "Payment status updated",
+      "update_error": "Error during update"
+    }
+  },
+
+  "admin_reservations": {
+    "title": "Booking Management",
+    "no_reservations": "No reservations",
+    "details": {
+      "title": "Booking Details",
+      "received_on": "Received on",
+      "client": "Client",
+      "finance": "Finance",
+      "budget": "Budget",
+      "tour": "Tour",
+      "departure": "Departure"
+    },
+    "actions": {
+      "confirm_title": "Confirm booking",
+      "refuse_title": "Refuse booking",
+      "selected_count": "{{count}} bookings selected"
+    },
+    "toast": {
+      "load_error": "Unable to load bookings",
+      "update_success": "Status updated",
+      "update_error": "Error during update"
+    }
+  },
+
+  "admin_clients": {
+    "title": "Client Database",
+    "subtitle": "Travelers directory",
+    "no_clients": "No clients",
+    "member_account": "Member account",
+    "direct_client": "Direct client",
+    "contact_info": "Contact info",
+    "history": "History"
+  },
+
+  "admin_accounts": {
+    "title": "Accounts Management",
+    "subtitle": "Manage administrator access",
+    "new_user": "New User",
+    "edit_user": "Edit User",
+    "view_user": "User Details",
+    "delete_title": "Delete this account?",
+    "delete_desc": "This action is irreversible for {{email}}.",
+    "no_users": "No users",
+    "temp_password": "Temporary password",
+    "toast": {
+      "load_error": "Unable to load users",
+      "delete_success": "User deleted",
+      "update_success": "User updated",
+      "create_success": "User created"
+    }
+  },
+
+  "admin_propositions": {  "title": "Propositions",
+  "subtitle": "Custom tour requests",
+  "no_propositions": "No propositions",
+  "table": {
+    "interests": "Interests"
+  },
+  "details": {
+    "title": "Proposition #{{id}}",
+    "subtitle": "Custom tour request",
+    "info": "Infos",
+    "duration": "Duration",
+    "interests_wishes": "Interests & Wishes",
+    "proposed_itinerary": "Proposed Itinerary"
+  },
+  "actions": {
+    "confirm_title": "Confirm proposition",
+    "reject_title": "Reject proposition",
+    "comment_required": "Please add a comment"
+  },
+  "toast": {
+    "load_error": "Unable to load propositions",
+    "update_success": "Proposition updated",
+    "update_error": "Error during update"
   }
+  },
+
+  "client_common": {
+    "dashboard": "Dashboard",
+    "my_reservations": "My Bookings",
+    "my_payments": "My Payments",
+    "my_profile": "My Profile",
+    "logout": "Logout",
+    "back_to_site": "Back to Site",
+    "client_space": "Client Space",
+    "need_help": "Need help?",
+    "help_desc": "Our team is available 24/7 to assist you in preparing your trip.",
+    "contact_us": "Contact us",
+    "quick_actions": "Quick Actions",
+    "search_placeholder": "Search by reference or tour..."
+  },
+
+  "client_dashboard": {
+    "welcome": "Hello, {{name}}!",
+    "subtitle": "Glad to see you again. Here is an overview of your travel projects.",
+    "stats": {
+      "total_reservations": "Total Bookings",
+      "pending": "Pending",
+      "pending_desc": "Bookings to confirm",
+      "confirmed": "Confirmed"
+    },
+    "recent_reservations": {
+      "title": "Recent Bookings",
+      "subtitle": "Your latest travel requests.",
+      "no_reservations": "No bookings yet.",
+      "discover_tours": "Discover our tours",
+      "view_all": "View all my bookings"
+    },
+    "actions": {
+      "book_new": "Book a new tour",
+      "update_profile": "Update my profile",
+      "payment_history": "Payment history"
+    }
+  },
+
+  "client_payments": {
+    "title": "Payment History",
+    "subtitle": "Manage your payments and receipts",
+    "new_payment": "New Payment",
+    "no_payments": "No payments found",
+    "table": {
+      "reference": "Reference",
+      "circuit_destination": "Tour / Destination",
+      "date": "Date",
+      "mode": "Mode",
+      "amount": "Amount"
+    },
+    "form": {
+      "title": "Register a payment",
+      "subtitle": "Please fill in the information regarding your payment.",
+      "reservation": "Booking",
+      "select_reservation": "Select a booking",
+      "reference_label": "Reference",
+      "reference_placeholder": "Transaction No.",
+      "amount_label": "Amount (€)",
+      "mode_label": "Payment method",
+      "select_mode": "Choose a method",
+      "proof_label": "Receipt (Image or PDF)",
+      "file_selected": "File: {{name}}",
+      "submit": "Register payment"
+    },
+    "toast": {
+      "load_error": "Error loading payments",
+      "save_success": "Payment registered successfully",
+      "save_error": "Error during registration",
+      "details_soon": "Details coming soon"
+    }
+  },
+
+  "client_reviews": {
+    "seo_description": "Discover our customers' feedback on their trips to Madagascar.",
+    "header": {
+      "badge": "Experiences",
+      "title_start": "Reviews from ",
+      "title_end": "our travelers",
+      "subtitle": "Your satisfaction is our greatest reward. Here are the testimonials of those who trusted us."
+    }
+  },
+
+  "client_common": {
+    "dashboard": "Dashboard",
+    "my_reservations": "My Bookings",
+    "my_payments": "My Payments",
+    "my_profile": "My Profile",
+    "logout": "Logout",
+    "back_to_site": "Back to Site",
+    "client_space": "Client Space",
+    "need_help": "Need help?",
+    "help_desc": "Our team is available 24/7 to support you in planning your trip.",
+    "contact_us": "Contact us",
+    "quick_actions": "Quick Actions",
+    "search_placeholder": "Search by reference or tour...",
+    "menu_navigation": "Navigation menu",
+    "menu_navigation_desc": "Access the different sections of your client space",
+    "brand_name": "TOUR MADA",
+    "role_client": "Client",
+    "notifications": "Notifications"
+  },
+
+  "client_dashboard": {
+    "welcome": "Hello, {{name}}!",
+    "subtitle": "Glad to see you again. Here is an overview of your travel plans.",
+    "stats": {
+      "total_reservations": "Total Bookings",
+      "pending": "Pending",
+      "pending_desc": "Bookings to confirm",
+      "confirmed": "Confirmed"
+    },
+    "recent_reservations": {
+      "title": "Recent Bookings",
+      "subtitle": "Your latest travel requests.",
+      "no_reservations": "No bookings yet.",
+      "discover_tours": "Discover our tours",
+      "view_all": "View all my bookings"
+    },
+    "actions": {
+      "book_new": "Book a new tour",
+      "update_profile": "Update my profile",
+      "payment_history": "Payment history"
+    }
+  },
+
+  "client_payments": {
+    "title": "Payment History",
+    "subtitle": "Manage your payments and receipts",
+    "new_payment": "New Payment",
+    "no_payments": "No payments found",
+    "table": {
+      "reference": "Reference",
+      "circuit_destination": "Tour / Destination",
+      "date": "Date",
+      "mode": "Method",
+      "amount": "Amount"
+    },
+    "form": {
+      "title": "Record a payment",
+      "subtitle": "Please fill in the information regarding your payment.",
+      "reservation": "Booking",
+      "select_reservation": "Select a booking",
+      "reference_label": "Reference",
+      "reference_placeholder": "Transaction No.",
+      "amount_label": "Amount (€)",
+      "mode_label": "Payment method",
+      "select_mode": "Choose a method",
+      "proof_label": "Proof of payment (Image or PDF)",
+      "file_selected": "File: {{name}}",
+      "submit": "Record payment"
+    },
+    "toast": {
+      "load_error": "Error loading payments",
+      "save_success": "Payment recorded successfully",
+      "save_error": "Error recording payment",
+      "details_soon": "Details available soon"
+    }
+  },
+
+  "tours_page": {
+    "title": "All our <0>tours</0> in Madagascar",
+    "loading": "Loading tours...",
+    "available_tours": "{{count}} tour available",
+    "available_tours_plural": "{{count}} tours available",
+    "hero_title": "Madagascar Standard Tours",
+    "hero_subtitle": "Browse our catalog of tours in Madagascar. Unforgettable adventures adapted to all budgets and durations.",
+    "seo": {
+      "title": "Our Tours",
+      "description": "Browse our catalog of tours in Madagascar. Unforgettable adventures adapted to all budgets and durations.",
+      "keywords": "tours madagascar, madagascar tours, organized travel madagascar, visit madagascar"
+    },
+    "filters": {
+      "price_per_person": "Price per person",
+      "duration": "Duration",
+      "tour_name": "Tour name",
+      "all_budgets": "All budgets",
+      "all_durations": "All durations",
+      "price_ranges": {
+        "0-500": "Under 500 €",
+        "500-1000": "500 - 1000 €",
+        "1000": "Over 1000 €"
+      },
+      "duration_ranges": {
+        "1-3": "1-3 days",
+        "4-7": "4-7 days",
+        "8-14": "8-14 days",
+        "14": "14+ days"
+      },
+      "tour_name_placeholder": "Ex: Isalo Park, Tsingy, Baobabs...",
+      "reset": "Reset",
+      "filter": "Filter"
+    },
+    "tour_card": {
+      "location": "Madagascar",
+      "default_description": "Discover the wonders of Madagascar with this exceptional tour.",
+      "days": "day",
+      "days_plural": "days",
+      "not_specified": "Not specified",
+      "learn_more": "Learn more",
+      "video_available": "Video available",
+      "videos_count": "video",
+      "videos_count_plural": "videos"
+    },
+    "no_results": {
+      "title": "No tours found",
+      "description": "No tours match your search criteria.",
+      "reset_filters": "Reset filters"
+    }
+  },
+
+  "tour_details": {
+    "loading": "Loading tour details...",
+    "not_found": "Tour not found",
+    "back_to_tours": "Back to tours",
+    "days": "day",
+    "days_plural": "days",
+    "pricing": "{{price}} € / person",
+    "tabs": {
+      "description": "Description",
+      "itinerary": "Itinerary",
+      "tips": "Tips",
+      "reviews": "Reviews"
+    },
+    "media": {
+      "gallery_title": "Tour Gallery",
+      "video_badge": "Video",
+      "preview_title": "Media Preview",
+      "preview_desc": "Preview of the tour image or video"
+    },
+    "description": {
+      "badge": "Exploration",
+      "title": "About this trip"
+    },
+    "itinerary": {
+      "badge": "Adventure",
+      "title": "Your Itinerary"
+    },
+    "tips": {
+      "badge": "Preparation",
+      "title": "Things to bring",
+      "no_items": "No specific tips for this tour.",
+      "mandatory": "Mandatory"
+    },
+    "inclusion": {
+      "title": "What's included",
+      "guide": "Professional guide",
+      "activities": "All activities",
+      "transport": "Secure transport",
+      "support": "24/7 Assistance"
+    },
+    "booking": {
+      "reserve_button": "Book this tour",
+      "limited_availability": "Limited availability for the season"
+    },
+    "delete_modal": {
+      "title": "Delete tour",
+      "description": "Do you really want to delete the tour <0>{{tourName}}</0>? This action is irreversible.",
+      "cancel": "Cancel",
+      "confirm": "Delete"
+    },
+    "messages": {
+      "delete_success": "The tour was successfully deleted.",
+      "delete_error": "Error during deletion",
+      "load_error": "Unable to load tour details"
+    }
+  },
+
+  "client_reservations": {
+    "subtitle": "View and manage your travel bookings",
+    "new_trip": "New Trip",
+    "search_placeholder": "Search for a booking...",
+    "table": {
+      "destination": "Tour / Destination",
+      "date": "Planned Date",
+      "people": "Persons",
+      "amount": "Total Amount",
+      "status": "Status"
+    },
+    "details": {
+      "title": "Booking Details",
+      "id": "ID",
+      "circuit": "Tour",
+      "statut": "Status",
+      "date": "Date",
+      "voyageurs": "Travelers",
+      "duree": "Duration",
+      "distribution": "Traveler Distribution",
+      "contact": "Contact Info",
+      "total": "Total Amount",
+      "days": "days",
+      "persons": "pers."
+    },
+    "actions": {
+      "view_details": "View Details",
+      "pay": "Make a payment",
+      "cancel": "Cancel reservation"
+    },
+    "cancel_dialog": {
+      "title": "Cancel Reservation",
+      "description": "Please let us know the reason for your cancellation. This message will be sent to the administration.",
+      "placeholder": "Reason for cancellation (optional)...",
+      "confirm": "Confirm Cancellation",
+      "cancel": "Keep Reservation"
+    },
+    "toast": {
+    "cancel_confirm": "Are you sure you want to cancel this reservation? This action is irreversible.",
+    "cancel_success": "Reservation successfully cancelled",
+    "cancel_error": "Error during cancellation"
+    }
+    },
+    "notifications": {
+      "title": "Notifications",
+      "mark_all_read": "Mark all as read",
+      "no_notifications": "No notifications for now",
+      "view": "View",
+      "new": "New notification"
+    },
+    "chat": {
+      "title": "Messages",
+      "discussion_center": "Discussion Center",
+      "no_messages": "No messages for now",
+      "placeholder": "Type your message...",
+      "send": "Send",
+      "contacts": "Discussions",
+      "admin_support": "MADA Support",
+      "online": "Online",
+      "offline": "Offline"
+    }
 }

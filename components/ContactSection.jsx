@@ -26,18 +26,18 @@ const ContactSection = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.name || !formData.email || !formData.message) {
-      toast.error("Veuillez remplir tous les champs obligatoires.");
+      toast.error(t("contact.form.required_fields"));
       return;
     }
 
     try {
       setLoading(true);
       await MailApi.sendContactEmail(formData);
-      toast.success("Votre message a été envoyé avec succès !");
+      toast.success(t("contact.form.success"));
       setFormData({ name: "", email: "", subject: "", message: "" });
     } catch (error) {
       console.error(error);
-      toast.error("Une erreur est survenue lors de l'envoi du message.");
+      toast.error(t("contact.form.error"));
     } finally {
       setLoading(false);
     }
@@ -136,7 +136,7 @@ const ContactSection = () => {
                     name="subject"
                     value={formData.subject}
                     onChange={handleChange}
-                    placeholder="Sujet" 
+                    placeholder={t("contact.form.subject")} 
                     className="border-input focus-visible:ring-primary h-12" 
                   />
                 </div>
@@ -145,7 +145,7 @@ const ContactSection = () => {
                     name="message"
                     value={formData.message}
                     onChange={handleChange}
-                    placeholder="Votre message..." 
+                    placeholder={t("contact.form.message")} 
                     className="border-input focus-visible:ring-primary min-h-[150px]" 
                     required
                   />

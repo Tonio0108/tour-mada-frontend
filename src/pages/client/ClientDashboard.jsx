@@ -12,12 +12,14 @@ import {
 } from "lucide-react";
 import { getAuthToken, reservationAPI } from "../../../lib/api";
 import { Link } from "react-router";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@src/hooks/useAuth";
 
 export default function ClientDashboard() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [stats, setStats] = useState({
     totalReservations: 0,
@@ -70,24 +72,39 @@ export default function ClientDashboard() {
     </Card>
   );
 
+  const getStatusLabel = (status) => {
+    if (status === "CONFIRMER") return t('reservations.status.confirmed');
+    if (status === "ANNULER") return t('reservations.status.cancelled');
+    return t('reservations.status.pending');
+  };
+
   return (
     <div className="space-y-8">
+      <div className="text-left space-y-1">
+        <h1 className="text-2xl font-bold tracking-tight">
+          {t('client_dashboard.welcome', { name: user?.Clients?.prenom || "" })}
+        </h1>
+        <p className="text-muted-foreground">
+          {t('client_dashboard.subtitle')}
+        </p>
+      </div>
+
       <div className="grid gap-4 md:grid-cols-3">
         <StatCard 
-          title="Total Réservations" 
+          title={t('client_dashboard.stats.total_reservations')}
           value={stats.totalReservations} 
           icon={Package} 
           colorClass="bg-blue-500/10 text-blue-600"
         />
         <StatCard 
-          title="En attente" 
+          title={t('client_dashboard.stats.pending')} 
           value={stats.pendingPayments} 
           icon={Clock} 
-          description="Réservations à confirmer"
+          description={t('client_dashboard.stats.pending_desc')}
           colorClass="bg-yellow-500/10 text-yellow-600"
         />
         <StatCard 
-          title="Confirmées" 
+          title={t('client_dashboard.stats.confirmed')} 
           value={stats.confirmedReservations} 
           icon={CheckCircle2} 
           colorClass="bg-green-500/10 text-green-600"
@@ -97,8 +114,8 @@ export default function ClientDashboard() {
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
         <Card className="md:col-span-4">
           <CardHeader>
-            <CardTitle>Réservations Récentes</CardTitle>
-            <CardDescription>Vos dernières demandes de voyage.</CardDescription>
+            <CardTitle>{t('client_dashboard.recent_reservations.title')}</CardTitle>
+            <CardDescription>{t('client_dashboard.recent_reservations.subtitle')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -110,13 +127,13 @@ export default function ClientDashboard() {
                         <MapPin className="w-4 h-4 text-primary" />
                       </div>
                       <div>
-                        <p className="text-sm font-medium">{res.tour?.nom_tour || "Circuit Personnalisé"}</p>
+                        <p className="text-sm font-medium">{res.tour?.nom_tour || t('tour.custom_tour')}</p>
                         <p className="text-xs text-muted-foreground">{new Date(res.date_tour_prevue).toLocaleDateString()}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
                       <Badge variant={res.statut === "CONFIRMER" ? "default" : "secondary"}>
-                        {res.statut}
+                        {getStatusLabel(res.statut)}
                       </Badge>
                       <Button variant="ghost" size="icon" asChild>
                         <Link to="/client/reservations">
@@ -128,16 +145,16 @@ export default function ClientDashboard() {
                 ))
               ) : (
                 <div className="text-center py-8">
-                  <p className="text-sm text-muted-foreground">Aucune réservation pour le moment.</p>
+                  <p className="text-sm text-muted-foreground">{t('client_dashboard.recent_reservations.no_reservations')}</p>
                   <Button variant="link" asChild>
-                    <Link to="/tours">Découvrir nos circuits</Link>
+                    <Link to="/tours">{t('client_dashboard.recent_reservations.discover_tours')}</Link>
                   </Button>
                 </div>
               )}
             </div>
             {recentReservations.length > 0 && (
               <Button variant="outline" className="w-full mt-4" asChild>
-                <Link to="/client/reservations">Voir toutes mes réservations</Link>
+                <Link to="/client/reservations">{t('client_dashboard.recent_reservations.view_all')}</Link>
               </Button>
             )}
           </CardContent>
@@ -145,33 +162,33 @@ export default function ClientDashboard() {
 
         <Card className="md:col-span-3">
           <CardHeader>
-            <CardTitle>Actions Rapides</CardTitle>
+            <CardTitle>{t('client_common.quick_actions')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <Button className="w-full justify-start gap-2" variant="outline" asChild>
               <Link to="/tours">
-                <MapPin className="w-4 h-4" /> Réserver un nouveau tour
+                <MapPin className="w-4 h-4" /> {t('client_dashboard.actions.book_new')}
               </Link>
             </Button>
             <Button className="w-full justify-start gap-2" variant="outline" asChild>
               <Link to="/client/profile">
-                <TrendingUp className="w-4 h-4" /> Mettre à jour mon profil
+                <TrendingUp className="w-4 h-4" /> {t('client_dashboard.actions.update_profile')}
               </Link>
             </Button>
             <Button className="w-full justify-start gap-2" variant="outline" asChild>
               <Link to="/client/paiements">
-                <WalletCards className="w-4 h-4" /> Historique des paiements
+                <WalletCards className="w-4 h-4" /> {t('client_dashboard.actions.payment_history')}
               </Link>
             </Button>
             
             <div className="mt-6 p-4 bg-primary/5 rounded-lg border border-primary/10">
               <h4 className="text-sm font-bold flex items-center gap-2 mb-2">
-                <AlertCircle className="w-4 h-4 text-primary" /> Besoin d'aide ?
+                <AlertCircle className="w-4 h-4 text-primary" /> {t('client_common.need_help')}
               </h4>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Notre équipe est disponible 24/7 pour vous accompagner dans la préparation de votre voyage.
+                {t('client_common.help_desc')}
               </p>
-              <Button variant="link" className="p-0 h-auto text-xs mt-2">Nous contacter</Button>
+              <Button variant="link" className="p-0 h-auto text-xs mt-2">{t('client_common.contact_us')}</Button>
             </div>
           </CardContent>
         </Card>

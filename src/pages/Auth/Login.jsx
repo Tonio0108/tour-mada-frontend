@@ -54,9 +54,18 @@ export default function Login() {
 
       const response = await authAPI.login(credentials);
       setAuthToken(response.token);
-      await login(response.token);
+      const userProfile = await login(response.token);
       toast.success(t('login.success_message') || "Connexion réussie !");
-      navigate(redirectUrl, { replace: true });
+      
+      if (searchParams.get("redirect")) {
+        navigate(redirectUrl, { replace: true });
+      } else {
+        if (userProfile.type_utilisateur === "ADMIN") {
+          navigate("/admin", { replace: true });
+        } else {
+          navigate("/client", { replace: true });
+        }
+      }
     } catch (error) {
       console.error("Login error:", error);
       const message = error.message.includes("email") || error.message.includes("mot de passe")

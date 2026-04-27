@@ -15,7 +15,7 @@ import {
 import { Input } from "../../../components/ui/Input";
 import { reservationSchema } from "../../../lib/validations/reservation";
 import { useAuth } from "../../hooks/useAuth";
-import { reservationAPI, Tours } from "../../../lib/api";
+import { reservationAPI, Tours, MailApi } from "../../../lib/api";
 import { useTranslation, Trans } from 'react-i18next';
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -40,14 +40,47 @@ export default function NormalReservation() {
     defaultValues: {
       tourId: tourId ? parseInt(tourId) : undefined,
       nombre_jeune: 0,
-      nombre_adulte: 0,
+      nombre_adulte: 1,
       nombre_enfant: 0,
+      nombre_pers: 1,
       nombre_homme: 0,
       nombre_femme: 0,
       age_plus_age: 0,  
       age_moins_age: 0, 
+      nom_complet: "",
+      email: "",
+      num_tel: "",
+      adresse: "",
     },
   });
+
+  // Surveillance des catégories pour calculer le total
+  const nAdulte = watch("nombre_adulte") || 0;
+  const nJeune = watch("nombre_jeune") || 0;
+  const nEnfant = watch("nombre_enfant") || 0;
+
+  useEffect(() => {
+    const total = nAdulte + nJeune + nEnfant;
+    if (total > 0) {
+        setValue("nombre_pers", total, { shouldValidate: true });
+    }
+  }, [nAdulte, nJeune, nEnfant, setValue]);
+
+  // Pré-remplissage quand l'utilisateur est chargé
+  useEffect(() => {
+    if (user) {
+      const client = user.Clients || user.client;
+      if (client) {
+        reset({
+          ...watch(),
+          nom_complet: `${client.nom || ""} ${client.prenom || ""}`.trim(),
+          email: user.email || "",
+          num_tel: client.telephone || "",
+          adresse: client.adresse || "",
+        });
+      }
+    }
+  }, [user, reset]);
 
   useEffect(() => {
     const fetchTour = async () => {
@@ -66,25 +99,11 @@ export default function NormalReservation() {
     fetchTour();
   }, [tourId, setValue]);
 
-  const url = import.meta.env.VITE_API_URL;
-
-  const notify = async (nomClient, nomTour) => {
-    try {
-      const endpoint = tourId ? "notify-reservation" : "notify-custom-tour";
-      const body = tourId ? { nomClient, nomTour } : { nomClient, tour: nomTour };
-      await fetch(`${url}/mail/${endpoint}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-    } catch (e) { console.error(e); }
-  };
-
   const onSubmit = async (data) => {
     setLoading(true);
     try {
       const payload = {
-        clientId: user.Clients.id_client,
+        clientId: user.Clients?.id_client || user.client?.id_client,
         nombre_pers: data.nombre_pers,
         nbre_jours: data.nbre_jours,
         nombre_adulte: data.nombre_adulte,
@@ -96,7 +115,7 @@ export default function NormalReservation() {
         age_moins_age: data.age_moins_age,
         budget_estime: data.budget_estime,
         montant_total: data.montant_total,
-        date_tour_prevue: data.date_tour_prevue.toString(),
+        date_tour_prevue: data.date_tour_prevue.toISOString(),
         nom_complet: data.nom_complet,
         email: data.email,
         num_tel: data.num_tel,
@@ -107,11 +126,11 @@ export default function NormalReservation() {
       if (tourId) {
         await reservationAPI.createReservation({ ...payload, tourId: parseInt(tourId) });
         toast.success(t('reservation.submit_button.success_standard'));
-        await notify(payload.nom_complet, tourId);
+        await MailApi.notifyReservation({ nomClient: payload.nom_complet, nomTour: tour?.nom_tour || tourId });
         navigate("/client/reservations");
       } else {
         const tourRes = await Tours.createTourPersonnalise({
-          clientId: user.Clients.id_client,
+          clientId: user.Clients?.id_client || user.client?.id_client,
           interets: data.interets,
           nombre_jours: data.nbre_jours.toString(),
           statut: "EN_ATTENTE",
@@ -119,7 +138,7 @@ export default function NormalReservation() {
         });
         await reservationAPI.createReservation({ ...payload, tour_personnaliseId: tourRes.id_tour_perso });
         toast.success(t('reservation.submit_button.success_custom'));
-        await notify(`${user.Clients.nom} ${user.Clients.prenom}`, data.interets);
+        await MailApi.notifyCustomTour({ nomClient: payload.nom_complet, tour: data.interets });
         navigate("/client/reservations");
         reset();
       }
@@ -130,12 +149,8 @@ export default function NormalReservation() {
     }
   };
 
-  const nombrePers = watch("nombre_pers") || 0;
-  const totalCategories = (watch("nombre_adulte") || 0) + (watch("nombre_jeune") || 0) + (watch("nombre_enfant") || 0);
-  const categoriesError = totalCategories !== nombrePers;
-
   return (
-    <div className="min-h-screen pt-20 pb-10 px-4 bg-gray-50">
+    <div className="min-h-screen pt-20 pb-10 px-4 bg-gray-50 text-left">
       <div className="max-w-4xl mx-auto bg-white p-6 md:p-8 rounded-lg shadow-sm border border-gray-200">
         <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2">{t('reservation.title')}</h1>
         <p className="text-gray-600 mb-6">
@@ -165,7 +180,6 @@ export default function NormalReservation() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Input label={t('reservation.reservation_details.planned_date')} type="date" icon={Calendar} {...register("date_tour_prevue")} error={errors.date_tour_prevue?.message} />
               <Input label={t('reservation.reservation_details.days_count')} type="number" icon={Clock} min="1" {...register("nbre_jours", { valueAsNumber: true })} error={errors.nbre_jours?.message} />
-              <Input label={t('reservation.reservation_details.total_people')} type="number" icon={Users} min="1" {...register("nombre_pers", { valueAsNumber: true })} error={errors.nombre_pers?.message} />
               {tour && <Input label={t('reservation.reservation_details.price_per_person')} type="number" icon={DollarSign} readOnly value={tour.prix_par_pers} className="bg-gray-100" />}
             </div>
           </div>
@@ -177,14 +191,32 @@ export default function NormalReservation() {
               <Input label={t('reservation.people_distribution.youth')} type="number" min="0" {...register("nombre_jeune", { valueAsNumber: true })} error={errors.nombre_jeune?.message} />
               <Input label={t('reservation.people_distribution.children')} type="number" min="0" {...register("nombre_enfant", { valueAsNumber: true })} error={errors.nombre_enfant?.message} />
             </div>
-            {categoriesError && nombrePers > 0 && (
-              <p className="text-red-600 text-sm mt-2"><Trans i18nKey="reservation.people_distribution.sum_error" values={{ total: totalCategories, totalPeople: nombrePers }} /></p>
-            )}
+            
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
               <Input label={t('reservation.people_distribution.men')} type="number" min="0" {...register("nombre_homme", { valueAsNumber: true })} error={errors.nombre_homme?.message} />
               <Input label={t('reservation.people_distribution.women')} type="number" min="0" {...register("nombre_femme", { valueAsNumber: true })} error={errors.nombre_femme?.message} />
+            </div>
+            {errors.nombre_homme && (
+              <p className="text-red-600 text-xs mt-2 font-medium bg-red-50 p-2 rounded border border-red-100 italic">
+                {errors.nombre_homme.message}
+              </p>
+            )}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
               <Input label={t('reservation.people_distribution.oldest_age')} type="number" min="0" {...register("age_plus_age", { valueAsNumber: true })} error={errors.age_plus_age?.message} />
               <Input label={t('reservation.people_distribution.youngest_age')} type="number" min="0" {...register("age_moins_age", { valueAsNumber: true })} error={errors.age_moins_age?.message} />
+            </div>
+
+            <div className="mt-6 p-4 bg-emerald-50 rounded-lg border border-emerald-100 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Users className="h-5 w-5 text-emerald-600" />
+                <span className="font-semibold text-emerald-900">{t('reservation.reservation_details.total_people')}</span>
+              </div>
+              <Input 
+                type="number" 
+                readOnly 
+                className="w-24 bg-white font-bold text-center border-emerald-200" 
+                {...register("nombre_pers", { valueAsNumber: true })} 
+              />
             </div>
           </div>
 
@@ -197,7 +229,7 @@ export default function NormalReservation() {
           </div>
 
           <div className="flex justify-center">
-            <Button type="submit" disabled={loading || categoriesError} className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 h-auto font-semibold">
+            <Button type="submit" disabled={loading} className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 h-auto font-semibold">
               {loading ? <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div> : <><Calendar className="h-5 w-5 mr-2" />{t('reservation.submit_button.confirm')}</>}
             </Button>
           </div>

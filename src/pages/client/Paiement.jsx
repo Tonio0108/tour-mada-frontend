@@ -1,19 +1,12 @@
 import React, { useEffect, useState, useCallback } from "react";
 import {
-  Calendar,
-  CreditCard,
-  DollarSign,
-  Download,
   Eye,
-  Filter,
   Search,
   CheckCircle,
-  XCircle,
-  AlertCircle,
   Plus,
-  X,
   MoreVertical,
   FileText,
+  Loader
 } from "lucide-react";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/button";
@@ -48,16 +41,17 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 
-const paiementSchema = z.object({
-  id_reservation: z.number().min(1, "La réservation est requise"),
-  reference_paiement: z.string().min(1, "La référence est requise"),
-  montant: z.string().min(1, "Le montant est requis"),
-  mode_paiement: z.string().min(1, "Le mode de paiement est requis"),
-  file: z.any(),
-});
-
 export const Paiement = () => {
   const { t } = useTranslation();
+
+  const paiementSchema = z.object({
+    id_reservation: z.number().min(1, t('reservation.people_distribution.sum_error').split('(')[0]),
+    reference_paiement: z.string().min(1, t('client_payments.form.reference_label')),
+    montant: z.string().min(1, t('client_payments.form.amount_label')),
+    mode_paiement: z.string().min(1, t('client_payments.form.mode_label')),
+    file: z.any(),
+  });
+
   const { user } = useAuth();
   const [paiements, setPaiements] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
@@ -90,11 +84,11 @@ export const Paiement = () => {
       setFilteredData(data);
     } catch (err) {
       console.error(err);
-      toast.error("Erreur lors du chargement des paiements");
+      toast.error(t('client_payments.toast.load_error'));
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  }, [user, t]);
 
   const fetchReservations = useCallback(async () => {
     if (!user?.Clients.id_client) return;
@@ -151,26 +145,22 @@ export const Paiement = () => {
       
       const selectedRes = reservations.find(res => res.id_reservation === parseInt(data.id_reservation));
       if (selectedRes) {
-        await notify(selectedRes.nom_complet || 'Client', data.montant);
+        await notify(selectedRes.nom_complet || t('navbar.user'), data.montant);
       }
 
-      toast.success("Paiement enregistré avec succès");
+      toast.success(t('client_payments.toast.save_success'));
       reset();
       setShowForm(false);
       fetchPaiements();
     } catch (err) {
-      toast.error(err.message || "Erreur lors de l'enregistrement");
+      toast.error(err.message || t('client_payments.toast.save_error'));
     } finally {
       setUploading(false);
     }
   };
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString("fr-FR", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
+    return new Date(dateString).toLocaleDateString();
   };
 
   const formatCurrency = (amount) => {
@@ -185,11 +175,11 @@ export const Paiement = () => {
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="text-left">
-          <h2 className="text-2xl font-bold text-foreground">Historique des Paiements</h2>
-          <p className="text-sm text-muted-foreground mt-1">Gérez vos règlements et justificatifs</p>
+          <h2 className="text-2xl font-bold text-foreground">{t('client_payments.title')}</h2>
+          <p className="text-sm text-muted-foreground mt-1">{t('client_payments.subtitle')}</p>
         </div>
         <Button onClick={() => setShowForm(true)}>
-          <Plus className="w-4 h-4 mr-2" /> Nouveau Paiement
+          <Plus className="w-4 h-4 mr-2" /> {t('client_payments.new_payment')}
         </Button>
       </div>
 
@@ -198,7 +188,7 @@ export const Paiement = () => {
           <div className="relative max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
             <Input
-              placeholder="Rechercher par référence ou circuit..."
+              placeholder={t('client_common.search_placeholder')}
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
               className="pl-9"
@@ -210,11 +200,11 @@ export const Paiement = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="px-4 py-3 font-medium">Référence</TableHead>
-                <TableHead className="px-4 py-3 font-medium">Circuit / Destination</TableHead>
-                <TableHead className="px-4 py-3 font-medium">Date</TableHead>
-                <TableHead className="px-4 py-3 font-medium">Mode</TableHead>
-                <TableHead className="px-4 py-3 font-medium text-right">Montant</TableHead>
+                <TableHead className="px-4 py-3 font-medium">{t('client_payments.table.reference')}</TableHead>
+                <TableHead className="px-4 py-3 font-medium">{t('client_payments.table.circuit_destination')}</TableHead>
+                <TableHead className="px-4 py-3 font-medium">{t('client_payments.table.date')}</TableHead>
+                <TableHead className="px-4 py-3 font-medium">{t('client_payments.table.mode')}</TableHead>
+                <TableHead className="px-4 py-3 font-medium text-right">{t('client_payments.table.amount')}</TableHead>
                 <TableHead className="w-12 px-4 py-3 text-right"></TableHead>
               </TableRow>
             </TableHeader>
@@ -228,7 +218,7 @@ export const Paiement = () => {
               ) : filteredData.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={6} className="h-32 text-center text-muted-foreground">
-                    Aucun paiement trouvé
+                    {t('client_payments.no_payments')}
                   </TableCell>
                 </TableRow>
               ) : (
@@ -241,7 +231,7 @@ export const Paiement = () => {
                       </div>
                     </TableCell>
                     <TableCell className="px-4 py-4 text-left text-sm">
-                      {p.reservation?.tour?.nom_tour || p.reservation?.tour_personnalise?.interets || "Circuit Personnalisé"}
+                      {p.reservation?.tour?.nom_tour || p.reservation?.tour_personnalise?.interets || t('tour.custom_tour')}
                     </TableCell>
                     <TableCell className="px-4 py-4 text-left text-sm text-muted-foreground">
                       {formatDate(p.date_paiement)}
@@ -260,8 +250,8 @@ export const Paiement = () => {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                           <DropdownMenuItem onClick={() => toast.info("Détails bientôt disponibles")}>
-                            <Eye className="w-4 h-4 mr-2" /> Voir justificatif
+                           <DropdownMenuItem onClick={() => toast.info(t('client_payments.toast.details_soon'))}>
+                            <Eye className="w-4 h-4 mr-2" /> {t('payments.form.proof')}
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -278,22 +268,22 @@ export const Paiement = () => {
       <Dialog open={showForm} onOpenChange={setShowForm}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle>Enregistrer un paiement</DialogTitle>
+            <DialogTitle>{t('client_payments.form.title')}</DialogTitle>
             <DialogDescription>
-              Veuillez remplir les informations concernant votre règlement.
+              {t('client_payments.form.subtitle')}
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 py-4">
             <div className="space-y-1 text-left">
-              <label className="text-sm font-medium">Réservation</label>
+              <label className="text-sm font-medium">{t('client_payments.form.reservation')}</label>
               <select
                 {...register("id_reservation", { valueAsNumber: true })}
                 className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-primary"
               >
-                <option value="">Sélectionnez une réservation</option>
+                <option value="">{t('client_payments.form.select_reservation')}</option>
                 {reservations.map((res) => (
                   <option key={res.id_reservation} value={res.id_reservation}>
-                    #{res.id_reservation} - {res.tour?.nom_tour || "Personnalisé"}
+                    #{res.id_reservation} - {res.tour?.nom_tour || t('tour.custom_tour')}
                   </option>
                 ))}
               </select>
@@ -302,13 +292,13 @@ export const Paiement = () => {
 
             <div className="grid grid-cols-2 gap-4">
               <Input
-                label="Référence"
-                placeholder="N° de transaction"
+                label={t('client_payments.form.reference_label')}
+                placeholder={t('client_payments.form.reference_placeholder')}
                 error={errors.reference_paiement?.message}
                 {...register("reference_paiement")}
               />
               <Input
-                label="Montant (€)"
+                label={t('client_payments.form.amount_label')}
                 type="number"
                 placeholder="0"
                 error={errors.montant?.message}
@@ -317,30 +307,30 @@ export const Paiement = () => {
             </div>
 
             <div className="space-y-1 text-left">
-              <label className="text-sm font-medium">Mode de paiement</label>
+              <label className="text-sm font-medium">{t('client_payments.form.mode_label')}</label>
               <select
                 {...register("mode_paiement")}
                 className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-primary"
               >
-                <option value="">Choisir un mode</option>
-                <option value="Mobile Money">Mobile Money</option>
-                <option value="Virement">Virement Bancaire</option>
-                <option value="Espèces">Espèces</option>
+                <option value="">{t('client_payments.form.select_mode')}</option>
+                <option value="Mobile Money">{t('payments.methods.mobile_money')}</option>
+                <option value="Virement">{t('payments.methods.transfer')}</option>
+                <option value="Espèces">{t('payments.methods.cash')}</option>
               </select>
               {errors.mode_paiement && <p className="text-xs text-destructive">{errors.mode_paiement.message}</p>}
             </div>
 
             <div className="space-y-1 text-left">
-              <label className="text-sm font-medium">Justificatif (Image ou PDF)</label>
+              <label className="text-sm font-medium">{t('client_payments.form.proof_label')}</label>
               <Input type="file" accept="image/*,.pdf" {...register("file")} />
-              {selectedFile?.[0] && <p className="text-xs text-primary font-medium">Fichier : {selectedFile[0].name}</p>}
+              {selectedFile?.[0] && <p className="text-xs text-primary font-medium">{t('client_payments.form.file_selected', { name: selectedFile[0].name })}</p>}
             </div>
 
             <DialogFooter className="pt-4">
-              <Button type="button" variant="ghost" onClick={() => setShowForm(false)}>Annuler</Button>
+              <Button type="button" variant="ghost" onClick={() => setShowForm(false)}>{t('admin_common.cancel')}</Button>
               <Button type="submit" disabled={uploading}>
                 {uploading ? <Loader className="w-4 h-4 animate-spin mr-2" /> : <CheckCircle className="w-4 h-4 mr-2" />}
-                Enregistrer le paiement
+                {t('client_payments.form.submit')}
               </Button>
             </DialogFooter>
           </form>
