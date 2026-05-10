@@ -1,8 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import bgImage from "../../assets/bg.jpg";
-import { useState } from "react";
-import { useEffect } from "react";
-import { Link, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../../hooks/useAuth";
 import HeroSection from "./../../../components/HeroSection";
@@ -11,12 +9,11 @@ import { TourSection } from "./../../../components/TourSection";
 import { CTASection } from "./../../../components/CTASection";
 import TopReviewsSection from "./../../../components/TopReviewsSection";
 import ContactSection from "./../../../components/ContactSection";
-import { getAuthToken } from "../../../lib/api";
 import { SEO } from "../../components/SEO";
+import { useQuery } from "@tanstack/react-query";
 
 export default function HomePage() {
   const { t } = useTranslation();
-  const [tours, setTours] = useState([]);
   const [filters, setFilters] = useState({
     prix_par_pers: "",
     duree_jours: "",
@@ -26,30 +23,18 @@ export default function HomePage() {
   const { isAuthenticated } = useAuth();
   const url = import.meta.env.VITE_API_URL;
 
-  useEffect(() => {
-    const fetchTours = async () => {
-      const token = await getAuthToken()
-      try {
-        const res = await fetch(`${url}/tours-standards`, {
-          headers: {
-            Authorization: `Beaber ${token}`
-          }
-        });
-        if (!res.ok) {
-          throw new Error(t("tour.loading_error"));
-        }
-        const data = await res.json();
-        setTours(data);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-
-    fetchTours();
-  }, []);
+  const { data: tours = [] } = useQuery({
+    queryKey: ["tours"],
+    queryFn: async () => {
+      const response = await fetch(`${url}/tours-standards`);
+      if (!response.ok) throw new Error(t("tour.loading_error"));
+      return response.json();
+    },
+  });
 
   const handleSearch = (e) => {
     e.preventDefault();
+
 
     // Construire les paramètres de recherche
     const searchParams = new URLSearchParams();

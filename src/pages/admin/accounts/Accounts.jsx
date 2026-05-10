@@ -58,6 +58,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
+import TableSkeleton from "@/components/ui/TableSkeleton";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const userSchema = z.object({
   email: z.string().email("Email invalide"),

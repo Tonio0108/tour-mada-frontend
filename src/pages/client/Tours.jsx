@@ -1,10 +1,13 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useMemo } from "react";
 import { Link, useSearchParams } from "react-router";
 import trekking from "../../assets/trekking.jpg";
 import { Tours as ToursApi } from "../../../lib/api";
 import { useTranslation } from 'react-i18next';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/Input";
+import { Skeleton } from "@/components/ui/skeleton";
+import TourCardSkeleton from "@/components/TourCardSkeleton";
+import { useQuery } from "@tanstack/react-query";
 import { 
   Search, 
   RefreshCw, 
@@ -20,9 +23,6 @@ import { SEO } from "../../components/SEO";
 
 const Tours = () => {
   const { t } = useTranslation();
-  const [tours, setTours] = useState([]);
-  const [filteredTours, setFilteredTours] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [searchParams, setSearchParams] = useSearchParams();
   const url = import.meta.env.VITE_API_URL;
   
@@ -32,45 +32,33 @@ const Tours = () => {
     nom_tour: searchParams.get("nom") || "",
   });
 
-  const applyFilters = useCallback((currentFilters, toursData) => {
-    let result = [...toursData];
-    if (currentFilters.prix_par_pers) {
-      const [min, max] = currentFilters.prix_par_pers.split("-").map(Number);
+  const { data: tours = [], isLoading: loading } = useQuery({
+    queryKey: ["tours"],
+    queryFn: ToursApi.getAllTourStandards,
+  });
+
+  const filteredTours = useMemo(() => {
+    let result = [...tours];
+    if (filters.prix_par_pers) {
+      const [min, max] = filters.prix_par_pers.split("-").map(Number);
       result = result.filter((tour) => {
         const prix = Number(tour.prix_par_pers) || 0;
         return max ? (prix >= min && prix <= max) : (prix >= min);
       });
     }
-    if (currentFilters.duree_jours) {
-      const [min, max] = currentFilters.duree_jours.split("-").map(Number);
+    if (filters.duree_jours) {
+      const [min, max] = filters.duree_jours.split("-").map(Number);
       result = result.filter((tour) => {
         const duree = tour.duree_jours || 0;
         return max ? (duree >= min && duree <= max) : (duree >= min);
       });
     }
-    if (currentFilters.nom_tour) {
-      const term = currentFilters.nom_tour.toLowerCase();
+    if (filters.nom_tour) {
+      const term = filters.nom_tour.toLowerCase();
       result = result.filter((tour) => tour.nom_tour?.toLowerCase().includes(term));
     }
-    setFilteredTours(result);
-  }, []);
-
-  useEffect(() => {
-    const fetchTours = async () => {
-      try {
-        setLoading(true);
-        const data = await ToursApi.getAllTourStandards();
-        setTours(data);
-        applyFilters(filters, data);
-      } catch (err) { console.error(err); }
-      finally { setLoading(false); }
-    };
-    fetchTours();
-  }, []);
-
-  useEffect(() => {
-    if (!loading) applyFilters(filters, tours);
-  }, [filters, tours, loading, applyFilters]);
+    return result;
+  }, [tours, filters]);
 
   const handleFilterChange = (name, value) => {
     const newFilters = { ...filters, [name]: value };
@@ -82,9 +70,19 @@ const Tours = () => {
     setSearchParams(params, { replace: true });
   };
 
-  if (loading) return (
-    <div className="min-h-[400px] flex items-center justify-center">
-      <RefreshCw className="w-6 h-6 animate-spin text-muted-foreground" />
+  if (loading && tours.length === 0) return (
+    <div className="space-y-8 max-w-7xl mx-auto py-6">
+      <div className="relative py-10 px-8 rounded-lg border bg-primary text-primary-foreground overflow-hidden shadow-sm">
+        <Skeleton className="h-6 w-32 mb-3 bg-primary-foreground/20" />
+        <Skeleton className="h-8 w-64 mb-2 bg-primary-foreground/20" />
+        <Skeleton className="h-4 w-96 bg-primary-foreground/20" />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 bg-card p-4 rounded-lg border border-border shadow-sm">
+        {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-10 w-full" />)}
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {[...Array(6)].map((_, i) => <TourCardSkeleton key={i} />)}
+      </div>
     </div>
   );
 

@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate, useParams, Link } from "react-router";
 import { useTranslation, Trans } from "react-i18next";
 import { getAuthToken } from "@/lib/api";
 import { useRole } from "../../hooks/useRole";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -48,6 +49,7 @@ import {
 } from "lucide-react";
 import { SEO } from "../../components/SEO";
 import ReviewSection from "../../components/ReviewSection";
+import TourDetailsSkeleton from "@/components/TourDetailsSkeleton";
 
 export default function TourDetails() {
   const { t } = useTranslation();
@@ -55,30 +57,19 @@ export default function TourDetails() {
   const navigate = useNavigate();
   const url = import.meta.env.VITE_API_URL;
   const baseUrl = url.replace('/api', '');
-  const [tour, setTour] = useState(null);
   const [activeTab, setActiveTab] = useState("description");
   const { isAdmin } = useRole();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [mediaModal, setMediaModal] = useState({ open: false, url: "", type: "image" });
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchTour = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch(`${url}/tours-standards/${id}`);
-        if (!response.ok) throw new Error(t("tour_details.messages.load_error"));
-        const data = await response.json();
-        setTour(data);
-      } catch (err) {
-        console.error(err);
-        toast.error(t("tour_details.messages.load_details_error"));
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchTour();
-  }, [id, url, t]);
+  const { data: tour, isLoading: loading, isError } = useQuery({
+    queryKey: ["tour", id],
+    queryFn: async () => {
+      const response = await fetch(`${url}/tours-standards/${id}`);
+      if (!response.ok) throw new Error(t("tour_details.messages.load_error"));
+      return response.json();
+    },
+  });
 
   const handleDelete = async () => {
     try {
@@ -96,15 +87,7 @@ export default function TourDetails() {
     }
   };
 
-  if (loading) return (
-    <div className="min-h-screen flex items-center justify-center">
-      <SEO title={t('admin_common.loading')} />
-      <div className="flex flex-col items-center gap-2">
-        <Loader2 className="h-10 w-10 animate-spin text-primary" />
-        <p className="text-sm text-muted-foreground">{t('tour_details.loading')}</p>
-      </div>
-    </div>
-  );
+  if (loading) return <TourDetailsSkeleton />;
 
   if (!tour) return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4">

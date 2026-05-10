@@ -1,6 +1,7 @@
 import { Link } from "react-router";
 import { useTranslation, Trans } from 'react-i18next';
 import TourCard from "./TourCard";
+import TourCardSkeleton from "./TourCardSkeleton";
 import { Button } from "./ui/button";
 import { ArrowRight } from "lucide-react";
 
@@ -26,7 +27,9 @@ export const TourSection = ({ tours }) => {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {tours && tours.length > 0 ? (
+          {!tours ? (
+            [...Array(3)].map((_, i) => <TourCardSkeleton key={i} />)
+          ) : tours.length > 0 ? (
             tours.slice(0, 3).map((tour) => {
               const firstImage = tour.photos?.find(photo => 
                 photo.url.match(/\.(jpg|jpeg|png|gif|webp|bmp)$/i)
@@ -45,7 +48,7 @@ export const TourSection = ({ tours }) => {
             })
           ) : (
             <div className="col-span-full text-center py-12">
-              <p className="text-muted-foreground italic text-sm">{t('tour.loading')}</p>
+              <p className="text-muted-foreground italic text-sm">{t('tour.no_tours') || "Aucun tour disponible pour le moment"}</p>
             </div>
           )}
         </div>

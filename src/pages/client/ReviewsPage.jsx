@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { AvisApi } from "@/lib/api";
 import { SEO } from "@src/components/SEO";
 import AgencyReviewDialog from "../../../components/AgencyReviewDialog";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function ReviewsPage() {
   const { t } = useTranslation();
@@ -41,6 +42,29 @@ export default function ReviewsPage() {
     );
   };
 
+  const ReviewSkeleton = () => (
+    <Card className="bg-background border-none shadow-lg">
+      <CardContent className="p-8 space-y-6">
+        <div className="flex justify-between items-start">
+          <div className="flex items-center gap-4">
+            <Skeleton className="w-12 h-12 rounded-full" />
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-3 w-20" />
+            </div>
+          </div>
+          <Skeleton className="h-4 w-24" />
+        </div>
+        <div className="space-y-2">
+          <Skeleton className="h-4 w-full" />
+          <Skeleton className="h-4 w-full" />
+          <Skeleton className="h-4 w-3/4" />
+        </div>
+        <Skeleton className="h-4 w-32 pt-4 border-t" />
+      </CardContent>
+    </Card>
+  );
+
   return (
     <div className="min-h-screen bg-muted/20 py-12 md:py-20">
       <SEO 
@@ -62,8 +86,8 @@ export default function ReviewsPage() {
         </div>
 
         {loading ? (
-          <div className="flex justify-center py-20">
-            <Loader2 className="w-10 h-10 animate-spin text-primary" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+            {[...Array(4)].map((_, i) => <ReviewSkeleton key={i} />)}
           </div>
         ) : (
           <>

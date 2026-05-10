@@ -7,6 +7,7 @@ import { Card, CardContent } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { AvisApi } from "../lib/api";
 import AgencyReviewDialog from "./AgencyReviewDialog";
+import { Skeleton } from "./ui/skeleton";
 
 export default function TopReviewsSection() {
   const { t } = useTranslation();
@@ -27,10 +28,22 @@ export default function TopReviewsSection() {
     fetchTopReviews();
   }, []);
 
-  if (loading) return (
-    <div className="py-20 flex justify-center">
-      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-    </div>
+  const ReviewSkeleton = () => (
+    <Card className="bg-background border-none shadow-xl">
+      <CardContent className="p-8 space-y-6">
+        <div className="space-y-4">
+          <Skeleton className="h-4 w-24" />
+          <Skeleton className="h-20 w-full" />
+        </div>
+        <div className="flex items-center gap-4 pt-4 border-t border-border">
+          <Skeleton className="w-12 h-12 rounded-full" />
+          <div className="space-y-2 flex-1">
+            <Skeleton className="h-4 w-32" />
+            <Skeleton className="h-3 w-20" />
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 
   const renderStars = (count) => {
@@ -74,7 +87,11 @@ export default function TopReviewsSection() {
           </div>
         </div>
 
-        {reviews.length === 0 ? (
+        {loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[1, 2, 3].map((i) => <ReviewSkeleton key={i} />)}
+          </div>
+        ) : reviews.length === 0 ? (
           <div className="bg-background rounded-xl p-12 text-center border border-dashed max-w-2xl mx-auto">
             <Quote className="w-12 h-12 mx-auto text-primary/20 mb-4" />
             <p className="text-muted-foreground italic mb-6">

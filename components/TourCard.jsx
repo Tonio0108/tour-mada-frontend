@@ -15,6 +15,7 @@ export default function TourCard({ title, imageUrl, navigateTo, duration, price 
           <img
             src={getImageUrl(imageUrl)}
             alt={title}
+            loading="lazy"
             className="w-full h-full object-cover transition-transform hover:scale-105 duration-500"
           />
         </div>

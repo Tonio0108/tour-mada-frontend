@@ -18,6 +18,7 @@ import { reservationAPI, MailApi } from "../../../../lib/api";
 import { Input } from "../../../../components/ui/Input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
   TableBody,
@@ -46,6 +47,7 @@ import {
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
+import TableSkeleton from "@/components/ui/TableSkeleton";
 
 export const AdminReservation = () => {
   const { t } = useTranslation();
@@ -249,9 +251,13 @@ export const AdminReservation = () => {
             </TableHeader>
             <TableBody>
               {loading ? (
-                Array.from({length: 5}).map((_, i) => (
+                [...Array(5)].map((_, i) => (
                   <TableRow key={i} className="border-none">
-                    <TableCell colSpan={7} className="h-16 bg-muted/5 animate-pulse" />
+                    <TableCell colSpan={7} className="p-0">
+                      <div className="px-4 py-4">
+                        <Skeleton className="h-10 w-full" />
+                      </div>
+                    </TableCell>
                   </TableRow>
                 ))
               ) : filteredReservations.length === 0 ? (
@@ -380,7 +386,7 @@ export const AdminReservation = () => {
                 placeholder={t('admin_common.message_placeholder')}
                 value={commentaire}
                 onChange={(e) => setCommentaire(e.target.value)}
-                className="min-h-[120px]"
+                className="min-h-30"
               />
             </div>
           </div>

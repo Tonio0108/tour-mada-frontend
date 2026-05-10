@@ -30,6 +30,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import TableSkeleton from "@/components/ui/TableSkeleton";
+import { Skeleton } from "@/components/ui/skeleton";
 
 import { getImageUrl } from "../../../utils/imageUrl";
 
@@ -197,9 +199,13 @@ export default function Tours() {
             </TableHeader>
             <TableBody>
               {loading ? (
-                Array.from({length: 5}).map((_, i) => (
+                [...Array(5)].map((_, i) => (
                   <TableRow key={i} className="border-none">
-                    <TableCell colSpan={5} className="h-16 bg-muted/5 animate-pulse" />
+                    <TableCell colSpan={5} className="p-0">
+                      <div className="px-4 py-4">
+                        <Skeleton className="h-10 w-full" />
+                      </div>
+                    </TableCell>
                   </TableRow>
                 ))
               ) : filteredData.length === 0 ? (

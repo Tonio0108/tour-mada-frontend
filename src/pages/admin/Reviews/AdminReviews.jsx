@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { AvisApi } from "@/lib/api";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function AdminReviews() {
   const { t } = useTranslation();
@@ -138,8 +139,33 @@ export default function AdminReviews() {
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center py-20">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <div className="grid grid-cols-1 gap-4">
+          {[1, 2, 3].map((i) => (
+            <Card key={i} className="overflow-hidden border-l-4 border-l-muted">
+              <CardContent className="p-5 flex flex-col md:flex-row gap-6">
+                <div className="flex-1 space-y-4">
+                  <div className="flex justify-between items-start">
+                    <div className="flex items-center gap-3">
+                      <Skeleton className="w-10 h-10 rounded-full" />
+                      <div className="space-y-2">
+                        <Skeleton className="h-4 w-32" />
+                        <Skeleton className="h-3 w-20" />
+                      </div>
+                    </div>
+                    <Skeleton className="h-4 w-24" />
+                  </div>
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-3/4" />
+                  </div>
+                </div>
+                <div className="flex md:flex-col gap-2 shrink-0 md:min-w-[140px]">
+                  <Skeleton className="h-9 w-full rounded" />
+                  <Skeleton className="h-9 w-full rounded" />
+                </div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
       ) : filteredReviews.length === 0 ? (
         <Card className="border-dashed py-20">

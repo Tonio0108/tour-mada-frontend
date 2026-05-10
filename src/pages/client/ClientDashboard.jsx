@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { 
   CalendarDays, 
   WalletCards, 
@@ -17,43 +17,32 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@src/hooks/useAuth";
+import { Skeleton } from "@/components/ui/skeleton";
+import StatsSkeleton from "@/components/ui/StatsSkeleton";
+import { useQuery } from "@tanstack/react-query";
 
 export default function ClientDashboard() {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const [stats, setStats] = useState({
-    totalReservations: 0,
-    pendingPayments: 0,
-    confirmedReservations: 0,
+
+  const clientId = user?.Clients?.id_client;
+
+  const { data: reservations = [], isLoading: loading } = useQuery({
+    queryKey: ["reservations", clientId],
+    queryFn: () => reservationAPI.getClientReservations(clientId),
+    enabled: !!clientId,
   });
-  const [recentReservations, setRecentReservations] = useState([]);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (user?.Clients?.id_client) {
-      fetchDashboardData();
-    }
-  }, [user]);
-
-  const fetchDashboardData = async () => {
-    try {
-      setLoading(true);
-      const clientId = user.Clients.id_client;
-      const data = await reservationAPI.getClientReservations(clientId);
-      
-      setStats({
-        totalReservations: data.length,
-        pendingPayments: data.filter(r => r.statut === "EN_ATTENTE").length,
-        confirmedReservations: data.filter(r => r.statut === "CONFIRMER").length,
-      });
-      
-      setRecentReservations(data.slice(0, 3));
-    } catch (error) {
-      console.error("Error fetching dashboard data:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { stats, recentReservations } = useMemo(() => {
+    return {
+      stats: {
+        totalReservations: reservations.length,
+        pendingPayments: reservations.filter(r => r.statut === "EN_ATTENTE").length,
+        confirmedReservations: reservations.filter(r => r.statut === "CONFIRMER").length,
+      },
+      recentReservations: reservations.slice(0, 3),
+    };
+  }, [reservations]);
 
   const StatCard = ({ title, value, icon: Icon, description, colorClass }) => (
     <Card className={'hover:border-primary transition-all'}>
@@ -81,35 +70,48 @@ export default function ClientDashboard() {
   return (
     <div className="space-y-8">
       <div className="text-left space-y-1">
-        <h1 className="text-2xl font-bold tracking-tight">
-          {t('client_dashboard.welcome', { name: user?.Clients?.prenom || "" })}
-        </h1>
-        <p className="text-muted-foreground">
-          {t('client_dashboard.subtitle')}
-        </p>
+        {loading ? (
+          <>
+            <Skeleton className="h-8 w-64" />
+            <Skeleton className="h-4 w-48 mt-1" />
+          </>
+        ) : (
+          <>
+            <h1 className="text-2xl font-bold tracking-tight">
+              {t('client_dashboard.welcome', { name: user?.Clients?.prenom || "" })}
+            </h1>
+            <p className="text-muted-foreground">
+              {t('client_dashboard.subtitle')}
+            </p>
+          </>
+        )}
       </div>
 
-      <div className="grid gap-4 md:grid-cols-3">
-        <StatCard 
-          title={t('client_dashboard.stats.total_reservations')}
-          value={stats.totalReservations} 
-          icon={Package} 
-          colorClass="bg-blue-500/10 text-blue-600"
-        />
-        <StatCard 
-          title={t('client_dashboard.stats.pending')} 
-          value={stats.pendingPayments} 
-          icon={Clock} 
-          description={t('client_dashboard.stats.pending_desc')}
-          colorClass="bg-yellow-500/10 text-yellow-600"
-        />
-        <StatCard 
-          title={t('client_dashboard.stats.confirmed')} 
-          value={stats.confirmedReservations} 
-          icon={CheckCircle2} 
-          colorClass="bg-green-500/10 text-green-600"
-        />
-      </div>
+      {loading ? (
+        <StatsSkeleton />
+      ) : (
+        <div className="grid gap-4 md:grid-cols-3">
+          <StatCard 
+            title={t('client_dashboard.stats.total_reservations')}
+            value={stats.totalReservations} 
+            icon={Package} 
+            colorClass="bg-blue-500/10 text-blue-600"
+          />
+          <StatCard 
+            title={t('client_dashboard.stats.pending')} 
+            value={stats.pendingPayments} 
+            icon={Clock} 
+            description={t('client_dashboard.stats.pending_desc')}
+            colorClass="bg-yellow-500/10 text-yellow-600"
+          />
+          <StatCard 
+            title={t('client_dashboard.stats.confirmed')} 
+            value={stats.confirmedReservations} 
+            icon={CheckCircle2} 
+            colorClass="bg-green-500/10 text-green-600"
+          />
+        </div>
+      )}
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
         <Card className="md:col-span-4">
@@ -119,7 +121,20 @@ export default function ClientDashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {recentReservations.length > 0 ? (
+              {loading ? (
+                [...Array(3)].map((_, i) => (
+                  <div key={i} className="flex items-center justify-between p-4 border border-border rounded-lg">
+                    <div className="flex items-center gap-4 flex-1">
+                      <Skeleton className="w-8 h-8 rounded" />
+                      <div className="space-y-2 flex-1">
+                        <Skeleton className="h-4 w-32" />
+                        <Skeleton className="h-3 w-20" />
+                      </div>
+                    </div>
+                    <Skeleton className="w-16 h-6 rounded-full" />
+                  </div>
+                ))
+              ) : recentReservations.length > 0 ? (
                 recentReservations.map((res) => (
                   <div key={res.id_reservation} className="flex items-center justify-between p-4 border border-border hover:shadow-md transition-all rounded-lg">
                     <div className="flex items-center gap-4">

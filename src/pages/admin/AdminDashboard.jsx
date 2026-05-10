@@ -28,6 +28,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
+import StatsSkeleton from "@/components/ui/StatsSkeleton";
+import TableSkeleton from "@/components/ui/TableSkeleton";
+import { Skeleton } from "@/components/ui/skeleton";
 import { 
   BarChart, 
   Bar, 
@@ -41,55 +44,48 @@ import {
   Cell
 } from 'recharts';
 
+import { useQuery } from "@tanstack/react-query";
+
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
 
 export default function AdminDashboard() {
   const { t } = useTranslation();
-  const [analytics, setAnalytics] = useState({
-    stats: {
-      totalRevenue: 0,
-      totalReservations: 0,
-      totalTours: 0,
-      pendingPayments: 0
-    },
-    revenueByMonth: [],
-    popularTours: []
-  });
-
-  const [recentReservations, setRecentReservations] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
   const url = import.meta.env.VITE_API_URL;
 
+  const { data: analytics = {
+    stats: { totalRevenue: 0, totalReservations: 0, totalTours: 0, pendingPayments: 0 },
+    revenueByMonth: [],
+    popularTours: []
+  }, isLoading: analyticsLoading } = useQuery({
+    queryKey: ["admin", "analytics"],
+    queryFn: async () => {
+      const token = await getAuthToken();
+      const response = await fetch(`${url}/analytics/dashboard`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      return response.json();
+    }
+  });
+
+  const { data: recentReservations = [], isLoading: reservationsLoading } = useQuery({
+    queryKey: ["admin", "recent-reservations"],
+    queryFn: async () => {
+      const token = await getAuthToken();
+      const response = await fetch(`${url}/reservation`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await response.json();
+      return data.slice(0, 5);
+    }
+  });
+
+  const loading = analyticsLoading || reservationsLoading;
+
   useEffect(() => {
-    fetchDashboardData();
-    // Utiliser un micro-délai pour laisser le layout se stabiliser
     const timer = setTimeout(() => setMounted(true), 100);
     return () => clearTimeout(timer);
   }, []);
-
-  const fetchDashboardData = async () => {
-    setLoading(true);
-    const token = await getAuthToken();
-    try {
-      const [analyticsRes, reservsRes] = await Promise.all([
-        fetch(`${url}/analytics/dashboard`, { headers: { Authorization: `Bearer ${token}` } }),
-        fetch(`${url}/reservation`, { headers: { Authorization: `Bearer ${token}` } })
-      ]);
-
-      const [analyticsData, reservations] = await Promise.all([
-        analyticsRes.json(),
-        reservsRes.json()
-      ]);
-
-      setAnalytics(analyticsData);
-      setRecentReservations(reservations.slice(0, 5));
-    } catch (error) {
-      console.error("Dashboard error:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const getStatusBadge = (status) => {
     const s = status?.toUpperCase();
@@ -133,9 +129,50 @@ export default function AdminDashboard() {
   );
 
   if (loading) return (
-    <div className="h-[60vh] flex flex-col items-center justify-center gap-3">
-      <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">{t('admin_common.loading')}</p>
+    <div className="space-y-8">
+      <div>
+        <Skeleton className="h-8 w-64" />
+        <Skeleton className="h-1 w-12 mt-2" />
+      </div>
+
+      <StatsSkeleton />
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card className="border-border shadow-none bg-card">
+          <CardHeader>
+            <Skeleton className="h-6 w-48 mb-2" />
+            <Skeleton className="h-4 w-64" />
+          </CardHeader>
+          <CardContent className="h-75">
+            <Skeleton className="h-full w-full" />
+          </CardContent>
+        </Card>
+        <Card className="border-border shadow-none bg-card">
+          <CardHeader>
+            <Skeleton className="h-6 w-48 mb-2" />
+            <Skeleton className="h-4 w-64" />
+          </CardHeader>
+          <CardContent className="h-75 flex items-center justify-center">
+            <Skeleton className="h-48 w-48 rounded-full" />
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+          <TableSkeleton columns={6} rows={5} />
+        </div>
+        <div className="space-y-4">
+          <Card className="bg-white border-none shadow-sm">
+            <CardHeader><Skeleton className="h-6 w-32" /></CardHeader>
+            <CardContent className="space-y-2">
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 
@@ -180,7 +217,7 @@ export default function AdminDashboard() {
             </div>
             <CardDescription className="text-left">{t('admin_dashboard.charts.revenue_desc')}</CardDescription>
           </CardHeader>
-          <CardContent className="h-[300px] min-h-[300px] w-full" style={{ minWidth: 0 }}>
+          <CardContent className="h-75 min-h-75 w-full" style={{ minWidth: 0 }}>
             {mounted ? (
               <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                 <BarChart data={[...analytics.revenueByMonth].reverse()}>
@@ -211,7 +248,7 @@ export default function AdminDashboard() {
             <CardDescription className="text-left text-xs">{t('admin_dashboard.charts.popular_desc')}</CardDescription>
           </CardHeader>
           <CardContent className="flex-1 flex flex-col pt-0" style={{ minWidth: 0 }}>
-            <div className="h-[200px] w-full" style={{ minWidth: 0 }}>
+            <div className="h-50 w-full" style={{ minWidth: 0 }}>
               {mounted ? (
                 <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                   <PieChart>
@@ -300,7 +337,7 @@ export default function AdminDashboard() {
                           </div>
                         </TableCell>
                         <TableCell className="px-6 py-4">
-                          <span className="text-xs font-medium block max-w-[150px] truncate">
+                          <span className="text-xs font-medium block max-w-37.5 truncate">
                             {r.tour?.nom_tour || r.tour_personnalise?.interets || "Sur mesure"}
                           </span>
                         </TableCell>
