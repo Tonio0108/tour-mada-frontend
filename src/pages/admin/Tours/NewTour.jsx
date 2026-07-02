@@ -192,11 +192,20 @@ export default function NewTour() {
       {/* Stepper Simplifié */}
       <div className="grid grid-cols-4 gap-2">
         {steps.map((step, idx) => (
-          <div key={idx} className={cn(
-            "flex flex-col items-center p-3 rounded border transition-all",
-            currentStep === idx ? "bg-primary text-primary-foreground border-primary" : 
-            currentStep > idx ? "bg-muted text-muted-foreground border-border" : "bg-background text-muted-foreground border-border"
-          )}>
+          <div
+            key={idx}
+            role={idx < currentStep ? "button" : undefined}
+            tabIndex={idx < currentStep ? 0 : undefined}
+            onClick={() => idx < currentStep && setCurrentStep(idx)}
+            onKeyDown={(e) => idx < currentStep && e.key === 'Enter' && setCurrentStep(idx)}
+            className={cn(
+              "flex flex-col items-center p-3 rounded border transition-all",
+              currentStep === idx ? "bg-primary text-primary-foreground border-primary" : 
+              currentStep > idx
+                ? "bg-muted text-muted-foreground border-border cursor-pointer hover:bg-accent hover:text-accent-foreground"
+                : "bg-background text-muted-foreground border-border"
+            )}
+          >
             <step.icon className="w-4 h-4 mb-1" />
             <span className="text-[10px] font-bold uppercase">{step.title}</span>
           </div>
@@ -229,7 +238,7 @@ export default function NewTour() {
                   <div className="grid grid-cols-2 gap-4">
                     <FormField control={form.control} name="prix_par_pers" render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Prix (Ar)</FormLabel>
+                        <FormLabel>Prix (€)</FormLabel>
                         <FormControl><Input type="number" {...field} /></FormControl>
                         <FormMessage />
                       </FormItem>
@@ -365,7 +374,7 @@ export default function NewTour() {
                 <h3 className="text-2xl font-bold">{form.watch("nom_tour")}</h3>
                 <div className="flex gap-4 mt-2 text-sm opacity-90">
                   <span className="flex items-center gap-1"><Clock className="w-4 h-4" /> {form.watch("duree_jours")}j</span>
-                  <span className="flex items-center gap-1"><DollarSign className="w-4 h-4" /> {parseInt(form.watch("prix_par_pers"))?.toLocaleString()} Ar</span>
+                  <span className="flex items-center gap-1"><DollarSign className="w-4 h-4" /> {parseInt(form.watch("prix_par_pers"))?.toLocaleString()} €</span>
                 </div>
               </div>
               <div className="p-6 space-y-6">

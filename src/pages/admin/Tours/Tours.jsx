@@ -233,7 +233,7 @@ export default function Tours() {
                       </div>
                     </TableCell>
                     <TableCell className="px-4 py-3 text-right font-medium text-primary">
-                      {parseInt(tour.prix_par_pers)?.toLocaleString()} Ar
+                      {parseInt(tour.prix_par_pers)?.toLocaleString()} €
                     </TableCell>
                     <TableCell className="px-4 py-3 text-center">
                       <Badge variant="secondary">{tour.duree_jours}j</Badge>

@@ -6,6 +6,14 @@ import Sitemap from 'vite-plugin-sitemap';
 
 // https://vite.dev/config/
 export default defineConfig({
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+      },
+    },
+  },
   plugins: [
     react(), 
     tailwindcss(),
@@ -19,6 +27,7 @@ export default defineConfig({
     alias: {
       "@": path.resolve(__dirname, "."),
       "@src": path.resolve(__dirname, "./src"),
+      "@lib": path.resolve(__dirname, "./src/lib"),
     },
   },
   test: {

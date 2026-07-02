@@ -206,7 +206,7 @@ export default function ClientList() {
                           <p className="text-xs text-muted-foreground">#{r.id_reservation} - {formatDate(r.date_tour_prevue)}</p>
                         </div>
                         <div className="flex items-center gap-4">
-                          <p className="font-bold text-primary">{parseInt(r.montant_total)?.toLocaleString()} Ar</p>
+                          <p className="font-bold text-primary">{parseInt(r.montant_total)?.toLocaleString()} €</p>
                           {getStatusBadge(r.statut)}
                         </div>
                       </div>

@@ -9,6 +9,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/Input";
 import { Badge } from "@/components/ui/badge";
 import { 
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { 
   Search, 
   ChevronLeft, 
   Send, 
@@ -16,7 +22,8 @@ import {
   X,
   MessageCircle,
   FileIcon,
-  CheckCheck
+  CheckCheck,
+  Plus
 } from "lucide-react";
 import { io } from "socket.io-client";
 import { getAuthToken } from "../lib/api";
@@ -37,6 +44,8 @@ export function ChatSidebar({ open, onOpenChange, user, isAdmin }) {
   const [showSearch, setShowSearch] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [showNewConvDialog, setShowNewConvDialog] = useState(false);
+  const [clients, setClients] = useState([]);
   
   const scrollRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -111,6 +120,16 @@ export function ChatSidebar({ open, onOpenChange, user, isAdmin }) {
     } catch (e) { console.error(e); }
   };
 
+  const fetchClients = async () => {
+    const token = await getAuthToken();
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/client/with-reservations`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) setClients(await res.json());
+    } catch (e) { console.error(e); }
+  };
+
   const markMessagesAsRead = async (conversationId) => {
     const token = await getAuthToken();
     try {
@@ -165,7 +184,7 @@ export function ChatSidebar({ open, onOpenChange, user, isAdmin }) {
   };
 
   const getPartnerInfo = (conv) => {
-    const p = conv.participants.find(p => p.id_utilisateur !== user?.id_utilisateur);
+    const p = conv?.participants?.find(p => p.id_utilisateur !== user?.id_utilisateur);
     if (!p) return { name: t("chat.user_default") || "Utilisateur", email: "" };
     const details = p.type_utilisateur === 'ADMIN' ? p.Administrateur : p.Clients;
     return { 
@@ -200,6 +219,38 @@ export function ChatSidebar({ open, onOpenChange, user, isAdmin }) {
                 <MessageCircle className="w-5 h-5 text-primary" />
                 {t("chat.title") || "Messages"}
               </SheetTitle>
+              <Button size="sm" className="w-full mt-3 gap-1.5 rounded-full text-xs font-semibold shadow-sm"
+                onClick={async () => {
+                  if (!isAdmin) {
+                    const token = await getAuthToken();
+                    try {
+                      const adminRes = await fetch(`${import.meta.env.VITE_API_URL}/chat/admin`, {
+                        headers: { Authorization: `Bearer ${token}` }
+                      });
+                      if (adminRes.ok) {
+                        const admin = await adminRes.json();
+                        if (admin) {
+                          const convRes = await fetch(`${import.meta.env.VITE_API_URL}/chat/conversation/find-or-create`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                            body: JSON.stringify({ participantId: admin.id_utilisateur })
+                          });
+                          if (convRes.ok) {
+                            const conv = await convRes.json();
+                            fetchMessages(conv);
+                          }
+                        }
+                      }
+                    } catch (e) { console.error(e); }
+                  } else {
+                    fetchClients();
+                    setShowNewConvDialog(true);
+                  }
+                }}
+              >
+                <Plus className="w-4 h-4" />
+                {t("chat.new_discussion") || "Nouvelle discussion"}
+              </Button>
               <div className="relative mt-2">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input 
@@ -366,6 +417,51 @@ export function ChatSidebar({ open, onOpenChange, user, isAdmin }) {
             </div>
           </>
         )}
+        <Dialog open={showNewConvDialog} onOpenChange={(open) => { setShowNewConvDialog(open); if (!open) setClients([]); }}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>{t("chat.select_client") || "Sélectionner un client"}</DialogTitle>
+            </DialogHeader>
+            <div className="max-h-80 overflow-y-auto space-y-1 -mx-6 -mb-6 px-6 pb-6 pt-2">
+              {clients.length === 0 ? (
+                <div className="py-8 text-center text-sm text-muted-foreground">
+                  {t("chat.no_clients") || "Aucun client disponible"}
+                </div>
+              ) : (
+                clients.map((client) => (
+                  <button
+                    key={client.id_client}
+                    onClick={async () => {
+                      const token = await getAuthToken();
+                      try {
+                        const convRes = await fetch(`${import.meta.env.VITE_API_URL}/chat/conversation/find-or-create`, {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                          body: JSON.stringify({ participantId: client.utilisateur.id_utilisateur })
+                        });
+                        if (convRes.ok) {
+                          const conv = await convRes.json();
+                          fetchMessages(conv);
+                        }
+                      } catch (e) { console.error(e); }
+                      setShowNewConvDialog(false);
+                      setClients([]);
+                    }}
+                    className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors text-left"
+                  >
+                    <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-primary text-xs font-bold shrink-0">
+                      {client.prenom[0]}{client.nom[0]}
+                    </div>
+                    <div className="min-w-0">
+                      <div className="text-sm font-semibold truncate">{client.prenom} {client.nom}</div>
+                      <div className="text-xs text-muted-foreground truncate">{client.utilisateur.email}</div>
+                    </div>
+                  </button>
+                ))
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
       </SheetContent>
     </Sheet>
   );

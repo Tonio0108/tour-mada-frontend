@@ -16,9 +16,39 @@
       "days": "jours",
       "expand_details": "Détails",
       "collapse_details": "Réduire"
+    },
+    "details": {
+      "contact": "Contact",
+      "details": "Détails",
+      "adults": "Adultes",
+      "youth": "Jeunes",
+      "children": "Enfants",
+      "budget": "Budget",
+      "men": "Hommes",
+      "women": "Femmes",
+      "oldest_age": "Âge du plus âgé",
+      "youngest_age": "Âge du plus jeune",
+      "tour": "Circuit",
+      "custom": "Personnalisé",
+      "reserved_on": "Réservé le"
+    },
+    "actions": {
+      "cancel": "Annuler",
+      "contact": "Contacter"
+    },
+    "cancel_dialog": {
+      "title": "Annuler la réservation",
+      "description": "Veuillez nous indiquer la raison de votre annulation.",
+      "placeholder": "Raison de l'annulation (facultatif)...",
+      "confirm": "Confirmer l'annulation",
+      "cancel": "Garder la réservation"
+    },
+    "empty_state": {
+      "title": "Aucune réservation",
+      "description": "Vous n'avez pas encore effectué de réservation.",
+      "discover_tours": "Découvrir nos circuits"
     }
   },
-
   "navbar": {
     "brand": "Tour Mada Découverte",
     "home": "Accueil",
@@ -36,13 +66,11 @@
     "account": "Compte",
     "notifications": "Notifications",
     "connected_as": "Connecté en tant que",
-    "select_language" : "Choisir une langue"
+    "select_language": "Choisir une langue"
   },
-
   "hero": {
     "title": "Leader du tourisme authentique à Madagascar",
     "subtitle": "L'art de voyager, d'explorer une nouvelle culture, de vivre l'authenticité malgache",
-
     "price_per_person": "Prix par personne",
     "all_prices": "Tous les budgets",
     "price_under_500": "Moins de 500 €",
@@ -54,12 +82,10 @@
     "duration_4_7": "4-7 jours",
     "duration_8_14": "8-14 jours",
     "duration_14_plus": "Plus de 14 jours",
-
     "tour_name": "Nom du tour",
     "tour_placeholder": "Ex: Parc Isalo, Tsingy, Baobabs...",
     "search": "Rechercher"
   },
-
   "about": {
     "title": "Qui <0>sommes-nous</0> ?",
     "description": "Nous sommes une équipe locale passionnée, spécialisée dans le tourisme réceptif à Madagascar. Notre mission est de créer des séjours authentiques et responsables, adaptés à vos envies.",
@@ -82,7 +108,6 @@
     },
     "conclusion": "Avec <0>TOUR MADA DECOUVERTE</0> chaque voyage est personnalisé et encadré par des guides expérimentés."
   },
-
   "tour": {
     "title": "Découvrez nos <0>tours</0>",
     "description": "Nous proposons des tours à travers plusieurs endroits à Madagascar, cliquez sur en savoir plus pour voir les informations sur chaque tour.",
@@ -98,9 +123,11 @@
     "view_all_tours": "Voir tous nos tours",
     "loading": "Chargement des tours en cours...",
     "custom_tour": "Circuit Personnalisé",
-    "agency": "Agence"
+    "agency": "Agence",
+    "tour_name": "Nom du tour",
+    "loading_error": "Erreur lors du chargement des tours",
+    "no_tours": "Aucun tour disponible pour le moment"
   },
-
   "cta": {
     "custom_badge": "Sur mesure",
     "title": "Vous ne trouvez pas <0>le tour idéal</0> ?",
@@ -126,42 +153,51 @@
       "response_time": "Réponse sous 24h - Devis gratuit"
     }
   },
-
   "contact": {
-    "title": "Contactez nous",
+    "title": "Contactez-nous",
     "our_info": "Nos informations",
     "our_location": "Notre localisation",
     "address": {
       "title": "Adresse",
-      "value": "Lot 25 A IV / 36 09 ATANIFOTSY IV FIANARANTSOA 301"
+      "value": "Antananarivo, Madagascar"
     },
     "phone": {
-      "title": "Téléphone / WhatsApp",
-      "value": "034 53 161 61"
+      "title": "Téléphone",
+      "value": "+261 34 12 345 67"
     },
     "email": {
       "title": "Email",
-      "value": "tourmadadecouverte@gmail.com"
+      "value": "contact@tourmada.com"
     },
     "social": {
-      "title": "Réseaux sociaux",
-      "facebook": "Rado Tour Guida (Facebook)"
+      "title": "Réseaux Sociaux",
+      "facebook": "Tour Mada Découverte"
     },
     "location_description": "Nous nous trouvons à Fianarantsoa, une ville stratégique pour explorer les merveilles de Madagascar",
-    "call_to_action": "N'hésitez pas à nous contacter pour toute demande d'information ou de réservation",
+    "call_to_action": "Une question ? Un projet de voyage ? N'hésitez pas à nous contacter, notre équipe vous répondra dans les plus brefs délais.",
     "buttons": {
       "call": "Nous appeler",
-      "email": "Envoyer un email"
+      "email": "Envoyez-nous un message"
+    },
+    "form": {
+      "subject": "Sujet",
+      "message": "Votre message...",
+      "success": "Votre message a été envoyé avec succès !",
+      "error": "Une erreur est survenue lors de l'envoi du message.",
+      "required_fields": "Veuillez remplir tous les champs obligatoires."
     }
   },
-
   "tour_details": {
-    "loading": "Chargement du tour...",
+    "loading": "Chargement des détails du circuit...",
     "media": {
       "photos": "Photos",
       "videos": "Vidéos",
       "no_media": "Aucun média disponible",
-      "video_not_supported": "Votre navigateur ne supporte pas la lecture de vidéos."
+      "video_not_supported": "Votre navigateur ne supporte pas la lecture de vidéos.",
+      "gallery_title": "Galerie du circuit",
+      "video_badge": "Vidéo",
+      "preview_title": "Aperçu média",
+      "preview_desc": "Aperçu de l'image ou vidéo du tour"
     },
     "tabs": {
       "itinerary": "Itinéraire",
@@ -170,18 +206,22 @@
       "reviews": "Avis"
     },
     "description": {
-      "title": "Description détaillée"
+      "title": "À propos de ce voyage",
+      "badge": "Exploration"
     },
     "itinerary": {
-      "title": "Itinéraire détaillé"
+      "title": "Votre Itinéraire",
+      "badge": "Aventure",
+      "day": "Jour"
     },
     "tips": {
       "title": "Choses à apporter",
-      "no_items": "Aucun objet nécessaire spécifié.",
-      "mandatory": "Obligatoire"
+      "no_items": "Aucun conseil particulier pour ce circuit.",
+      "mandatory": "Obligatoire",
+      "badge": "Préparation"
     },
-    "pricing": "À partir de {{price}} €/personne",
-    "days": "jours",
+    "pricing": "{{price}} € / personne",
+    "days": "jour",
     "book_tour": "Réserver ce tour",
     "admin": {
       "options": "Options",
@@ -197,26 +237,57 @@
         "title": "Suppression de tour",
         "message": "Le tour a été supprimé avec succès."
       }
+    },
+    "not_found": "Circuit non trouvé",
+    "back_to_tours": "Retour aux circuits",
+    "booking": {
+      "title": "Prêt pour l'aventure ?",
+      "price_label": "À partir de",
+      "per_person": "par personne",
+      "duration": "Durée du voyage",
+      "availability": "Disponibilité",
+      "immediate_confirm": "Confirmation sous 24h",
+      "reserve_button": "Réserver ce circuit",
+      "custom_button": "Demander une personnalisation",
+      "limited_availability": "Disponibilités limitées pour la saison"
+    },
+    "inclusion": {
+      "title": "Ce qui est inclus",
+      "guide": "Guide professionnel",
+      "activities": "Toutes les activités",
+      "transport": "Transport sécurisé",
+      "support": "Assistance 24/7"
+    },
+    "delete_modal": {
+      "title": "Supprimer le circuit",
+      "description": "Voulez-vous vraiment supprimer le circuit <0>{{tourName}}</0> ? Cette action est irréversible.",
+      "confirm": "Supprimer",
+      "cancel": "Annuler"
+    },
+    "days_plural": "jours",
+    "messages": {
+      "delete_success": "Le tour a été supprimé avec succès.",
+      "delete_error": "Erreur lors de la suppression",
+      "load_error": "Impossible de charger les détails du tour"
     }
   },
-
   "reviews": {
     "title": "Avis de nos voyageurs",
-    "write_review": "Donner votre avis",
-    "write_agency_review": "Donner un avis sur l'agence",
-    "share_experience": "Partagez votre expérience avec nous et aidez les autres voyageurs.",
+    "write_review": "Laisser un avis",
+    "write_agency_review": "Avis sur l'agence",
+    "share_experience": "Partagez votre expérience avec nous",
     "your_rating": "Votre note",
     "your_comment": "Votre commentaire",
     "placeholder": "Racontez-nous votre voyage...",
-    "submit": "Publier mon avis",
-    "success": "Merci ! Votre avis a été publié.",
-    "error": "Une erreur est survenue lors de la publication.",
-    "no_reviews": "Aucun avis pour le moment. Soyez le premier à en laisser un !",
-    "login_to_review": "Connectez-vous pour laisser un avis sur ce tour.",
-    "login_required": "Vous devez être connecté pour publier un avis.",
-    "deleted": "Avis supprimé avec succès.",
-    "confirm_delete": "Voulez-vous vraiment supprimer cet avis ?",
-    "error_delete": "Erreur lors de la suppression de l'avis.",
+    "submit": "Envoyer l'avis",
+    "success": "Merci pour votre avis !",
+    "error": "Une erreur est survenue lors de l'envoi.",
+    "no_reviews": "Aucun avis pour le moment.",
+    "login_to_review": "Connectez-vous pour partager votre expérience",
+    "login_required": "Veuillez vous connecter pour laisser un avis",
+    "deleted": "Avis supprimé",
+    "confirm_delete": "Voulez-vous supprimer cet avis ?",
+    "error_delete": "Erreur lors de la suppression",
     "view_all_reviews": "Voir tous les avis",
     "agency": "Agence",
     "choose_tour_to_review": "Choisir un tour à évaluer",
@@ -225,29 +296,12 @@
     "what_travelers_say_start": "Les avis de",
     "what_travelers_say_end": "nos voyageurs",
     "satisfaction_reward": "Votre satisfaction est notre plus grande récompense. Voici les témoignages de ceux qui nous ont fait confiance.",
-    "write_review": "Laisser un avis",
-    "write_agency_review": "Avis sur l'agence",
-    "no_reviews": "Aucun avis pour le moment.",
-    "view_all_reviews": "Voir tous les avis",
-    "share_experience": "Partagez votre expérience avec nous",
-    "your_rating": "Votre note",
-    "your_comment": "Votre commentaire",
-    "placeholder": "Racontez-nous votre voyage...",
-    "submit": "Envoyer l'avis",
-    "success": "Merci pour votre avis !",
-    "error": "Une erreur est survenue lors de l'envoi.",
-    "login_required": "Veuillez vous connecter pour laisser un avis",
-    "login_to_review": "Connectez-vous pour partager votre expérience",
-    "deleted": "Avis supprimé",
-    "error_delete": "Erreur lors de la suppression",
-    "confirm_delete": "Voulez-vous supprimer cet avis ?",
     "agency_name": "Tour Mada Découverte",
     "header": {
       "title": "Ce que disent <0>nos voyageurs</0>",
       "description": "Découvrez les expériences vécues par nos clients lors de leurs aventures à Madagascar."
     }
   },
-
   "footer": {
     "description": "Votre partenaire de confiance pour découvrir les merveilles de Madagascar à travers des circuits authentiques et personnalisés.",
     "navigation": "Navigation",
@@ -257,7 +311,6 @@
     "privacy": "Politique de confidentialité",
     "all_rights": "© {{year}} {{brand}}. Tous droits réservés."
   },
-
   "home": {
     "seo": {
       "title": "Leader du tourisme authentique",
@@ -265,38 +318,6 @@
       "keywords": "voyage madagascar, circuit madagascar, trekking madagascar, safari madagascar, guide touristique madagascar"
     }
   },
-
-  "contact": {
-    "title": "Contactez-nous",
-    "call_to_action": "Une question ? Un projet de voyage ? N'hésitez pas à nous contacter, notre équipe vous répondra dans les plus brefs délais.",
-    "phone": {
-      "title": "Téléphone",
-      "value": "+261 34 12 345 67"
-    },
-    "email": {
-      "title": "Email",
-      "value": "contact@tourmada.com"
-    },
-    "address": {
-      "title": "Adresse",
-      "value": "Antananarivo, Madagascar"
-    },
-    "social": {
-      "title": "Réseaux Sociaux",
-      "facebook": "Tour Mada Découverte"
-    },
-    "buttons": {
-      "email": "Envoyez-nous un message"
-    },
-    "form": {
-      "subject": "Sujet",
-      "message": "Votre message...",
-      "success": "Votre message a été envoyé avec succès !",
-      "error": "Une erreur est survenue lors de l'envoi du message.",
-      "required_fields": "Veuillez remplir tous les champs obligatoires."
-    }
-  },
-
   "reservation": {
     "title": "Formulaire de Réservation",
     "subtitle_standard": "Tour: {{tourName}}",
@@ -353,7 +374,6 @@
       "budget": "Budget estimé en Euro"
     }
   },
-
   "login": {
     "title": "Connexion à votre compte",
     "create_account": "créez un nouveau compte",
@@ -374,7 +394,6 @@
     "success_message": "Bienvenue !",
     "create_account_prompt": "Ou <0>créez un nouveau compte</0>"
   },
-
   "register": {
     "title": "Créer un nouveau compte",
     "subtitle": "Rejoignez notre communauté de voyageurs passionnés",
@@ -416,70 +435,14 @@
       "phone": "Votre numéro de téléphone",
       "address": "Votre adresse",
       "city": "Votre ville",
-      "postal_code": "Votre code postal"
+      "postal_code": "Votre code postal",
+      "country": "Votre pays"
     },
     "errors": {
       "generic": "Une erreur est survenue lors de l'inscription"
     },
     "success_message": "Compte créé avec succès !"
   },
-
-    "tour_details": {
-    "loading": "Chargement des détails...",
-    "not_found": "Tour introuvable",
-    "back_to_tours": "Retour aux tours",
-    "days": "jours",
-    "pricing": "{{price}} € / personne",
-    "media": {
-      "gallery_title": "Galerie & Médias",
-      "video_badge": "VIDÉO"
-    },
-    "tabs": {
-      "description": "Description",
-      "itinerary": "Itinéraire",
-      "tips": "Conseils",
-      "reviews": "Avis"
-    },
-    "description": {
-      "title": "Aperçu du voyage",
-      "badge": "Aperçu"
-    },
-    "itinerary": {
-      "title": "Votre programme jour par jour",
-      "badge": "Programme",
-      "day": "Jour"
-    },
-    "tips": {
-      "title": "Conseils de voyage",
-      "badge": "Préparation",
-      "no_items": "Aucun conseil spécifique pour ce tour."
-    },
-    "booking": {
-      "title": "Prêt pour l'aventure ?",
-      "price_label": "À partir de",
-      "per_person": "par personne",
-      "duration": "Durée du voyage",
-      "availability": "Disponibilité",
-      "immediate_confirm": "Confirmation sous 24h",
-      "reserve_button": "Réserver ce circuit",
-      "custom_button": "Demander une personnalisation",
-      "limited_availability": "Disponibilités limitées"
-    },
-    "inclusion": {
-      "title": "Inclus",
-      "guide": "Guide local certifié",
-      "activities": "Activités",
-      "transport": "Transport",
-      "support": "Support 24/7"
-    },
-    "delete_modal": {
-      "title": "Confirmer la suppression",
-      "description": "Voulez-vous vraiment supprimer le tour <strong>{{tourName}}</strong> ?",
-      "confirm": "Supprimer",
-      "cancel": "Annuler"
-    }
-  },
-
   "client_reservations": {
     "subtitle": "Consultez et gérez vos réservations de voyage",
     "new_trip": "Nouveau Voyage",
@@ -523,7 +486,6 @@
       "cancel_error": "Erreur lors de l'annulation"
     }
   },
-
   "payments": {
     "title": "Mes Paiements",
     "subtitle": "Consultez l'historique de tous vos paiements",
@@ -542,7 +504,7 @@
       "amount_placeholder": "Ex: 50000",
       "payment_method": "Mode de paiement",
       "method_placeholder": "Sélectionnez un mode de paiement",
-      "proof": "Justificatif (optionnel)",
+      "proof": "Voir le justificatif",
       "upload_text": "Télécharger un fichier",
       "drag_drop": "ou glisser-déposer",
       "file_types": "PNG, JPG, PDF jusqu'à 10MB",
@@ -577,7 +539,6 @@
       "first_payment": "Créer votre premier paiement"
     }
   },
-
   "tours_page": {
     "title": "Tous nos <0>tours</0> à Madagascar",
     "loading": "Chargement des tours...",
@@ -597,15 +558,15 @@
       "all_budgets": "Tous les budgets",
       "all_durations": "Toutes les durées",
       "price_ranges": {
+        "1000": "Plus de 1000 €",
         "0-500": "Moins de 500 €",
-        "500-1000": "500 - 1000 €",
-        "1000": "Plus de 1000 €"
+        "500-1000": "500 - 1000 €"
       },
       "duration_ranges": {
+        "14": "14+ jours",
         "1-3": "1-3 jours",
         "4-7": "4-7 jours",
-        "8-14": "8-14 jours",
-        "14": "14+ jours"
+        "8-14": "8-14 jours"
       },
       "tour_name_placeholder": "Ex: Parc Isalo, Tsingy, Baobabs...",
       "reset": "Réinitialiser",
@@ -628,7 +589,6 @@
       "reset_filters": "Réinitialiser les filtres"
     }
   },
-
   "profile": {
     "title": "Mon Profil",
     "subtitle": "Gérez vos informations personnelles",
@@ -688,8 +648,7 @@
       "password_error": "Erreur lors du changement de mot de passe"
     }
   },
-
-    "admin_common": {
+  "admin_common": {
     "search": "Rechercher...",
     "filters": "Filtres",
     "clear_filters": "Effacer les filtres",
@@ -707,7 +666,7 @@
     "date": "Date",
     "client": "Client",
     "amount": "Montant",
-    "currency": "Ar",
+    "currency": "€",
     "loading": "Chargement",
     "no_data": "Aucune donnée disponible",
     "success_update": "Mise à jour réussie",
@@ -716,9 +675,8 @@
     "message_placeholder": "Écrivez votre message ici...",
     "mail_included": "Sera inclus dans le mail",
     "all_status": "Tous les statuts"
-    },
-
-    "admin_dashboard": {
+  },
+  "admin_dashboard": {
     "title": "Tableau de bord",
     "stats": {
       "total_revenue": "Revenu Total",
@@ -748,9 +706,8 @@
       "desc": "La capacité maximale des circuits est désormais active pour éviter les sur-réservations.",
       "manage_tours": "Gérer les circuits"
     }
-    },
-
-    "admin_reviews": {
+  },
+  "admin_reviews": {
     "title": "Gestion des Avis",
     "subtitle": "Modérez et gérez les avis laissés par les clients.",
     "search_placeholder": "Rechercher un avis...",
@@ -773,9 +730,8 @@
       "delete_success": "Avis supprimé",
       "delete_error": "Erreur lors de la suppression"
     }
-    },
-
-    "admin_payments": {
+  },
+  "admin_payments": {
     "title": "Paiements",
     "subtitle": "Suivi des règlements clients",
     "filters": {
@@ -809,9 +765,8 @@
       "update_success": "Statut du paiement mis à jour",
       "update_error": "Erreur lors de la mise à jour"
     }
-    },
-
-    "admin_reservations": {
+  },
+  "admin_reservations": {
     "title": "Gestion des réservations",
     "no_reservations": "Aucune réservation",
     "details": {
@@ -833,37 +788,37 @@
       "update_success": "Statut mis à jour",
       "update_error": "Erreur lors de la mise à jour"
     }
-    },
-
-    "admin_clients": {
-      "title": "Base Clients",
-      "subtitle": "Répertoire des voyageurs",
-      "no_clients": "Aucun client",
-      "member_account": "Compte membre",
-      "direct_client": "Client direct",
-      "contact_info": "Coordonnées",
-      "history": "Historique"
-    },
-
-    "admin_accounts": {
-      "title": "Gestion des Comptes",
-      "subtitle": "Gérez les accès administrateurs",
-      "new_user": "Nouvel Utilisateur",
-      "edit_user": "Modifier l'utilisateur",
-      "view_user": "Détails de l'utilisateur",
-      "delete_title": "Supprimer ce compte ?",
-      "delete_desc": "Cette action est irréversible pour {{email}}.",
-      "no_users": "Aucun utilisateur",
-      "temp_password": "Mot de passe temporaire",
-      "toast": {
-        "load_error": "Impossible de charger les utilisateurs",
-        "delete_success": "Utilisateur supprimé",
-        "update_success": "Utilisateur mis à jour",
-        "create_success": "Utilisateur créé"
-      }
-    },
-
-    "admin_propositions": {
+  },
+  "admin_clients": {
+    "title": "Base Clients",
+    "subtitle": "Répertoire des voyageurs",
+    "no_clients": "Aucun client",
+    "member_account": "Compte membre",
+    "direct_client": "Client direct",
+    "contact_info": "Coordonnées",
+    "history": "Historique",
+    "toast": {
+      "load_error": "Erreur lors du chargement des clients"
+    }
+  },
+  "admin_accounts": {
+    "title": "Gestion des Comptes",
+    "subtitle": "Gérez les accès administrateurs",
+    "new_user": "Nouvel Utilisateur",
+    "edit_user": "Modifier l'utilisateur",
+    "view_user": "Détails de l'utilisateur",
+    "delete_title": "Supprimer ce compte ?",
+    "delete_desc": "Cette action est irréversible pour {{email}}.",
+    "no_users": "Aucun utilisateur",
+    "temp_password": "Mot de passe temporaire",
+    "toast": {
+      "load_error": "Impossible de charger les utilisateurs",
+      "delete_success": "Utilisateur supprimé",
+      "update_success": "Utilisateur mis à jour",
+      "create_success": "Utilisateur créé"
+    }
+  },
+  "admin_propositions": {
     "title": "Propositions",
     "subtitle": "Demandes de tours sur mesure",
     "no_propositions": "Aucune proposition",
@@ -888,188 +843,124 @@
       "update_success": "Proposition mise à jour",
       "update_error": "Erreur lors de la mise à jour"
     }
+  },
+  "client_common": {
+    "dashboard": "Tableau de bord",
+    "my_reservations": "Mes Réservations",
+    "my_payments": "Mes Paiements",
+    "my_profile": "Mon Profil",
+    "logout": "Déconnexion",
+    "back_to_site": "Retour au Site",
+    "client_space": "Espace Client",
+    "need_help": "Besoin d'aide ?",
+    "help_desc": "Notre équipe est disponible 24/7 pour vous accompagner dans la préparation de votre voyage.",
+    "contact_us": "Nous contacter",
+    "quick_actions": "Actions Rapides",
+    "search_placeholder": "Rechercher par référence ou circuit...",
+    "menu_navigation": "Menu de navigation",
+    "menu_navigation_desc": "Accédez aux différentes sections de votre espace client",
+    "brand_name": "TOUR MADA",
+    "role_client": "Client",
+    "notifications": "Notifications"
+  },
+  "client_dashboard": {
+    "welcome": "Bonjour, {{name}} !",
+    "subtitle": "Ravi de vous revoir. Voici un aperçu de vos projets de voyage.",
+    "stats": {
+      "total_reservations": "Total Réservations",
+      "pending": "En attente",
+      "pending_desc": "Réservations à confirmer",
+      "confirmed": "Confirmées"
     },
-
-    "client_common": {
-      "dashboard": "Tableau de bord",
-      "my_reservations": "Mes Réservations",
-      "my_payments": "Mes Paiements",
-      "my_profile": "Mon Profil",
-      "logout": "Déconnexion",
-      "back_to_site": "Retour au Site",
-      "client_space": "Espace Client",
-      "need_help": "Besoin d'aide ?",
-      "help_desc": "Notre équipe est disponible 24/7 pour vous accompagner dans la préparation de votre voyage.",
-      "contact_us": "Nous contacter",
-      "quick_actions": "Actions Rapides",
-      "search_placeholder": "Rechercher par référence ou circuit...",
-      "menu_navigation": "Menu de navigation",
-      "menu_navigation_desc": "Accédez aux différentes sections de votre espace client",
-      "brand_name": "TOUR MADA",
-      "role_client": "Client",
-      "notifications": "Notifications"
-      },
-
-      "client_dashboard": {      "welcome": "Bonjour, {{name}} !",
-      "subtitle": "Ravi de vous revoir. Voici un aperçu de vos projets de voyage.",
-      "stats": {
-        "total_reservations": "Total Réservations",
-        "pending": "En attente",
-        "pending_desc": "Réservations à confirmer",
-        "confirmed": "Confirmées"
-      },
-      "recent_reservations": {
-        "title": "Réservations Récentes",
-        "subtitle": "Vos dernières demandes de voyage.",
-        "no_reservations": "Aucune réservation pour le moment.",
-        "discover_tours": "Découvrir nos circuits",
-        "view_all": "Voir toutes mes réservations"
-      },
-      "actions": {
-        "book_new": "Réserver un nouveau tour",
-        "update_profile": "Mettre à jour mon profil",
-        "payment_history": "Historique des paiements"
-      }
+    "recent_reservations": {
+      "title": "Réservations Récentes",
+      "subtitle": "Vos dernières demandes de voyage.",
+      "no_reservations": "Aucune réservation pour le moment.",
+      "discover_tours": "Découvrir nos circuits",
+      "view_all": "Voir toutes mes réservations"
     },
-
-    "client_payments": {
-      "title": "Historique des Paiements",
-      "subtitle": "Gérez vos règlements et justificatifs",
-      "new_payment": "Nouveau Paiement",
-      "no_payments": "Aucun paiement trouvé",
-      "table": {
-        "reference": "Référence",
-        "circuit_destination": "Circuit / Destination",
-        "date": "Date",
-        "mode": "Mode",
-        "amount": "Montant"
-      },
-      "form": {
-        "title": "Enregistrer un paiement",
-        "subtitle": "Veuillez remplir les informations concernant votre règlement.",
-        "reservation": "Réservation",
-        "select_reservation": "Sélectionnez une réservation",
-        "reference_label": "Référence",
-        "reference_placeholder": "N° de transaction",
-        "amount_label": "Montant (€)",
-        "mode_label": "Mode de paiement",
-        "select_mode": "Choisir un mode",
-        "proof_label": "Justificatif (Image ou PDF)",
-        "file_selected": "Fichier : {{name}}",
-        "submit": "Enregistrer le paiement"
-      },
-      "toast": {
-        "load_error": "Erreur lors du chargement des paiements",
-        "save_success": "Paiement enregistré avec succès",
-        "save_error": "Erreur lors de l'enregistrement",
-        "details_soon": "Détails bientôt disponibles"
-      }
-    },
-
-    "client_reviews": {
-      "seo_description": "Découvrez les retours d'expérience de nos clients sur leurs voyages à Madagascar.",
-      "header": {
-        "badge": "Expériences",
-        "title_start": "Les avis de ",
-        "title_end": "nos voyageurs",
-        "subtitle": "Votre satisfaction est notre plus grande récompense. Voici les témoignages de ceux qui nous ont fait confiance."
-      }
-    },
-
-    "tour_details": {
-      "loading": "Chargement des détails du circuit...",
-      "not_found": "Circuit non trouvé",
-      "back_to_tours": "Retour aux circuits",
-      "days": "jour",
-      "days_plural": "jours",
-      "pricing": "{{price}} € / personne",
-      "tabs": {
-        "description": "Description",
-        "itinerary": "Itinéraire",
-        "tips": "Conseils",
-        "reviews": "Avis"
-      },
-      "media": {
-        "gallery_title": "Galerie du circuit",
-        "video_badge": "Vidéo",
-        "preview_title": "Aperçu média",
-        "preview_desc": "Aperçu de l'image ou vidéo du tour"
-      },
-      "description": {
-        "badge": "Exploration",
-        "title": "À propos de ce voyage"
-      },
-      "itinerary": {
-        "badge": "Aventure",
-        "title": "Votre Itinéraire"
-      },
-      "tips": {
-        "badge": "Préparation",
-        "title": "Choses à apporter",
-        "no_items": "Aucun conseil particulier pour ce circuit.",
-        "mandatory": "Obligatoire"
-      },
-      "inclusion": {
-        "title": "Ce qui est inclus",
-        "guide": "Guide professionnel",
-        "activities": "Toutes les activités",
-        "transport": "Transport sécurisé",
-        "support": "Assistance 24/7"
-      },
-      "booking": {
-        "reserve_button": "Réserver ce circuit",
-        "limited_availability": "Disponibilités limitées pour la saison"
-      },
-      "delete_modal": {
-        "title": "Supprimer le circuit",
-        "description": "Voulez-vous vraiment supprimer le circuit <0>{{tourName}}</0> ? Cette action est irréversible.",
-        "cancel": "Annuler",
-        "confirm": "Supprimer"
-      },
-      "messages": {
-        "delete_success": "Le tour a été supprimé avec succès.",
-        "delete_error": "Erreur lors de la suppression",
-        "load_error": "Impossible de charger les détails du tour"
-      }
-    },
-    "notifications": {
-      "title": "Notifications",
-      "mark_all_read": "Tout marquer comme lu",
-      "no_notifications": "Aucune notification pour le moment",
-      "view": "Voir",
-      "new": "Nouvelle notification"
-    },
-    "payments": {
-      "form": {
-        "proof": "Voir le justificatif"
-      },
-      "methods": {
-        "mobile_money": "Mobile Money",
-        "transfer": "Virement",
-        "cash": "Espèces"
-      }
-    },
-    "chat": {
-      "title": "Messages",
-      "discussion_center": "Centre de discussion",
-      "no_messages": "Aucun message pour le moment",
-      "placeholder": "Écrivez votre message...",
-      "send": "Envoyer",
-      "contacts": "Discussions",
-      "admin_support": "Support MADA",
-      "online": "En ligne",
-      "offline": "Hors ligne",
-      "view_all": "Tout voir",
-      "search_discussion": "Rechercher une discussion...",
-      "search_messages": "Rechercher dans la discussion...",
-      "search_placeholder": "Rechercher...",
-      "no_results": "Aucun résultat",
-      "active_session": "Session Active",
-      "file_sent": "📎 Fichier envoyé",
-      "file_received": "📎 Fichier reçu",
-      "secure_messaging": "Messagerie Sécurisée",
-      "select_conversation": "Sélectionnez une conversation pour commencer à échanger avec notre équipe.",
-      "file_ready": "Prêt",
-      "user_default": "Utilisateur"
+    "actions": {
+      "book_new": "Réserver un nouveau tour",
+      "update_profile": "Mettre à jour mon profil",
+      "payment_history": "Historique des paiements"
     }
+  },
+  "client_payments": {
+    "title": "Historique des Paiements",
+    "subtitle": "Gérez vos règlements et justificatifs",
+    "new_payment": "Nouveau Paiement",
+    "no_payments": "Aucun paiement trouvé",
+    "table": {
+      "reference": "Référence",
+      "circuit_destination": "Circuit / Destination",
+      "date": "Date",
+      "mode": "Mode",
+      "amount": "Montant"
+    },
+    "form": {
+      "title": "Enregistrer un paiement",
+      "subtitle": "Veuillez remplir les informations concernant votre règlement.",
+      "reservation": "Réservation",
+      "select_reservation": "Sélectionnez une réservation",
+      "reference_label": "Référence",
+      "reference_placeholder": "N° de transaction",
+      "amount_label": "Montant (€)",
+      "mode_label": "Mode de paiement",
+      "select_mode": "Choisir un mode",
+      "proof_label": "Justificatif (Image ou PDF)",
+      "file_selected": "Fichier : {{name}}",
+      "submit": "Enregistrer le paiement"
+    },
+    "toast": {
+      "load_error": "Erreur lors du chargement des paiements",
+      "save_success": "Paiement enregistré avec succès",
+      "save_error": "Erreur lors de l'enregistrement",
+      "details_soon": "Détails bientôt disponibles"
+    }
+  },
+  "client_reviews": {
+    "seo_description": "Découvrez les retours d'expérience de nos clients sur leurs voyages à Madagascar.",
+    "header": {
+      "badge": "Expériences",
+      "title_start": "Les avis de ",
+      "title_end": "nos voyageurs",
+      "subtitle": "Votre satisfaction est notre plus grande récompense. Voici les témoignages de ceux qui nous ont fait confiance."
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "mark_all_read": "Tout marquer comme lu",
+    "no_notifications": "Aucune notification pour le moment",
+    "view": "Voir",
+    "new": "Nouvelle notification"
+  },
+  "chat": {
+    "title": "Messages",
+    "discussion_center": "Centre de discussion",
+    "no_messages": "Aucun message pour le moment",
+    "placeholder": "Écrivez votre message...",
+    "send": "Envoyer",
+    "contacts": "Discussions",
+    "admin_support": "Support MADA",
+    "online": "En ligne",
+    "offline": "Hors ligne",
+    "view_all": "Tout voir",
+    "search_discussion": "Rechercher une discussion...",
+    "search_messages": "Rechercher dans la discussion...",
+    "search_placeholder": "Rechercher...",
+    "no_results": "Aucun résultat",
+    "active_session": "Session Active",
+    "file_sent": "📎 Fichier envoyé",
+    "file_received": "📎 Fichier reçu",
+    "secure_messaging": "Messagerie Sécurisée",
+    "select_conversation": "Sélectionnez une conversation pour commencer à échanger avec notre équipe.",
+    "file_ready": "Prêt",
+    "user_default": "Utilisateur",
+    "new_discussion": "Nouvelle discussion",
+    "select_client": "Sélectionner un client",
+    "no_clients": "Aucun client disponible"
+  },
+  "common": {
+    "delete": "Supprimer"
+  }
 }

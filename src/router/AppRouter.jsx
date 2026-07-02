@@ -1,4 +1,5 @@
 import { Routes, Route, Navigate } from "react-router";
+import { useAuth } from "../hooks/useAuth";
 import ClientTours from "../pages/client/Tours.jsx";
 import HomePage from "../pages/client/HomePage.jsx";
 import TourDetails from "./../pages/client/TourDetails";
@@ -31,6 +32,11 @@ import Notifications from "../pages/client/Notifications.jsx";
 import AdminNotifications from "../pages/admin/Notifications.jsx";
 import AdminChat from "../pages/admin/Chat.jsx";
 import ClientChat from "../pages/client/Chat.jsx";
+
+const ChatRedirect = () => {
+  const { isAdmin } = useAuth();
+  return <Navigate to={isAdmin ? "/admin/chat" : "/client/chat"} replace />;
+};
 
 export const AppRouter = () => {
   return (
@@ -106,6 +112,7 @@ export const AppRouter = () => {
         <Route path="chat" element={<AdminChat />} />
       </Route>
 
+      <Route path="/chat" element={<ChatRedirect />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

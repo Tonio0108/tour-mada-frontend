@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { getAuthToken, PaiementApi, reservationAPI } from "../../../lib/api";
+import { getAuthToken, PaiementApi, reservationAPI, MailApi } from "../../../lib/api";
 import { useAuth } from "../../hooks/useAuth";
 import { useTranslation } from 'react-i18next';
 import {
@@ -119,12 +119,8 @@ export const Paiement = () => {
 
   const notify = async (nomClient, montant) => {
     try {
-      await fetch(`${url}/mail/notify-payment`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nomClient, montant }),
-      });
-    } catch (e) { console.error(e); }
+      await MailApi.notifyPayment({ nomClient, montant });
+    } catch (e) { console.error("Erreur notification paiement:", e); }
   };
 
   const onSubmit = async (data) => {
@@ -164,11 +160,7 @@ export const Paiement = () => {
   };
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat("fr-FR", {
-      style: "currency",
-      currency: "EUR",
-      minimumFractionDigits: 0,
-    }).format(amount);
+    return new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR", minimumFractionDigits: 0 }).format(amount);
   };
 
   return (

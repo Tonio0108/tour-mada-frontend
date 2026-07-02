@@ -337,7 +337,7 @@ export default function Paiements() {
                       {p.reservation?.tour?.nom_tour || t('tour.custom_tour')}
                     </TableCell>
                     <TableCell className="px-4 py-3 text-right font-medium text-primary">
-                      {parseFloat(p.montant).toLocaleString()} Ar
+                      {parseFloat(p.montant).toLocaleString()} €
                     </TableCell>
                     <TableCell className="px-4 py-3 text-center">
                       {getStatusBadge(p.statut)}
@@ -396,7 +396,7 @@ export default function Paiements() {
                   <div className="space-y-2">
                     <h4 className="text-xs font-bold uppercase text-muted-foreground">{t('admin_payments.details.payment_info')}</h4>
                     <div className="text-sm">
-                      <p className="text-2xl font-bold text-primary">{parseFloat(selectedRecord.montant).toLocaleString()} Ar</p>
+                      <p className="text-2xl font-bold text-primary">{parseFloat(selectedRecord.montant).toLocaleString()} €</p>
                       <p className="text-muted-foreground">{t('navbar.payments')} {selectedRecord.mode_paiement}</p>
                     </div>
                   </div>
@@ -453,7 +453,7 @@ export default function Paiements() {
             <DialogDescription>
               {t('admin_common.client')}: {selectedRecord?.reservation?.client?.prenom} {selectedRecord?.reservation?.client?.nom}
               <br />
-              {t('admin_common.amount')}: {parseFloat(selectedRecord?.montant || 0).toLocaleString()} Ar
+              {t('admin_common.amount')}: {parseFloat(selectedRecord?.montant || 0).toLocaleString()} €
             </DialogDescription>
           </DialogHeader>
 

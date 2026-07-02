@@ -94,7 +94,7 @@ export default function DetailTours() {
             <h2 className="text-2xl font-bold text-foreground">{tour.nom_tour}</h2>
             <div className="flex gap-2 mt-1">
               <Badge variant="outline" className="bg-primary text-primary-foreground border-none">
-                <DollarSign className="w-3 h-3 mr-1" /> {parseInt(tour.prix_par_pers)?.toLocaleString()} Ar
+                <DollarSign className="w-3 h-3 mr-1" /> {parseInt(tour.prix_par_pers)?.toLocaleString()} €
               </Badge>
               <Badge variant="secondary">
                 <Clock className="w-3 h-3 mr-1" /> {tour.duree_jours}j

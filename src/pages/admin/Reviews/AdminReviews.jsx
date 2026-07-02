@@ -3,8 +3,6 @@ import { useTranslation } from "react-i18next";
 import { 
   Star, 
   Trash2, 
-  CheckCircle2, 
-  XCircle, 
   Loader2, 
   Search,
   MessageSquare,
@@ -51,16 +49,6 @@ export default function AdminReviews() {
   useEffect(() => {
     fetchReviews();
   }, []);
-
-  const handleToggleStatus = async (id, currentStatus) => {
-    try {
-      await AvisApi.updateStatus(id, !currentStatus);
-      toast.success(currentStatus ? t('admin_reviews.toast.hidden_success') : t('admin_reviews.toast.published_success'));
-      fetchReviews();
-    } catch (err) {
-      toast.error(t('admin_reviews.toast.status_error'));
-    }
-  };
 
   const handleDelete = async (id) => {
     if (!window.confirm(t('admin_reviews.delete_confirm'))) return;
@@ -178,7 +166,7 @@ export default function AdminReviews() {
       ) : (
         <div className="grid grid-cols-1 gap-4">
           {filteredReviews.map((review) => (
-            <Card key={review.id_avis} className={`overflow-hidden border-l-4 ${review.publie ? "border-l-green-500" : "border-l-amber-500"}`}>
+            <Card key={review.id_avis} className="overflow-hidden border-l-4 border-l-green-500">
               <CardContent className="p-0">
                 <div className="p-5 flex flex-col md:flex-row gap-6">
                   <div className="flex-1 space-y-4">
@@ -197,9 +185,6 @@ export default function AdminReviews() {
                       </div>
                       <div className="flex flex-col items-end gap-1">
                         {renderStars(review.note)}
-                        <Badge variant={review.publie ? "success" : "warning"} className="text-[10px] uppercase px-1.5 py-0">
-                          {review.publie ? t('admin_reviews.published') : t('admin_reviews.hidden')}
-                        </Badge>
                       </div>
                     </div>
 
@@ -216,18 +201,6 @@ export default function AdminReviews() {
                   </div>
 
                   <div className="flex md:flex-col justify-end gap-2 shrink-0 md:border-l md:pl-6 md:min-w-[140px]">
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className={`h-9 text-xs justify-start ${review.publie ? "text-amber-600 hover:text-amber-700 hover:bg-amber-50" : "text-green-600 hover:text-green-700 hover:bg-green-50"}`}
-                      onClick={() => handleToggleStatus(review.id_avis, review.publie)}
-                    >
-                      {review.publie ? (
-                        <><XCircle className="w-3.5 h-3.5 mr-2" /> {t('admin_reviews.hide')}</>
-                      ) : (
-                        <><CheckCircle2 className="w-3.5 h-3.5 mr-2" /> {t('admin_reviews.publish')}</>
-                      )}
-                    </Button>
                     <Button 
                       variant="outline" 
                       size="sm" 

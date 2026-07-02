@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/Input";
 import { Separator } from "@/components/ui/separator";
-import { 
+import {
   Send, 
   ChevronLeft, 
   Paperclip, 
@@ -16,11 +16,23 @@ import {
   Play,
   Search,
   MoreVertical,
-  Maximize2
+  Maximize2,
+  Plus,
+  Trash2,
+  EyeOff,
+  MailOpen
 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { 
   Dialog,
   DialogContent,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
 import { cn } from "../../lib/utils";
 import { getAuthToken } from "../../lib/api";
@@ -41,15 +53,18 @@ export default function ChatInterface({ user, isAdmin, fullScreen = false }) {
   const [showSearch, setShowSearch] = useState(false);
   const scrollRef = useRef(null);
   const fileInputRef = useRef(null);
+  const [showNewConvDialog, setShowNewConvDialog] = useState(false);
+  const [clients, setClients] = useState([]);
+  const [confirmDeleteConv, setConfirmDeleteConv] = useState(null);
+  const [confirmDeleteMsg, setConfirmDeleteMsg] = useState(null);
+  const [convMenuOpen, setConvMenuOpen] = useState(null);
 
   const filteredMessages = messages.filter(m => 
     m.contenu?.toLowerCase().includes(messageSearchQuery.toLowerCase()) ||
     m.nomFichier?.toLowerCase().includes(messageSearchQuery.toLowerCase())
   );
 
-  const API_URL = import.meta.env.VITE_API_URL.replace('/api', '');
-
-  useEffect(() => { activeChatRef.current = activeChat; }, [activeChat]);
+  const API_URL = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3000';
 
   const fetchConversations = useCallback(async () => {
     if (!user) return;
@@ -61,6 +76,21 @@ export default function ChatInterface({ user, isAdmin, fullScreen = false }) {
       if (res.ok) setConversations(await res.json());
     } catch (e) { console.error(e); }
   }, [user]);
+
+  useEffect(() => { activeChatRef.current = activeChat; }, [activeChat]);
+
+  // Rejoindre la room active après reconnexion socket
+  useEffect(() => {
+    if (!socket) return;
+    const handleReconnect = () => {
+      fetchConversations();
+      if (activeChatRef.current) {
+        socket.emit("join_conversation", activeChatRef.current.id_conversation);
+      }
+    };
+    socket.on("connect", handleReconnect);
+    return () => socket.off("connect", handleReconnect);
+  }, [socket, fetchConversations]);
 
   // Charger les conversations dès le début
   useEffect(() => {
@@ -95,9 +125,35 @@ export default function ChatInterface({ user, isAdmin, fullScreen = false }) {
       socket.on("update_conversations", fetchConversations);
       socket.on("new_message", handleNewMessage);
 
+      socket.on("message_deleted", ({ messageId, conversationId: convId }) => {
+        if (activeChatRef.current && activeChatRef.current.id_conversation === convId) {
+          setMessages((prev) => prev.filter(m => m.id_message !== messageId));
+        }
+      });
+
+      socket.on("conversation_deleted", ({ conversationId: convId }) => {
+        setConversations((prev) => prev.filter(c => c.id_conversation !== convId));
+        if (activeChatRef.current?.id_conversation === convId) {
+          setActiveChat(null);
+          setMessages([]);
+        }
+      });
+
+      socket.on("messages_read", ({ conversationId: convId }) => {
+        if (activeChatRef.current && activeChatRef.current.id_conversation === convId) {
+          setMessages((prev) => prev.map(m => ({
+            ...m,
+            est_lu: String(m.id_expediteur) === String(user?.id_utilisateur) ? true : m.est_lu,
+          })));
+        }
+      });
+
       return () => {
         socket.off("update_conversations", fetchConversations);
         socket.off("new_message", handleNewMessage);
+        socket.off("message_deleted");
+        socket.off("conversation_deleted");
+        socket.off("messages_read");
       };
     }
   }, [socket, fetchConversations]);
@@ -122,15 +178,82 @@ export default function ChatInterface({ user, isAdmin, fullScreen = false }) {
     } catch (e) { console.error(e); }
   };
 
-  const markMessagesAsRead = async (conversationId) => {
+  const startConversation = async (participantId) => {
     const token = await getAuthToken();
     try {
-      await fetch(`${import.meta.env.VITE_API_URL}/chat/messages/${conversationId}/read`, {
+      const convRes = await fetch(`${import.meta.env.VITE_API_URL}/chat/conversation/find-or-create`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ participantId })
+      });
+      if (convRes.ok) {
+        const conv = await convRes.json();
+        fetchConversations();
+        fetchMessages(conv);
+      }
+    } catch (e) { console.error(e); }
+  };
+
+  const fetchClients = async () => {
+    const token = await getAuthToken();
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/client/with-reservations`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) setClients(await res.json());
+    } catch (e) { console.error(e); }
+  };
+
+  const markMessagesAsRead = (conversationId) => {
+    if (socket?.connected) {
+      socket.emit("mark_read", conversationId);
+    }
+    fetchConversations();
+  };
+
+  const handleMarkAsUnread = async (convId) => {
+    const token = await getAuthToken();
+    try {
+      await fetch(`${import.meta.env.VITE_API_URL}/chat/conversations/${convId}/unread`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` }
       });
-      fetchConversations();
     } catch (e) { console.error(e); }
+  };
+
+  const handleDeleteConversation = async (conv) => {
+    const token = await getAuthToken();
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/chat/conversations/${conv.id_conversation}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const { participantIds } = await res.json();
+        setConversations((prev) => prev.filter(c => c.id_conversation !== conv.id_conversation));
+        if (activeChat?.id_conversation === conv.id_conversation) {
+          setActiveChat(null);
+          setMessages([]);
+        }
+        socket?.emit('delete_conversation', { conversationId: conv.id_conversation, participantIds });
+      }
+    } catch (e) { console.error(e); }
+    setConfirmDeleteConv(null);
+  };
+
+  const handleDeleteMessage = async (msg) => {
+    const token = await getAuthToken();
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/chat/messages/${msg.id_message}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        setMessages((prev) => prev.filter(m => m.id_message !== msg.id_message));
+        socket?.emit('delete_message', { messageId: msg.id_message, conversationId: msg.id_conversation });
+      }
+    } catch (e) { console.error(e); }
+    setConfirmDeleteMsg(null);
   };
 
   const [selectedFile, setSelectedFile] = useState(null);
@@ -199,7 +322,7 @@ export default function ChatInterface({ user, isAdmin, fullScreen = false }) {
 
   const handleBack = () => { setActiveChat(null); setMessages([]); };
   
-  const getPartner = (conv) => conv.participants.find(p => String(p.id_utilisateur) !== String(user?.id_utilisateur));
+  const getPartner = (conv) => conv?.participants?.find(p => String(p.id_utilisateur) !== String(user?.id_utilisateur));
 
   const getPartnerInfo = (p) => {
     if (!p) return { name: t("chat.user_default") || "Utilisateur", email: "", id: null };
@@ -303,22 +426,29 @@ export default function ChatInterface({ user, isAdmin, fullScreen = false }) {
         activeChat ? "hidden md:flex md:w-[300px]" : "w-full md:w-[300px]"
       )}>
         <div className="p-4 border-b border-border space-y-4">
-          <div className="flex items-center justify-between">
-            {!isAdmin && (
-              <Button size="icon" variant="ghost" className="h-8 w-8 rounded-full"
-                onClick={async () => {
+          <div className="flex items-center gap-2">
+            <Button size="sm" className="h-9 gap-1.5 rounded-full text-xs font-semibold shadow-sm"
+              onClick={async () => {
+                if (!isAdmin) {
                   const token = await getAuthToken();
-                  const res = await fetch(`${import.meta.env.VITE_API_URL}/chat/conversation/find-or-create`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-                    body: JSON.stringify({ participantId: 1 })
-                  });
-                  if (res.ok) fetchConversations();
-                }}
-              >
-                <MessageCircle className="w-4 h-4" />
-              </Button>
-            )}
+                  try {
+                    const adminRes = await fetch(`${import.meta.env.VITE_API_URL}/chat/admin`, {
+                      headers: { Authorization: `Bearer ${token}` }
+                    });
+                    if (adminRes.ok) {
+                      const admin = await adminRes.json();
+                      if (admin) startConversation(admin.id_utilisateur);
+                    }
+                  } catch (e) { console.error(e); }
+                } else {
+                  fetchClients();
+                  setShowNewConvDialog(true);
+                }
+              }}
+            >
+              <Plus className="w-4 h-4" />
+              {t("chat.new_discussion") || "Nouvelle discussion"}
+            </Button>
           </div>
           <div className="relative group">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -341,39 +471,57 @@ export default function ChatInterface({ user, isAdmin, fullScreen = false }) {
             
             return (
               <div 
-                key={c.id_conversation} 
-                onClick={() => fetchMessages(c)}
+                key={c.id_conversation}
                 className={cn(
-                  "flex items-center gap-3 p-3.5 cursor-pointer transition-all border-b border-border/50 relative",
+                  "flex items-center gap-3 p-3.5 cursor-pointer transition-all border-b border-border/50 relative group",
                   isActive ? "bg-primary/5 after:absolute after:right-0 after:top-2 after:bottom-2 after:w-1 after:bg-primary after:rounded-l-full" : "hover:bg-accent/30",
                   isUnread && "bg-primary/5"
                 )}
               >
-                <div className="relative shrink-0">
-                  <div className={cn(
-                    "w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-colors",
-                    isActive ? "bg-primary text-primary-foreground" : "bg-primary/10 text-primary"
-                  )}>
-                    {partner.name[0]}
+                <div className="flex-1 flex items-center gap-3 min-w-0" onClick={() => fetchMessages(c)}>
+                  <div className="relative shrink-0">
+                    <div className={cn(
+                      "w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-colors",
+                      isActive ? "bg-primary text-primary-foreground" : "bg-primary/10 text-primary"
+                    )}>
+                      {partner.name[0]}
+                    </div>
+                    {isPartnerOnline && (
+                      <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-green-500 border-2 border-white shadow-sm" />
+                    )}
+                    {isUnread && (
+                      <span className="absolute top-0 right-0 h-2.5 w-2.5 rounded-full bg-primary border-2 border-background" />
+                    )}
                   </div>
-                  {isPartnerOnline && (
-                    <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-green-500 border-2 border-white shadow-sm" />
-                  )}
-                  {isUnread && (
-                    <span className="absolute top-0 right-0 h-2.5 w-2.5 rounded-full bg-primary border-2 border-background" />
-                  )}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between gap-2 mb-0.5">
-                    <span className={cn("text-sm font-semibold truncate", isActive ? "text-primary" : "text-foreground")}>{partner.name}</span>
-                    <span className="text-[10px] text-muted-foreground whitespace-nowrap">
-                      {lastMessage ? new Date(lastMessage.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : ""}
-                    </span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-2 mb-0.5">
+                      <span className={cn("text-sm font-semibold truncate", isActive ? "text-primary" : "text-foreground")}>{partner.name}</span>
+                      <span className="text-[10px] text-muted-foreground whitespace-nowrap">
+                        {lastMessage ? new Date(lastMessage.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : ""}
+                      </span>
+                    </div>
+                    <p className={cn("text-xs truncate", isUnread ? "text-foreground font-medium" : "text-muted-foreground")}>
+                      {getMessagePreview(lastMessage)}
+                    </p>
                   </div>
-                  <p className={cn("text-xs truncate", isUnread ? "text-foreground font-medium" : "text-muted-foreground")}>
-                    {getMessagePreview(lastMessage)}
-                  </p>
                 </div>
+                <DropdownMenu open={convMenuOpen === c.id_conversation} onOpenChange={(open) => setConvMenuOpen(open ? c.id_conversation : null)}>
+                  <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                    <Button variant="ghost" size="icon" className="h-7 w-7 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                      <MoreVertical className="h-3.5 w-3.5 text-muted-foreground" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-44" onClick={(e) => e.stopPropagation()}>
+                    <DropdownMenuItem onClick={() => { handleMarkAsUnread(c.id_conversation); setConvMenuOpen(null); }}>
+                      <EyeOff className="h-4 w-4 mr-2" />
+                      Marquer non lu
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => { setConfirmDeleteConv(c); setConvMenuOpen(null); }} className="text-destructive focus:text-destructive">
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Supprimer la discussion
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             );
           })}
@@ -450,17 +598,32 @@ export default function ChatInterface({ user, isAdmin, fullScreen = false }) {
                         </span>
                       </div>
                     )}
-                    <div className={cn("flex w-full animate-in fade-in slide-in-from-bottom-1 duration-300", isMe ? "justify-end" : "justify-start")}>
+                    <div className={cn("flex w-full group/message animate-in fade-in slide-in-from-bottom-1 duration-300", isMe ? "justify-end" : "justify-start")}>
                       <div className={cn(
                         "flex flex-col gap-1 max-w-[85%] md:max-w-[70%]",
                         isMe ? "items-end" : "items-start"
                       )}>
                         <div className={cn(
-                          "px-3.5 py-2 text-sm shadow-sm transition-all font-medium tracking-tight",
+                          "px-3.5 py-2 text-sm shadow-sm transition-all font-medium tracking-tight relative",
                           isMe 
                             ? "bg-primary text-primary-foreground rounded-2xl rounded-tr-sm" 
                             : "bg-white text-foreground rounded-2xl rounded-tl-sm border border-border"
                         )}>
+                          {isMe && (
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon" className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-background border border-border shadow-sm opacity-0 group-hover/message:opacity-100 transition-opacity">
+                                  <MoreVertical className="h-3 w-3 text-muted-foreground" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end" className="w-40">
+                                <DropdownMenuItem onClick={() => setConfirmDeleteMsg(m)} className="text-destructive focus:text-destructive">
+                                  <Trash2 className="h-4 w-4 mr-2" />
+                                  Supprimer
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          )}
                           {renderMessageContent(m)}
                         </div>
                         <div className="flex items-center gap-1.5 px-1 opacity-50">
@@ -572,6 +735,71 @@ export default function ChatInterface({ user, isAdmin, fullScreen = false }) {
         .custom-scrollbar::-webkit-scrollbar-thumb { background: hsl(var(--border)); border-radius: 0px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: hsl(var(--primary)); }
       `}} />
+
+      <Dialog open={!!confirmDeleteConv} onOpenChange={() => setConfirmDeleteConv(null)}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Supprimer la discussion</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            Êtes-vous sûr de vouloir supprimer cette discussion ? Cette action est irréversible.
+          </p>
+          <div className="flex justify-end gap-2 mt-4">
+            <Button variant="outline" size="sm" onClick={() => setConfirmDeleteConv(null)}>Annuler</Button>
+            <Button variant="destructive" size="sm" onClick={() => handleDeleteConversation(confirmDeleteConv)}>Supprimer</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!confirmDeleteMsg} onOpenChange={() => setConfirmDeleteMsg(null)}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Supprimer le message</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            Êtes-vous sûr de vouloir supprimer ce message ? Cette action est irréversible.
+          </p>
+          <div className="flex justify-end gap-2 mt-4">
+            <Button variant="outline" size="sm" onClick={() => setConfirmDeleteMsg(null)}>Annuler</Button>
+            <Button variant="destructive" size="sm" onClick={() => handleDeleteMessage(confirmDeleteMsg)}>Supprimer</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showNewConvDialog} onOpenChange={(open) => { setShowNewConvDialog(open); if (!open) setClients([]); }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{t("chat.select_client") || "Sélectionner un client"}</DialogTitle>
+          </DialogHeader>
+          <div className="max-h-80 overflow-y-auto space-y-1 -mx-6 -mb-6 px-6 pb-6 pt-2">
+            {clients.length === 0 ? (
+              <div className="py-8 text-center text-sm text-muted-foreground">
+                {t("chat.no_clients") || "Aucun client disponible"}
+              </div>
+            ) : (
+              clients.map((client) => (
+                <button
+                  key={client.id_client}
+                  onClick={() => {
+                    startConversation(client.utilisateur.id_utilisateur);
+                    setShowNewConvDialog(false);
+                    setClients([]);
+                  }}
+                  className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors text-left"
+                >
+                  <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-primary text-xs font-bold shrink-0">
+                    {client.prenom[0]}{client.nom[0]}
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-sm font-semibold truncate">{client.prenom} {client.nom}</div>
+                    <div className="text-xs text-muted-foreground truncate">{client.utilisateur.email}</div>
+                  </div>
+                </button>
+              ))
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={!!selectedMedia} onOpenChange={() => setSelectedMedia(null)}>
         <DialogContent className="max-w-4xl p-0 overflow-hidden bg-black/95 border-none">

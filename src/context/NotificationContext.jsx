@@ -1,7 +1,8 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { io } from 'socket.io-client';
 import { toast } from 'sonner';
-import { getAuthToken, NotificationApi } from '../../lib/api';
+import { getAuthToken } from '../../lib/api';
+import { notificationService as NotificationApi } from '@lib';
 
 const NotificationContext = createContext();
 
@@ -46,7 +47,9 @@ export const NotificationProvider = ({ children, user }) => {
       socketInstance = io(import.meta.env.VITE_SOCKET_URL || 'http://localhost:3001', {
         auth: { token },
         reconnection: true,
-        reconnectionAttempts: Infinity,
+        reconnectionAttempts: 20,
+        reconnectionDelay: 1000,
+        reconnectionDelayMax: 10000,
       });
 
       socketInstance.on('connect', () => {
