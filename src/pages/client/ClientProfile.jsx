@@ -5,7 +5,7 @@ import {
 import { getAuthToken } from "../../../lib/api";
 import { useTranslation, Trans } from 'react-i18next';
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Input } from "@/components/ui/Input";
 import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
