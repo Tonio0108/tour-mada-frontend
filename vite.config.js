@@ -20,7 +20,6 @@ export default defineConfig({
     Sitemap({
       hostname: 'https://tourmada.mg',
       dynamicRoutes: ['/tours', '/login', '/register'],
-      outDir: 'dist'
     })
   ],
   resolve: {
