@@ -100,8 +100,8 @@ export default function TourDetails() {
     </div>
   );
 
-  const images = tour.photos?.filter(m => !m.url.match(/\.(mp4|avi|mov|wmv|flv|webm)$/i)) || [];
-  const videos = tour.photos?.filter(m => m.url.match(/\.(mp4|avi|mov|wmv|flv|webm)$/i)) || [];
+  const images = tour.photos?.filter(m => m.type === 'image' || !m.url.match(/\.(mp4|avi|mov|wmv|flv|webm)$/i)) || [];
+  const videos = tour.photos?.filter(m => m.type === 'video' || m.url.match(/\.(mp4|avi|mov|wmv|flv|webm)$/i)) || [];
 
   return (
     <div className="min-h-screen bg-muted/30 pb-20 overflow-x-hidden">

@@ -32,7 +32,7 @@ export const TourSection = ({ tours }) => {
           ) : tours.length > 0 ? (
             tours.slice(0, 3).map((tour) => {
               const firstImage = tour.photos?.find(photo => 
-                photo.url.match(/\.(jpg|jpeg|png|gif|webp|bmp)$/i)
+                photo.type === 'image' || photo.url.match(/\.(jpg|jpeg|png|gif|webp|bmp)$/i)
               );
 
               return (

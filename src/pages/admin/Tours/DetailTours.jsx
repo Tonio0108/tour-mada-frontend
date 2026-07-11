@@ -76,11 +76,11 @@ export default function DetailTours() {
   );
 
   const images = tour.photos?.filter(photo => 
-    photo.url.match(/\.(jpg|jpeg|png|gif|webp)$/i) || photo.type?.startsWith('image/')
+    photo.type === 'image' || photo.url.match(/\.(jpg|jpeg|png|gif|webp)$/i)
   ) || [];
 
   const videos = tour.photos?.filter(photo => 
-    photo.url.match(/\.(mp4|avi|mov|wmv|flv|webm)$/i) || photo.type?.startsWith('video/')
+    photo.type === 'video' || photo.url.match(/\.(mp4|avi|mov|wmv|flv|webm)$/i)
   ) || [];
 
   return (

@@ -25,7 +25,6 @@ import {
   CheckCheck,
   Plus
 } from "lucide-react";
-import { io } from "socket.io-client";
 import { getAuthToken } from "../lib/api";
 import { cn } from "../lib/utils";
 import { useTranslation } from "react-i18next";
@@ -34,12 +33,11 @@ import { getFileUrl } from "../src/utils/imageUrl";
 
 export function ChatSidebar({ open, onOpenChange, user, isAdmin }) {
   const { t } = useTranslation();
-  const { markChatNotificationsAsRead } = useNotifications();
+  const { markChatNotificationsAsRead, socket } = useNotifications();
   const [conversations, setConversations] = useState([]);
   const [activeChat, setActiveChat] = useState(null);
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState("");
-  const [socket, setSocket] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [messageSearchQuery, setMessageSearchQuery] = useState("");
   const [showSearch, setShowSearch] = useState(false);
@@ -60,32 +58,23 @@ export function ChatSidebar({ open, onOpenChange, user, isAdmin }) {
   );
 
   useEffect(() => {
-    if (open && user) {
-      const initSocket = async () => {
-        const token = await getAuthToken();
-        const newSocket = io(import.meta.env.VITE_SOCKET_URL || "http://localhost:3001", {
-          auth: { token },
-          transports: ['websocket']
-        });
+    if (!open || !socket || !user) return;
+    fetchConversations();
 
-        newSocket.on("new_message", (msg) => {
-          if (activeChatRef.current && msg.id_conversation === activeChatRef.current.id_conversation) {
-            setMessages(prev => [...prev, msg]);
-            markMessagesAsRead(msg.id_conversation);
-          }
-          fetchConversations();
-        });
-
-        setSocket(newSocket);
-        fetchConversations();
-      };
-      initSocket();
-    }
-    
-    return () => {
-      if (socket) socket.disconnect();
+    const handleNewMessage = (msg) => {
+      if (activeChatRef.current && msg.id_conversation === activeChatRef.current.id_conversation) {
+        setMessages(prev => [...prev, msg]);
+        markMessagesAsRead(msg.id_conversation);
+      }
+      fetchConversations();
     };
-  }, [open, user]);
+
+    socket.on("new_message", handleNewMessage);
+
+    return () => {
+      socket.off("new_message", handleNewMessage);
+    };
+  }, [open, socket, user]);
 
   useEffect(() => {
     if (scrollRef.current && !messageSearchQuery) {
@@ -141,7 +130,7 @@ export function ChatSidebar({ open, onOpenChange, user, isAdmin }) {
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
-    if ((!message.trim() && !selectedFile) || !socket || !activeChat) return;
+    if ((!message.trim() && !selectedFile) || !socket?.connected || !activeChat) return;
 
     const content = message.trim();
     const file = selectedFile;

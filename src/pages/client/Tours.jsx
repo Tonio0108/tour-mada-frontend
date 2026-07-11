@@ -159,7 +159,7 @@ const Tours = () => {
       {filteredTours.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredTours.map((tour) => {
-            const firstImage = tour.photos?.find(p => p.url.match(/\.(jpg|jpeg|png|webp)$/i));
+            const firstImage = tour.photos?.find(p => p.type === 'image' || p.url.match(/\.(jpg|jpeg|png|webp)$/i));
             return (
               <Card key={tour.id_tour} className="overflow-hidden group flex flex-col h-full text-left p-0 border-border bg-card shadow-sm transition-shadow hover:shadow-md">
                 <div className="relative aspect-[16/10] overflow-hidden shrink-0">

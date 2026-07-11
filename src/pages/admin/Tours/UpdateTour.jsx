@@ -105,7 +105,7 @@ export default function UpdateTour() {
         const data = await res.json();
 
         const existingMedias = data.photos?.map((p) => {
-          const isVideo = p.url.match(/\.(mp4|avi|mov|wmv|flv|webm)$/i);
+          const isVideo = p.type === 'video' || p.url.match(/\.(mp4|avi|mov|wmv|flv|webm)$/i);
           return {
             id: p.id_photo,
             name: p.url.split("/").pop(),

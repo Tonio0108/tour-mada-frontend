@@ -262,7 +262,7 @@ export default function ChatInterface({ user, isAdmin, fullScreen = false }) {
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
-    if ((!message.trim() && !selectedFile) || !socket || !activeChat) return;
+    if ((!message.trim() && !selectedFile) || !socket?.connected || !activeChat) return;
 
     const messageContent = message.trim();
     const fileToUpload = selectedFile;

@@ -222,7 +222,7 @@ export default function Tours() {
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded bg-muted flex items-center justify-center overflow-hidden">
                           {(() => {
-                            const firstImage = tour.photos?.find(p => !p.url.match(/\.(mp4|avi|mov|wmv|flv|webm)$/i));
+                            const firstImage = tour.photos?.find(p => p.type === 'image' || !p.url.match(/\.(mp4|avi|mov|wmv|flv|webm)$/i));
                             if (firstImage) {
                               return <img src={getImageUrl(firstImage.url)} className="w-full h-full object-cover" alt="" />;
                             }
