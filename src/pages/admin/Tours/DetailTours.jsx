@@ -2,6 +2,7 @@ import { Trash2, Pencil, ChevronDown, PlayCircle, Loader, Calendar, Clock, Dolla
 import { useEffect, useState } from "react";
 import { Link, useParams, useNavigate } from "react-router";
 import { Tours } from "../../../../lib/api";
+import { getImageUrl, getFileUrl } from "../../../../src/utils/imageUrl";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -199,7 +200,7 @@ export default function DetailTours() {
                 images.map((photo) => (
                   <div key={photo.id_photo} className="aspect-video rounded overflow-hidden border">
                     <img
-                      src={`${url.replace('/api', '')}${photo.url}`}
+                      src={getImageUrl(photo.url)}
                       className="w-full h-full object-cover"
                       alt=""
                     />
@@ -223,13 +224,13 @@ export default function DetailTours() {
                   <div
                     key={video.id_photo}
                     className="relative aspect-video rounded overflow-hidden border cursor-pointer group"
-                    onClick={() => setVideoModal({ open: true, url: `${url.replace('/api', '')}${video.url}` })}
+                    onClick={() => setVideoModal({ open: true, url: getFileUrl(video.url) })}
                   >
                     <div className="absolute inset-0 bg-black/40 flex items-center justify-center z-10 opacity-0 group-hover:opacity-100 transition-opacity">
                       <PlayCircle className="w-10 h-10 text-white" />
                     </div>
                     <video className="w-full h-full object-cover" preload="metadata">
-                      <source src={`${url.replace('/api', '')}${video.url}#t=0.1`} />
+                      <source src={`${getFileUrl(video.url)}#t=0.1`} />
                     </video>
                   </div>
                 ))}

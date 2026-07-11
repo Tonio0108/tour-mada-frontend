@@ -37,6 +37,7 @@ import {
 import { cn } from "../../lib/utils";
 import { getAuthToken } from "../../lib/api";
 import { useNotifications } from "../context/NotificationContext";
+import { getFileUrl } from "../utils/imageUrl";
 
 export default function ChatInterface({ user, isAdmin, fullScreen = false }) {
   const { t } = useTranslation();
@@ -64,7 +65,7 @@ export default function ChatInterface({ user, isAdmin, fullScreen = false }) {
     m.nomFichier?.toLowerCase().includes(messageSearchQuery.toLowerCase())
   );
 
-  const API_URL = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3000';
+
 
   const fetchConversations = useCallback(async () => {
     if (!user) return;
@@ -359,13 +360,13 @@ export default function ChatInterface({ user, isAdmin, fullScreen = false }) {
       return (
         <div className="space-y-2 relative group">
           <div className="relative overflow-hidden rounded-lg">
-            <img src={`${API_URL}${m.fichierUrl}`} alt={m.nomFichier} loading="lazy"
+            <img src={getFileUrl(m.fichierUrl)} alt={m.nomFichier} loading="lazy"
               className="max-w-full max-h-80 object-cover cursor-pointer hover:opacity-90 transition-opacity border border-border"
               onClick={() => setSelectedMedia(m)}
             />
             <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
               <Button variant="secondary" size="icon" className="h-8 w-8 rounded-full" asChild>
-                <a href={`${API_URL}${m.fichierUrl}`} download onClick={(e) => e.stopPropagation()}>
+                <a href={getFileUrl(m.fichierUrl)} download onClick={(e) => e.stopPropagation()}>
                   <Download className="w-4 h-4" />
                 </a>
               </Button>
@@ -382,7 +383,7 @@ export default function ChatInterface({ user, isAdmin, fullScreen = false }) {
       return (
         <div className="space-y-2 relative group">
           <div className="relative cursor-pointer w-full rounded-lg overflow-hidden" onClick={() => setSelectedMedia(m)}>
-            <video src={`${API_URL}${m.fichierUrl}`} preload="metadata" className="w-full max-h-[250px] object-cover bg-black border border-border" />
+            <video src={getFileUrl(m.fichierUrl)} preload="metadata" className="w-full max-h-[250px] object-cover bg-black border border-border" />
             <div className="absolute inset-0 flex items-center justify-center bg-black/10 group-hover:bg-black/30 transition-colors">
                 <div className="h-12 w-12 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center border border-white/20">
                   <Play className="w-6 h-6 text-white fill-current" />
@@ -396,7 +397,7 @@ export default function ChatInterface({ user, isAdmin, fullScreen = false }) {
     if (m.type === 'FILE') {
       return (
         <div className="space-y-2">
-          <a href={`${API_URL}${m.fichierUrl}`} target="_blank" rel="noopener noreferrer"
+          <a href={getFileUrl(m.fichierUrl)} target="_blank" rel="noopener noreferrer"
             className="flex items-center gap-3 p-3 bg-muted/40 rounded-lg hover:bg-muted/60 transition-colors border border-border"
           >
             <div className="h-9 w-9 bg-primary/10 rounded-full flex items-center justify-center shrink-0">
@@ -814,14 +815,14 @@ export default function ChatInterface({ user, isAdmin, fullScreen = false }) {
             </Button>
             {selectedMedia?.type === 'IMAGE' && (
               <img 
-                src={`${API_URL}${selectedMedia.fichierUrl}`} 
+                src={getFileUrl(selectedMedia.fichierUrl)} 
                 className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl animate-in zoom-in-95 duration-300" 
                 alt={selectedMedia.nomFichier}
               />
             )}
             {selectedMedia?.type === 'VIDEO' && (
               <video 
-                src={`${API_URL}${selectedMedia.fichierUrl}`} 
+                src={getFileUrl(selectedMedia.fichierUrl)} 
                 controls 
                 autoPlay 
                 className="max-w-full max-h-[85vh] rounded-lg shadow-2xl animate-in zoom-in-95 duration-300"
@@ -831,7 +832,7 @@ export default function ChatInterface({ user, isAdmin, fullScreen = false }) {
                <span className="text-xs text-white font-medium truncate max-w-[200px]">{selectedMedia?.nomFichier}</span>
                <Separator orientation="vertical" className="h-4 bg-white/20" />
                <a 
-                href={`${API_URL}${selectedMedia?.fichierUrl}`} 
+                href={getFileUrl(selectedMedia?.fichierUrl)} 
                 download 
                 className="text-white/80 hover:text-white transition-colors"
                 onClick={(e) => e.stopPropagation()}

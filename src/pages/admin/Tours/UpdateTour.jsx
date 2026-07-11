@@ -17,6 +17,7 @@ import {
   DollarSign,
 } from "lucide-react";
 import { getAuthToken } from "../../../../lib/api";
+import { getImageUrl } from "../../../../src/utils/imageUrl";
 import { Input } from "../../../../components/ui/Input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -108,7 +109,7 @@ export default function UpdateTour() {
           return {
             id: p.id_photo,
             name: p.url.split("/").pop(),
-            url: `${url.replace('/api', '')}${p.url}`,
+            url: getImageUrl(p.url),
             type: isVideo ? 'video/mp4' : 'image/jpeg',
             isExisting: true
           };

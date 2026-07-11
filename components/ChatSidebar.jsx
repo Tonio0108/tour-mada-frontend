@@ -30,6 +30,7 @@ import { getAuthToken } from "../lib/api";
 import { cn } from "../lib/utils";
 import { useTranslation } from "react-i18next";
 import { useNotifications } from "../src/context/NotificationContext";
+import { getFileUrl } from "../src/utils/imageUrl";
 
 export function ChatSidebar({ open, onOpenChange, user, isAdmin }) {
   const { t } = useTranslation();
@@ -50,8 +51,6 @@ export function ChatSidebar({ open, onOpenChange, user, isAdmin }) {
   const scrollRef = useRef(null);
   const fileInputRef = useRef(null);
   const activeChatRef = useRef(null);
-
-  const API_URL = import.meta.env.VITE_API_URL.replace('/api', '');
 
   useEffect(() => { activeChatRef.current = activeChat; }, [activeChat]);
 
@@ -358,9 +357,9 @@ export function ChatSidebar({ open, onOpenChange, user, isAdmin }) {
                         isMe ? "bg-primary text-primary-foreground rounded-2xl rounded-tr-sm" : "bg-muted rounded-2xl rounded-tl-sm"
                       )}>
                         {m.type === 'IMAGE' ? (
-                          <img src={`${API_URL}${m.fichierUrl}`} className="rounded-lg max-w-full" alt="" />
+                          <img src={getFileUrl(m.fichierUrl)} className="rounded-lg max-w-full" alt="" />
                         ) : m.type === 'FILE' ? (
-                          <a href={`${API_URL}${m.fichierUrl}`} target="_blank" className="flex items-center gap-2 underline">
+                          <a href={getFileUrl(m.fichierUrl)} target="_blank" className="flex items-center gap-2 underline">
                             <FileIcon className="w-4 h-4" /> {highlightText(m.nomFichier, messageSearchQuery)}
                           </a>
                         ) : (

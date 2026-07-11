@@ -50,13 +50,13 @@ import {
 import { SEO } from "../../components/SEO";
 import ReviewSection from "../../components/ReviewSection";
 import TourDetailsSkeleton from "@/components/TourDetailsSkeleton";
+import { getImageUrl, getFileUrl } from "../../utils/imageUrl";
 
 export default function TourDetails() {
   const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const url = import.meta.env.VITE_API_URL;
-  const baseUrl = url.replace('/api', '');
   const [activeTab, setActiveTab] = useState("description");
   const { isAdmin } = useRole();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -108,20 +108,20 @@ export default function TourDetails() {
       <SEO 
         title={tour.nom_tour} 
         description={tour.description?.substring(0, 160) || t('home.seo.description')}
-        image={images.length > 0 ? `${baseUrl}${images[0].url}` : "/logo.jpg"}
+        image={images.length > 0 ? getImageUrl(images[0].url) : "/logo.jpg"}
         keywords={`${tour.nom_tour}, voyage madagascar, circuit touristique, ${tour.duree_jours} ${t('tour_details.days')}`}
       />
       {/* Hero Section */}
       <div className="relative h-80 w-full overflow-hidden bg-black">
         {images.length > 0 ? (
           <img 
-            src={`${baseUrl}${images[0].url}`} 
+            src={getImageUrl(images[0].url)} 
             alt={tour.nom_tour} 
             className="w-full h-full object-cover"
           />
         ) : videos.length > 0 ? (
           <video 
-            src={`${baseUrl}${videos[0].url}`} 
+            src={getFileUrl(videos[0].url)} 
             autoPlay 
             muted 
             loop 
@@ -189,10 +189,10 @@ export default function TourDetails() {
                   {images.slice(1).map((img) => (
                     <div 
                       key={img.id_photo} 
-                      onClick={() => setMediaModal({ open: true, url: `${baseUrl}${img.url}`, type: "image" })}
+                      onClick={() => setMediaModal({ open: true, url: getImageUrl(img.url), type: "image" })}
                       className="aspect-square rounded-md overflow-hidden border cursor-pointer group relative"
                     >
-                      <img src={`${baseUrl}${img.url}`} className="w-full h-full object-cover group-hover:scale-105 transition-transform" alt="Gallery" />
+                      <img src={getImageUrl(img.url)} className="w-full h-full object-cover group-hover:scale-105 transition-transform" alt="Gallery" />
                       <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
                         <Maximize2 className="w-5 h-5 text-white" />
                       </div>
@@ -201,7 +201,7 @@ export default function TourDetails() {
                   {videos.map((vid) => (
                     <div 
                       key={vid.id_photo} 
-                      onClick={() => setMediaModal({ open: true, url: `${baseUrl}${vid.url}`, type: "video" })}
+                      onClick={() => setMediaModal({ open: true, url: getFileUrl(vid.url), type: "video" })}
                       onMouseEnter={(e) => e.currentTarget.querySelector('video').play()}
                       onMouseLeave={(e) => {
                         const v = e.currentTarget.querySelector('video');
@@ -211,7 +211,7 @@ export default function TourDetails() {
                       className="aspect-square rounded-md overflow-hidden relative cursor-pointer border bg-black flex items-center justify-center group"
                     >
                       <video 
-                        src={`${baseUrl}${vid.url}`} 
+                        src={getFileUrl(vid.url)} 
                         muted 
                         playsInline 
                         className="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition-opacity"

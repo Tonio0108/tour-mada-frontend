@@ -3,6 +3,7 @@ import { Link, useSearchParams } from "react-router";
 import trekking from "../../assets/trekking.jpg";
 import { Tours as ToursApi } from "../../../lib/api";
 import { useTranslation } from 'react-i18next';
+import { getImageUrl } from "../../utils/imageUrl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/Input";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -163,7 +164,7 @@ const Tours = () => {
               <Card key={tour.id_tour} className="overflow-hidden group flex flex-col h-full text-left p-0 border-border bg-card shadow-sm transition-shadow hover:shadow-md">
                 <div className="relative aspect-[16/10] overflow-hidden shrink-0">
                   <img
-                    src={firstImage ? `${url.replace('/api', '')}${firstImage.url}` : trekking}
+                    src={firstImage ? getImageUrl(firstImage.url) : trekking}
                     alt={tour.nom_tour}
                     className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105"
                     onError={(e) => { e.target.src = trekking; }}

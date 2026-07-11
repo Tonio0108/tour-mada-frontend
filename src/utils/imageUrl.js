@@ -12,3 +12,6 @@ export const getImageUrl = (imageUrl) => {
   // Retourner l'URL complète de l'image
   return `${BASE_URL}${imageUrl}`;
 };
+
+// Alias pour les fichiers non-image (vidéos, documents, etc.)
+export const getFileUrl = getImageUrl;
